@@ -8,227 +8,113 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root {
-  --primary: #1a2d4a;
-  --primary-light: #243d63;
-  --accent: #ff6b35;
-  --success: #28a745;
-  --danger: #dc3545;
-  --warning: #ffc107;
-  --info: #17a2b8;
-  --bg: #f0f4f8;
-  --card-bg: #ffffff;
-  --text: #2c3e50;
-  --text-muted: #6c757d;
-  --border: #dee2e6;
-  --shadow: 0 2px 12px rgba(0,0,0,0.08);
-  --radius: 10px;
-  --sidebar-width: 260px;
+  --primary: #1a2d4a; --primary-light: #243d63; --accent: #ff6b35; --success: #28a745;
+  --danger: #dc3545; --warning: #ffc107; --info: #17a2b8; --bg: #f0f4f8;
+  --text: #2c3e50; --text-muted: #6c757d; --border: #dee2e6; --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --radius: 10px; --sidebar-width: 260px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden;}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
 
 /* Sidebar */
-.sidebar{width:var(--sidebar-width);background:var(--primary);color:white;display:flex;flex-direction:column;position:fixed;height:100vh;transition:all 0.3s ease;z-index:1000;}
+.sidebar{width:var(--sidebar-width);background:var(--primary);color:white;display:flex;flex-direction:column;position:fixed;height:100vh;z-index:1000;}
 .sidebar-header{padding:25px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,0.1);}
-.sidebar-header i{font-size:24px;color:var(--accent);}
-.sidebar-header h2{font-size:18px;font-weight:600;letter-spacing:0.5px;}
-.sidebar-menu{list-style:none;padding:20px 0;flex-grow:1;overflow-y:auto;}
-.sidebar-menu li{padding:12px 25px;display:flex;align-items:center;gap:15px;cursor:pointer;transition:all 0.2s;color:rgba(255,255,255,0.7);font-size:15px;position:relative;}
-.sidebar-menu li:hover{background:var(--primary-light);color:white;}
-.sidebar-menu li.active{background:var(--primary-light);color:white;border-left:4px solid var(--accent);}
-.sidebar-menu li i{width:20px;text-align:center;font-size:18px;}
-.sidebar-menu li .badge-nav{position:absolute;right:20px;background:var(--danger);color:white;font-size:10px;padding:2px 6px;border-radius:10px;font-weight:bold;}
+.sidebar-menu{list-style:none;padding:20px 0;flex-grow:1;}
+.sidebar-menu li{padding:12px 25px;display:flex;align-items:center;gap:15px;cursor:pointer;transition:0.2s;color:rgba(255,255,255,0.7);}
+.sidebar-menu li:hover, .sidebar-menu li.active{background:var(--primary-light);color:white;}
+.sidebar-menu li.active{border-left:4px solid var(--accent);}
+.sidebar-footer{padding:20px;border-top:1px solid rgba(255,255,255,0.1);}
 
-/* Main Content */
-.main-content{flex-grow:1;margin-left:var(--sidebar-width);padding:30px;transition:all 0.3s ease;max-width:calc(100% - var(--sidebar-width));}
+/* Main */
+.main-content{flex-grow:1;margin-left:var(--sidebar-width);padding:30px;width:calc(100% - var(--sidebar-width));}
 header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;}
-.page-title h1{font-size:24px;font-weight:700;color:var(--primary);margin-bottom:5px;}
-.page-title p{color:var(--text-muted);font-size:14px;}
-.header-actions{display:flex;align-items:center;gap:20px;}
-.search-bar{position:relative;}
-.search-bar i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px;}
-.search-bar input{padding:10px 15px 10px 35px;border:1px solid var(--border);border-radius:8px;width:250px;font-size:14px;outline:none;transition:all 0.3s;}
-.search-bar input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(26,45,74,0.1);}
-.notifications{position:relative;cursor:pointer;font-size:20px;color:var(--text-muted);}
-.notifications .badge-dot{position:absolute;top:-2px;right:-2px;width:10px;height:10px;background:var(--danger);border-radius:50%;border:2px solid var(--bg);display:none;}
-.user-profile{display:flex;align-items:center;gap:12px;background:white;padding:6px 12px;border-radius:50px;box-shadow:var(--shadow);cursor:pointer;}
-.user-info{text-align:right;}
-.user-info .name{display:block;font-size:13px;font-weight:600;}
-.user-info .role{display:block;font-size:11px;color:var(--text-muted);}
-.avatar{width:32px;height:32px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px;}
-
-/* Dashboard Stats */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:20px;margin-bottom:30px;}
-.stat-card{background:white;padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);display:flex;align-items:center;gap:15px;transition:transform 0.2s;}
-.stat-card:hover{transform:translateY(-5px);}
-.stat-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:white;}
-.stat-info h3{font-size:24px;font-weight:700;margin-bottom:2px;}
-.stat-info p{color:var(--text-muted);font-size:13px;font-weight:500;}
-
-/* Dashboard Grid */
-.dashboard-grid{display:grid;grid-template-columns:2fr 1fr;gap:25px;margin-bottom:30px;}
-.card{background:white;padding:25px;border-radius:var(--radius);box-shadow:var(--shadow);height:100%;}
-.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
-.card-header h3{font-size:17px;font-weight:600;color:var(--primary);display:flex;align-items:center;gap:10px;}
-.card-header h3 i{color:var(--accent);}
+.card{background:white;padding:25px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:25px;}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
 
 /* Tables */
 .table-container{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;}
-th{text-align:left;padding:12px 15px;border-bottom:2px solid var(--border);color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:0.5px;}
-td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
-tr:hover{background-color:rgba(0,0,0,0.01);}
+th{text-align:left;padding:12px;border-bottom:2px solid var(--border);font-size:11px;color:var(--text-muted);text-transform:uppercase;}
+td{padding:12px;border-bottom:1px solid var(--border);font-size:13px;}
 
-.badge{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;display:inline-block;text-align:center;min-width:80px;}
-.badge-success{background-color:#e8f5e9;color:var(--success);}
-.badge-danger{background-color:#ffebee;color:var(--danger);}
-.badge-warning{background-color:#fff8e1;color:#f57f17;}
-.badge-info{background-color:#e0f7fa;color:var(--info);}
-
-/* Progress Bars */
-.progress-container{width:100%;background:#eee;border-radius:10px;height:6px;margin-top:5px;position:relative;}
-.progress-bar{height:100%;border-radius:10px;background:var(--primary);transition:width 0.5s;}
-
-/* Action Buttons */
-.action-btns{display:flex;gap:5px;}
-.btn-icon{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);background:white;color:var(--text-muted);cursor:pointer;transition:all 0.2s;}
-.btn-icon:hover{background:var(--primary);color:white;border-color:var(--primary);}
-
-/* Footer Sidebar - Bouton Excel */
-.sidebar-footer{padding:20px;border-top:1px solid rgba(255,255,255,0.1);}
-.btn{padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s;}
+/* Buttons & Modals */
+.btn{padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px;}
 .btn-primary{background:var(--primary);color:white;}
 .btn-excel{background:#1D6F42;color:white;width:100%;}
-
-/* Modals */
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;backdrop-filter:blur(2px);}
-.modal-content{background:white;width:95%;max-width:700px;border-radius:var(--radius);padding:0;box-shadow:0 10px 40px rgba(0,0,0,0.2);overflow:hidden;}
-.modal-header{padding:20px 25px;background:var(--primary);color:white;display:flex;justify-content:space-between;align-items:center;}
-.modal-body{padding:25px;max-height:80vh;overflow-y:auto;}
-.modal-footer{padding:15px 25px;background:#f8f9fa;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--border);}
-.close-modal{background:none;border:none;color:white;font-size:24px;cursor:pointer;}
-
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;}
+.modal-content{background:white;width:90%;max-width:600px;border-radius:var(--radius);overflow:hidden;}
+.modal-header{padding:20px;background:var(--primary);color:white;display:flex;justify-content:space-between;}
+.modal-body{padding:20px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
 .form-group{margin-bottom:15px;}
-.form-group label{display:block;margin-bottom:6px;font-weight:600;font-size:12px;color:var(--primary);}
-.form-group input, .form-group select, .form-group textarea{width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;}
-
-.toast{position:fixed;bottom:20px;right:20px;background:var(--primary);color:white;padding:12px 25px;border-radius:8px;box-shadow:var(--shadow);display:none;z-index:3000;}
+.form-group label{display:block;font-size:12px;margin-bottom:5px;font-weight:600;}
+.form-group input, .form-group select{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--primary);color:white;padding:12px 25px;border-radius:8px;display:none;z-index:3000;}
 </style>
 </head>
 <body>
 
 <div class="sidebar">
-  <div class="sidebar-header">
-    <i class="fas fa-shield-alt"></i>
-    <h2>TrustFleet</h2>
-  </div>
+  <div class="sidebar-header"><i class="fas fa-shield-alt"></i><h2>TrustFleet</h2></div>
   <ul class="sidebar-menu">
-    <li class="active" onclick="showSection('dashboard', this)"><i class="fas fa-th-large"></i> <span>Tableau de bord</span></li>
-    <li onclick="showSection('vehicles', this)"><i class="fas fa-car"></i> <span>Véhicules</span></li>
-    <li onclick="showSection('drivers', this)"><i class="fas fa-id-card"></i> <span>Chauffeurs</span></li>
-    <li onclick="showSection('maintenance', this)"><i class="fas fa-wrench"></i> <span>Entretiens</span></li>
-    <li onclick="showSection('fuel', this)"><i class="fas fa-gas-pump"></i> <span>Carburant</span></li>
-    <li onclick="showSection('insurance', this)"><i class="fas fa-file-contract"></i> <span>Documents</span> <span class="badge-nav" id="badge-alerts" style="display:none">0</span></li>
+    <li class="active" onclick="showSection('dashboard', this)"><i class="fas fa-th-large"></i><span>Tableau de bord</span></li>
+    <li onclick="showSection('vehicles', this)"><i class="fas fa-car"></i><span>Véhicules</span></li>
+    <li onclick="showSection('maintenance', this)"><i class="fas fa-wrench"></i><span>Entretiens</span></li>
+    <li onclick="showSection('fuel', this)"><i class="fas fa-gas-pump"></i><span>Carburant</span></li>
   </ul>
   <div class="sidebar-footer">
-    <button class="btn btn-excel" onclick="exportToExcel()">
-      <i class="fas fa-file-excel"></i> <span>Exporter vers Excel</span>
-    </button>
+    <button class="btn btn-excel" onclick="exportToExcel()"><i class="fas fa-file-excel"></i><span>Exporter Excel</span></button>
   </div>
 </div>
 
 <div class="main-content">
-  <header>
-    <div class="page-title">
-      <h1 id="section-title">Tableau de bord</h1>
-      <p id="current-date"></p>
-    </div>
-    <div class="header-actions">
-        <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Rechercher..."></div>
-        <div class="user-profile"><div class="avatar">AD</div></div>
-    </div>
-  </header>
+  <header><div><h1 id="section-title">Tableau de bord</h1><p id="current-date"></p></div></header>
 
   <div id="section-dashboard" class="content-section">
-    <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon" style="background:var(--primary)"><i class="fas fa-car"></i></div><div class="stat-info"><h3 id="stat-vehicles">0</h3><p>Véhicules</p></div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:var(--success)"><i class="fas fa-check-circle"></i></div><div class="stat-info"><h3 id="stat-active">0</h3><p>En service</p></div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:var(--danger)"><i class="fas fa-tools"></i></div><div class="stat-info"><h3 id="stat-maint">0</h3><p>Entretiens (30j)</p></div></div>
-    </div>
-    <div class="dashboard-grid">
-        <div class="card"><div class="card-header"><h3>Consommation</h3></div><canvas id="chart-fuel" height="150"></canvas></div>
-        <div class="card"><div class="card-header"><h3>Alertes</h3><span class="badge badge-danger" id="header-alert-count">0</span></div><div id="dashboard-alerts"></div></div>
-    </div>
+    <div class="card"><h3>Statistiques</h3><p>Véhicules enregistrés : <span id="stat-v">0</span></p></div>
   </div>
 
   <div id="section-vehicles" class="content-section" style="display:none">
-    <div class="card"><div class="card-header"><h3>Liste des Véhicules</h3><button class="btn btn-primary" onclick="openModal('vehicle')">Nouveau Véhicule</button></div>
-    <div class="table-container"><table><thead><tr><th>Véhicule</th><th>Immatriculation</th><th>KM Actuel</th><th>État</th><th>Actions</th></tr></thead><tbody id="tbody-vehicles"></tbody></table></div></div>
-  </div>
-
-  <div id="section-drivers" class="content-section" style="display:none">
-    <div class="card"><div class="card-header"><h3>Chauffeurs</h3><button class="btn btn-primary" onclick="openModal('driver')">Nouveau Chauffeur</button></div>
-    <div class="table-container"><table><thead><tr><th>Nom</th><th>Matricule</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="tbody-drivers"></tbody></table></div></div>
+    <div class="card"><div class="card-header"><h3>Véhicules</h3><button class="btn btn-primary" onclick="openModal('vehicle')">Nouveau Véhicule</button></div>
+    <div class="table-container"><table><thead><tr><th>Marque</th><th>Immatriculation</th><th>KM Actuel</th><th>Actions</th></tr></thead><tbody id="tbody-vehicles"></tbody></table></div></div>
   </div>
 
   <div id="section-maintenance" class="content-section" style="display:none">
     <div class="card"><div class="card-header"><h3>Entretiens</h3><button class="btn btn-primary" onclick="openModal('maintenance')">Saisir Entretien</button></div>
-    <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Type</th><th>Coût</th><th>Actions</th></tr></thead><tbody id="tbody-maintenance"></tbody></table></div></div>
+    <table><thead><tr><th>Date</th><th>Véhicule</th><th>Type</th><th>KM relevé</th><th>Actions</th></tr></thead><tbody id="tbody-maintenance"></tbody></table></div>
   </div>
 
   <div id="section-fuel" class="content-section" style="display:none">
     <div class="card"><div class="card-header"><h3>Carburant</h3><button class="btn btn-primary" onclick="openModal('fuel')">Saisir Carburant</button></div>
-    <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Litres</th><th>Montant</th><th>Actions</th></tr></thead><tbody id="tbody-fuel"></tbody></table></div></div>
-  </div>
-
-  <div id="section-insurance" class="content-section" style="display:none">
-    <div class="card"><div class="card-header"><h3>Documents</h3><button class="btn btn-primary" onclick="openModal('insurance')">Nouveau Document</button></div>
-    <div class="table-container"><table><thead><tr><th>Véhicule</th><th>Type</th><th>Expiration</th><th>Actions</th></tr></thead><tbody id="tbody-insurance"></tbody></table></div></div>
+    <table><thead><tr><th>Date</th><th>Véhicule</th><th>Litres</th><th>KM relevé</th><th>Actions</th></tr></thead><tbody id="tbody-fuel"></tbody></table></div>
   </div>
 </div>
 
-<div id="modal-vehicle" class="modal"><div class="modal-content"><div class="modal-header"><h3>Véhicule</h3><button class="close-modal" onclick="closeModal('vehicle')">&times;</button></div><div class="modal-body"><form id="form-vehicle"><input type="hidden" name="id"><div class="form-grid"><div class="form-group"><label>Marque</label><input type="text" name="brand" required></div><div class="form-group"><label>Immatriculation</label><input type="text" name="plate" required></div><div class="form-group"><label>Année</label><input type="number" name="year" required></div><div class="form-group"><label>KM Actuel</label><input type="number" name="km" required></div><div class="form-group"><label>État</label><select name="state"><option value="En service">En service</option><option value="En panne">En panne</option></select></div></div></form></div><div class="modal-footer"><button class="btn btn-primary" onclick="handleSave('vehicles', 'vehicle')">Enregistrer</button></div></div></div>
+<div id="modal-vehicle" class="modal"><div class="modal-content"><div class="modal-header"><h3>Véhicule</h3><button onclick="closeModal('vehicle')">&times;</button></div><form id="form-vehicle" class="modal-body"><div class="form-grid"><div class="form-group"><label>Marque</label><input type="text" name="brand" required></div><div class="form-group"><label>Immatriculation</label><input type="text" name="plate" required></div><div class="form-group"><label>KM Initial</label><input type="number" name="km" required></div></div><button type="button" class="btn btn-primary" onclick="handleSave('vehicles','vehicle')">Enregistrer</button></form></div></div>
 
-<div id="modal-driver" class="modal"><div class="modal-content"><div class="modal-header"><h3>Chauffeur</h3><button class="close-modal" onclick="closeModal('driver')">&times;</button></div><div class="modal-body"><form id="form-driver"><input type="hidden" name="id"><div class="form-grid"><div class="form-group"><label>Nom</label><input type="text" name="name" required></div><div class="form-group"><label>Matricule</label><input type="text" name="mat" required></div><div class="form-group"><label>Statut</label><select name="status"><option value="Actif">Actif</option><option value="Repos">Repos</option></select></div></div></form></div><div class="modal-footer"><button class="btn btn-primary" onclick="handleSave('drivers', 'driver')">Enregistrer</button></div></div></div>
+<div id="modal-maintenance" class="modal"><div class="modal-content"><div class="modal-header"><h3>Entretien</h3><button onclick="closeModal('maintenance')">&times;</button></div><form id="form-maintenance" class="modal-body"><div class="form-grid"><div class="form-group"><label>Véhicule</label><select name="vehicle" id="sel-m-v" required></select></div><div class="form-group"><label>Type</label><input type="text" name="type" required></div><div class="form-group"><label>Kilométrage Actuel</label><input type="number" name="km" required></div><div class="form-group"><label>Coût</label><input type="number" name="cost" required></div></div><button type="button" class="btn btn-primary" onclick="handleSave('maintenance','maintenance')">Enregistrer</button></form></div></div>
 
-<div id="modal-maintenance" class="modal"><div class="modal-content"><div class="modal-header"><h3>Entretien</h3><button class="close-modal" onclick="closeModal('maintenance')">&times;</button></div><div class="modal-body"><form id="form-maintenance"><input type="hidden" name="id"><div class="form-grid"><div class="form-group"><label>Date</label><input type="date" name="date" required></div><div class="form-group"><label>Véhicule</label><select name="vehicle" id="select-m-v" required></select></div><div class="form-group"><label>Type</label><input type="text" name="type" required></div><div class="form-group"><label>Coût</label><input type="number" name="cost" required></div></div></form></div><div class="modal-footer"><button class="btn btn-primary" onclick="handleSave('maintenance', 'maintenance')">Enregistrer</button></div></div></div>
-
-<div id="modal-fuel" class="modal"><div class="modal-content"><div class="modal-header"><h3>Carburant</h3><button class="close-modal" onclick="closeModal('fuel')">&times;</button></div><div class="modal-body"><form id="form-fuel"><input type="hidden" name="id"><div class="form-grid"><div class="form-group"><label>Date</label><input type="date" name="date" required></div><div class="form-group"><label>Véhicule</label><select name="vehicle" id="select-f-v" required></select></div><div class="form-group"><label>Litres</label><input type="number" name="liters" required></div><div class="form-group"><label>Montant</label><input type="number" name="cost" required></div></div></form></div><div class="modal-footer"><button class="btn btn-primary" onclick="handleSave('fuel', 'fuel')">Enregistrer</button></div></div></div>
-
-<div id="modal-insurance" class="modal"><div class="modal-content"><div class="modal-header"><h3>Document</h3><button class="close-modal" onclick="closeModal('insurance')">&times;</button></div><div class="modal-body"><form id="form-insurance"><input type="hidden" name="id"><div class="form-grid"><div class="form-group"><label>Véhicule</label><select name="vehicle" id="select-i-v" required></select></div><div class="form-group"><label>Type</label><select name="type"><option value="Assurance">Assurance</option><option value="Visite">Visite</option></select></div><div class="form-group"><label>Expiration</label><input type="date" name="end" required></div></div></form></div><div class="modal-footer"><button class="btn btn-primary" onclick="handleSave('insurance', 'insurance')">Enregistrer</button></div></div></div>
+<div id="modal-fuel" class="modal"><div class="modal-content"><div class="modal-header"><h3>Carburant</h3><button onclick="closeModal('fuel')">&times;</button></div><form id="form-fuel" class="modal-body"><div class="form-grid"><div class="form-group"><label>Véhicule</label><select name="vehicle" id="sel-f-v" required></select></div><div class="form-group"><label>Litres</label><input type="number" name="liters" required></div><div class="form-group"><label>Kilométrage Actuel</label><input type="number" name="km" required></div><div class="form-group"><label>Montant</label><input type="number" name="cost" required></div></div><button type="button" class="btn btn-primary" onclick="handleSave('fuel','fuel')">Enregistrer</button></form></div></div>
 
 <div id="toast" class="toast"></div>
 
 <script>
-// CONFIGURATION
-const KEYS = { vehicles: 'tf_v1_v', drivers: 'tf_v1_d', maintenance: 'tf_v1_m', fuel: 'tf_v1_f', insurance: 'tf_v1_i' };
+const KEYS = { vehicles: 'tf_v_list', maintenance: 'tf_m_list', fuel: 'tf_f_list' };
 
-// CORE FUNCTIONS
-function load(key) { return JSON.parse(localStorage.getItem(KEYS[key])) || []; }
-function save(key, data) { localStorage.setItem(KEYS[key], JSON.stringify(data)); refreshUI(); }
+function load(k) { return JSON.parse(localStorage.getItem(KEYS[k])) || []; }
+function save(k, d) { localStorage.setItem(KEYS[k], JSON.stringify(d)); refreshUI(); }
 
-function showSection(id, element) {
-    document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
-    document.getElementById('section-' + id).style.display = 'block';
-    document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
-    element.classList.add('active');
-    document.getElementById('section-title').textContent = element.innerText;
-}
-
-// MODAL CONTROLLERS (FIXED)
-function openModal(type) {
-    const modal = document.getElementById('modal-' + type);
-    const form = document.getElementById('form-' + type);
-    if(modal && form) {
-        form.reset();
-        form.id.value = '';
-        modal.style.display = 'flex';
+// --- MISE À JOUR DU KILOMÉTRAGE ---
+function updateVehicleKM(plate, newKM) {
+    let vs = load('vehicles');
+    let idx = vs.findIndex(v => v.plate === plate);
+    if(idx !== -1) {
+        // On ne met à jour que si le nouveau KM est supérieur à l'ancien
+        if(parseInt(newKM) > parseInt(vs[idx].km)) {
+            vs[idx].km = newKM;
+            localStorage.setItem(KEYS.vehicles, JSON.stringify(vs));
+        }
     }
-}
-
-function closeModal(type) {
-    document.getElementById('modal-' + type).style.display = 'none';
 }
 
 function handleSave(key, modalType) {
@@ -237,75 +123,45 @@ function handleSave(key, modalType) {
     const data = load(key);
     const item = Object.fromEntries(new FormData(form).entries());
     item.id = Date.now().toString();
+    item.date = new Date().toLocaleDateString();
+    
     data.push(item);
+    
+    // Si on enregistre du carburant ou entretien, on met à jour le compteur du véhicule
+    if(item.vehicle && item.km) {
+        updateVehicleKM(item.vehicle, item.km);
+    }
+    
     save(key, data);
     closeModal(modalType);
-    toast("Enregistré avec succès !");
+    toast("Enregistré et Kilométrage mis à jour !");
 }
 
-function deleteItem(key, id) {
-    if(!confirm("Supprimer ?")) return;
-    save(key, load(key).filter(x => x.id !== id));
-}
-
-// RENDERING
 function refreshUI() {
-    renderVehicles(); renderDrivers(); renderMaintenance(); renderFuel(); renderInsurance(); populateSelects(); renderDashboard();
-}
-
-function renderVehicles() {
-    const tbody = document.getElementById('tbody-vehicles');
-    tbody.innerHTML = load('vehicles').map(v => `<tr><td>${v.brand}</td><td>${v.plate}</td><td>${v.km} km</td><td>${v.state}</td><td><button onclick="deleteItem('vehicles','${v.id}')">Suppr</button></td></tr>`).join('') || '<tr><td colspan="5">Aucun véhicule</td></tr>';
-}
-
-function renderDrivers() {
-    const tbody = document.getElementById('tbody-drivers');
-    tbody.innerHTML = load('drivers').map(d => `<tr><td>${d.name}</td><td>${d.mat}</td><td>${d.status}</td><td><button onclick="deleteItem('drivers','${d.id}')">Suppr</button></td></tr>`).join('');
-}
-
-function renderMaintenance() {
-    const tbody = document.getElementById('tbody-maintenance');
-    tbody.innerHTML = load('maintenance').map(m => `<tr><td>${m.date}</td><td>${m.vehicle}</td><td>${m.type}</td><td>${m.cost}</td><td><button onclick="deleteItem('maintenance','${m.id}')">Suppr</button></td></tr>`).join('');
-}
-
-function renderFuel() {
-    const tbody = document.getElementById('tbody-fuel');
-    tbody.innerHTML = load('fuel').map(f => `<tr><td>${f.date}</td><td>${f.vehicle}</td><td>${f.liters} L</td><td>${f.cost}</td><td><button onclick="deleteItem('fuel','${f.id}')">Suppr</button></td></tr>`).join('');
-}
-
-function renderInsurance() {
-    const tbody = document.getElementById('tbody-insurance');
-    tbody.innerHTML = load('insurance').map(i => `<tr><td>${i.vehicle}</td><td>${i.type}</td><td>${i.end}</td><td><button onclick="deleteItem('insurance','${i.id}')">Suppr</button></td></tr>`).join('');
-}
-
-function populateSelects() {
-    const options = load('vehicles').map(v => `<option value="${v.plate}">${v.plate}</option>`).join('');
-    ['select-m-v', 'select-f-v', 'select-i-v'].forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.innerHTML = options;
-    });
-}
-
-function renderDashboard() {
     const v = load('vehicles');
-    document.getElementById('stat-vehicles').textContent = v.length;
-    document.getElementById('stat-active').textContent = v.filter(x => x.state === 'En service').length;
+    document.getElementById('tbody-vehicles').innerHTML = v.map(x => `<tr><td>${x.brand}</td><td>${x.plate}</td><td><b>${x.km} km</b></td><td><button onclick="deleteItem('vehicles','${x.id}')">Suppr</button></td></tr>`).join('');
+    document.getElementById('tbody-maintenance').innerHTML = load('maintenance').map(x => `<tr><td>${x.date}</td><td>${x.vehicle}</td><td>${x.type}</td><td>${x.km} km</td><td><button onclick="deleteItem('maintenance','${x.id}')">Suppr</button></td></tr>`).join('');
+    document.getElementById('tbody-fuel').innerHTML = load('fuel').map(x => `<tr><td>${x.date}</td><td>${x.vehicle}</td><td>${x.liters}L</td><td>${x.km} km</td><td><button onclick="deleteItem('fuel','${x.id}')">Suppr</button></td></tr>`).join('');
+    
+    const opts = v.map(x => `<option value="${x.plate}">${x.plate} (${x.brand})</option>`).join('');
+    document.getElementById('sel-m-v').innerHTML = opts;
+    document.getElementById('sel-f-v').innerHTML = opts;
+    document.getElementById('stat-v').textContent = v.length;
 }
 
-function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2000); }
-
-function exportToExcel() {
-    let csv = "SECTION;DETAIL1;DETAIL2\n";
-    load('vehicles').forEach(v => csv += `VEHICULE;${v.brand};${v.plate}\n`);
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'TrustFleet_Export.csv';
-    a.click();
+function openModal(t) { document.getElementById('modal-'+t).style.display='flex'; }
+function closeModal(t) { document.getElementById('modal-'+t).style.display='none'; }
+function deleteItem(k,id) { if(confirm("Supprimer ?")) save(k, load(k).filter(x=>x.id!==id)); }
+function showSection(id, el) {
+    document.querySelectorAll('.content-section').forEach(s => s.style.display='none');
+    document.getElementById('section-'+id).style.display='block';
+    document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+    el.classList.add('active');
 }
+function toast(m) { const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
 
 window.onload = () => {
-    document.getElementById('current-date').textContent = new Date().toLocaleDateString();
+    document.getElementById('current-date').textContent = new Date().toLocaleLongDateString ? new Date().toLocaleLongDateString() : new Date().toLocaleDateString();
     refreshUI();
 };
 </script>
