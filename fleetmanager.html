@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TrustFleet Pro v3.6 | Gestion Sécurisée</title>
+<title>TrustFleet Pro v3.7 | Gestion de Parc</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -117,7 +117,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
         <div style="display:flex; justify-content:space-between;"><h3>Véhicules</h3><button class="btn btn-accent" onclick="openModal('vehicle')">+ Ajouter</button></div>
         <div class="table-container">
             <table>
-                <thead><tr><th>Photo</th><th>Modèle</th><th>Immatriculation</th><th>KM</th><th>Position</th><th>Actions</th></tr></thead>
+                <thead><tr><th>Photo</th><th>Marque</th><th>Modèle</th><th>Immatriculation</th><th>Châssis</th><th>KM</th><th>Position</th><th>Actions</th></tr></thead>
                 <tbody id="tbody-vehicles"></tbody>
             </table>
         </div>
@@ -140,7 +140,6 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
         <div class="card"><h3>Maintenance</h3><button class="btn btn-primary" onclick="openModal('maintenance')">Saisir</button>
         <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Type</th><th>KM</th><th>Coût</th><th>Actions</th></tr></thead><tbody id="tbody-m"></tbody></table></div></div>
     </div>
-
     <div id="section-fuel" class="content-section" style="display:none">
         <div class="card"><h3>Carburant</h3><button class="btn btn-primary" onclick="openModal('fuel')">Saisir</button>
         <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>L</th><th>KM</th><th>Prix</th><th>Actions</th></tr></thead><tbody id="tbody-f"></tbody></table></div></div>
@@ -150,12 +149,14 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
 
 <div id="modal-vehicle" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h3>Véhicule</h3><button onclick="closeModal('vehicle')">&times;</button></div>
+        <div class="modal-header"><h3>Fiche Véhicule</h3><button onclick="closeModal('vehicle')">&times;</button></div>
         <form id="form-vehicle" class="modal-body">
             <input type="hidden" name="id">
             <div class="form-grid">
                 <input type="text" name="brand" placeholder="Marque" required>
+                <input type="text" name="model" placeholder="Modèle" required>
                 <input type="text" name="plate" placeholder="Immatriculation" required>
+                <input type="text" name="chassis" placeholder="Numéro de Châssis">
                 <input type="number" name="km" placeholder="KM Actuel" required>
                 <select name="status"><option value="En service">En service</option><option value="Indisponible">Indisponible</option></select>
                 <input type="file" accept="image/*" onchange="compressAndEncode(this, 'h-v')">
@@ -166,42 +167,21 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
     </div>
 </div>
 
-<div id="modal-driver" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><h3>Chauffeur</h3><button onclick="closeModal('driver')">&times;</button></div>
-        <form id="form-driver" class="modal-body">
-            <input type="hidden" name="id">
-            <div class="form-grid">
-                <input type="text" name="grade" placeholder="Grade" required>
-                <input type="text" name="name" placeholder="Nom Complet" required>
-                <input type="text" name="mat" placeholder="Matricule" required>
-                <select name="lictype"><option value="VL">VL</option><option value="PL">PL</option><option value="VL-PL">VL-PL</option></select>
-                <select name="status"><option value="Actif">Actif</option><option value="Indisponible">Indisponible</option></select>
-                <input type="file" accept="image/*" onchange="compressAndEncode(this, 'h-d')">
-                <input type="hidden" name="image" id="h-d">
-            </div><br>
-            <button type="button" class="btn btn-primary" onclick="handleSave('drivers','driver')">Enregistrer</button>
-        </form>
-    </div>
-</div>
-
+<div id="modal-driver" class="modal"><div class="modal-content"><div class="modal-header"><h3>Chauffeur</h3><button onclick="closeModal('driver')">&times;</button></div><form id="form-driver" class="modal-body"><input type="hidden" name="id"><div class="form-grid"><input type="text" name="grade" placeholder="Grade"><input type="text" name="name" placeholder="Nom"><input type="text" name="mat" placeholder="Matricule"><select name="lictype"><option value="VL">VL</option><option value="PL">PL</option></select><select name="status"><option value="Actif">Actif</option><option value="Indisponible">Indisponible</option></select><input type="file" onchange="compressAndEncode(this,'h-d')"><input type="hidden" name="image" id="h-d"></div><br><button type="button" class="btn btn-primary" onclick="handleSave('drivers','driver')">Enregistrer</button></form></div></div>
 <div id="modal-maintenance" class="modal"><div class="modal-content"><div class="modal-header"><h3>Entretien</h3><button onclick="closeModal('maintenance')">&times;</button></div><form id="form-maintenance" class="modal-body"><input type="hidden" name="id"><div class="form-grid"><select name="vehicle" class="v-select"></select><input type="text" name="type" placeholder="Nature"><input type="number" name="km" placeholder="KM actuel"><input type="number" name="cost" placeholder="Coût"></div><br><button type="button" class="btn btn-primary" onclick="handleSave('maintenance','maintenance')">Valider</button></form></div></div>
 <div id="modal-fuel" class="modal"><div class="modal-content"><div class="modal-header"><h3>Carburant</h3><button onclick="closeModal('fuel')">&times;</button></div><form id="form-fuel" class="modal-body"><input type="hidden" name="id"><div class="form-grid"><select name="vehicle" class="v-select"></select><input type="number" name="liters" placeholder="Litres"><input type="number" name="km" placeholder="KM actuel"><input type="number" name="cost" placeholder="Montant"></div><br><button type="button" class="btn btn-primary" onclick="handleSave('fuel','fuel')">Valider</button></form></div></div>
 
 <script>
 const KEYS = { vehicles: 'tf_v3_v', drivers: 'tf_v3_d', maintenance: 'tf_v3_m', fuel: 'tf_v3_f', auth: 'tf_secure_v3' };
 
+// AUTH & UTILS
 function checkAuth() {
     const u = document.getElementById('user-id').value, p = document.getElementById('user-pass').value;
     const cfg = JSON.parse(localStorage.getItem(KEYS.auth));
     if(!cfg) { if(confirm("Créer ce compte admin ?")) { localStorage.setItem(KEYS.auth, JSON.stringify({id:u, pw:p})); launch(); } }
     else if(u === cfg.id && p === cfg.pw) { launch(); } else { alert("Identifiants incorrects"); }
 }
-function launch() { 
-    document.getElementById('login-screen').style.display='none'; 
-    document.getElementById('app-interface').style.display='block'; 
-    refreshUI(); 
-}
+function launch() { document.getElementById('login-screen').style.display='none'; document.getElementById('app-interface').style.display='block'; refreshUI(); }
 
 function compressAndEncode(input, hid) {
     const file = input.files[0];
@@ -213,8 +193,7 @@ function compressAndEncode(input, hid) {
             const canvas = document.createElement('canvas');
             const MAX_WIDTH = 300; 
             const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleSize;
+            canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize;
             canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
             document.getElementById(hid).value = canvas.toDataURL('image/jpeg', 0.7);
         };
@@ -225,15 +204,14 @@ function compressAndEncode(input, hid) {
 
 function load(k) { try { return JSON.parse(localStorage.getItem(KEYS[k])) || []; } catch(e) { return []; } }
 
+// SAVE & EDIT
 function handleSave(k, type) {
     const f = document.getElementById('form-'+type), d = load(k);
-    const formData = new FormData(f);
-    const item = Object.fromEntries(formData.entries());
+    const item = Object.fromEntries(new FormData(f).entries());
     
     if(item.id) {
         const idx = d.findIndex(x => x.id == item.id);
         if(idx !== -1) {
-            // Garder l'image existante si pas de nouvelle image
             if(!item.image && d[idx].image) item.image = d[idx].image;
             item.date = d[idx].date;
             d[idx] = item;
@@ -244,7 +222,7 @@ function handleSave(k, type) {
         d.push(item);
     }
     
-    // Auto-update KM véhicule
+    // Auto-update KM
     if(item.vehicle && item.km) {
         let vs = load('vehicles');
         let idx = vs.findIndex(v => v.plate === item.vehicle);
@@ -256,8 +234,7 @@ function handleSave(k, type) {
 
     try {
         localStorage.setItem(KEYS[k], JSON.stringify(d)); 
-        refreshUI();
-        closeModal(type); f.reset();
+        refreshUI(); closeModal(type); f.reset();
     } catch (e) { alert("⚠️ Mémoire saturée !"); }
 }
 
@@ -265,25 +242,19 @@ function editItem(key, type, id) {
     const data = load(key);
     const item = data.find(x => x.id == id);
     if(!item) return;
-    
-    const f = document.getElementById('form-'+type);
     openModal(type);
-    
-    Object.keys(item).forEach(k => {
-        if(f.elements[k] && f.elements[k].type !== 'file') {
-            f.elements[k].value = item[k];
-        }
-    });
+    const f = document.getElementById('form-'+type);
+    Object.keys(item).forEach(k => { if(f.elements[k] && f.elements[k].type !== 'file') f.elements[k].value = item[k]; });
 }
 
 function deleteItem(key, id) {
-    if(!confirm("Êtes-vous sûr de vouloir supprimer cet enregistrement ?")) return;
-    let data = load(key);
-    data = data.filter(x => x.id != id);
+    if(!confirm("Supprimer cet enregistrement ?")) return;
+    let data = load(key).filter(x => x.id != id);
     localStorage.setItem(KEYS[key], JSON.stringify(data));
     refreshUI();
 }
 
+// UI RENDERING
 let fChart, kChart;
 function refreshUI() {
     const v = load('vehicles'), dr = load('drivers'), m = load('maintenance'), fu = load('fuel');
@@ -293,9 +264,10 @@ function refreshUI() {
     document.getElementById('dash-cost-total').textContent = totalCost.toLocaleString() + " FCFA";
     document.getElementById('dash-counts').textContent = `${v.length} vhc / ${dr.length} chf`;
 
+    // Table Véhicules (Nouveaux champs)
     document.getElementById('tbody-vehicles').innerHTML = v.map(x=>`<tr>
         <td><img src="${x.image || ''}" class="img-preview"></td>
-        <td>${x.brand}</td><td>${x.plate}</td><td>${x.km}</td>
+        <td>${x.brand || ''}</td><td>${x.model || ''}</td><td>${x.plate}</td><td>${x.chassis || '-'}</td><td>${x.km}</td>
         <td><span class="status-badge ${x.status==='En service'?'bg-success':'bg-danger'}">${x.status}</span></td>
         <td class="actions">
             <button class="btn-icon btn-edit" onclick="editItem('vehicles','vehicle',${x.id})"><i class="fas fa-edit"></i></button>
@@ -303,6 +275,7 @@ function refreshUI() {
         </td>
     </tr>`).join('');
 
+    // Tables Chauffeurs, Maintenance, Fuel (Inchangés)
     document.getElementById('tbody-drivers').innerHTML = dr.map(x=>`<tr>
         <td><img src="${x.image || ''}" class="img-preview" style="border-radius:50%"></td>
         <td>${x.grade} ${x.name}</td><td>${x.mat}</td><td>${x.lictype}</td>
@@ -310,8 +283,7 @@ function refreshUI() {
         <td class="actions">
             <button class="btn-icon btn-edit" onclick="editItem('drivers','driver',${x.id})"><i class="fas fa-edit"></i></button>
             <button class="btn-icon btn-delete" onclick="deleteItem('drivers',${x.id})"><i class="fas fa-trash"></i></button>
-        </td>
-    </tr>`).join('');
+        </td></tr>`).join('');
 
     document.getElementById('tbody-m').innerHTML = m.map(x=>`<tr><td>${x.date}</td><td>${x.vehicle}</td><td>${x.type}</td><td>${x.km}</td><td>${x.cost}</td>
         <td class="actions">
@@ -359,7 +331,7 @@ function closeModal(t) {
     document.getElementById('form-'+t).reset();
     document.getElementById('form-'+t).querySelector('input[name="id"]').value = "";
 }
-window.onload = () => { document.getElementById('date-display').textContent = new Date().toLocaleDateString(); };
+window.onload = () => { document.getElementById('date-display').textContent = new Date().toLocaleDateString('fr-FR', {weekday:'long', year:'numeric', month:'long', day:'numeric'}); };
 </script>
 </body>
 </html>
