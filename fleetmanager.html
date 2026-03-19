@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🚗 FleetManager Pro</title>
+<title>🚗 TrustFleet</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -677,66 +677,30 @@ function uid() {
 // ========================================
 function initDemoData() {
   if (!localStorage.getItem(KEYS.vehicles)) {
-    const vehicles = [
-      {id:'v1',plate:'AB-1234-CD',vin:'VIN0001ABC',brand:'Toyota',model:'Hilux',year:2020,type:'Pick-up',color:'Blanc',fuel:'Diesel',km:85200,state:'En service',driver:'d1'},
-      {id:'v2',plate:'EF-5678-GH',vin:'VIN0002DEF',brand:'Peugeot',model:'308',year:2019,type:'Berline',color:'Gris',fuel:'Essence',km:62000,state:'En service',driver:'d2'},
-      {id:'v3',plate:'IJ-9012-KL',vin:'VIN0003GHI',brand:'Mercedes',model:'Sprinter',year:2021,type:'Minibus',color:'Blanc',fuel:'Diesel',km:45000,state:'En révision',driver:''},
-      {id:'v4',plate:'MN-3456-OP',vin:'VIN0004JKL',brand:'Ford',model:'Ranger',year:2018,type:'Pick-up',color:'Noir',fuel:'Diesel',km:120000,state:'En panne',driver:'d3'},
-      {id:'v5',plate:'QR-7890-ST',vin:'VIN0005MNO',brand:'Hyundai',model:'Tucson',year:2022,type:'SUV',color:'Bleu',fuel:'Essence',km:28000,state:'En service',driver:'d4'},
-      {id:'v6',plate:'UV-2345-WX',vin:'VIN0006PQR',brand:'Renault',model:'Master',year:2017,type:'Utilitaire',color:'Blanc',fuel:'Diesel',km:158000,state:'Hors service',driver:''}
-    ];
+    const vehicles = [];
     save('vehicles', vehicles);
   }
   if (!localStorage.getItem(KEYS.drivers)) {
-    const drivers = [
-      {id:'d1',name:'Kouadio Jean-Pierre',mat:'CH-001',grade:'Chauffeur Principal',phone:'+225 07 11 22 33',email:'jp.kouadio@fleet.ci',status:'Actif',license:'LIC-001',liccat:'B+C',licexp:'2025-06-30',vehicle:'v1'},
-      {id:'d2',name:'Traoré Aminata',mat:'CH-002',grade:'Chauffeur',phone:'+225 05 44 55 66',email:'a.traore@fleet.ci',status:'Actif',license:'LIC-002',liccat:'B',licexp:'2024-12-31',vehicle:'v2'},
-      {id:'d3',name:'Bamba Moussa',mat:'CH-003',grade:'Agent de Liaison',phone:'+225 01 77 88 99',email:'m.bamba@fleet.ci',status:'En congé',license:'LIC-003',liccat:'B',licexp:'2026-03-15',vehicle:'v4'},
-      {id:'d4',name:'Koné Ibrahim',mat:'CH-004',grade:'Chauffeur de Direction',phone:'+225 07 22 33 44',email:'i.kone@fleet.ci',status:'Actif',license:'LIC-004',liccat:'B+D',licexp:'2025-01-20',vehicle:'v5'}
-    ];
+    const drivers = [];
     save('drivers', drivers);
   }
   if (!localStorage.getItem(KEYS.maintenance)) {
     const today = new Date();
     const m = (d) => { const dt = new Date(today); dt.setDate(dt.getDate()-d); return dt.toISOString().split('T')[0]; };
     const f = (d) => { const dt = new Date(today); dt.setDate(dt.getDate()+d); return dt.toISOString().split('T')[0]; };
-    const maintenance = [
-      {id:'m1',vehicle:'v1',type:'Vidange huile',date:m(60),km:80000,nextDate:f(90),nextKm:90000,cost:45000,currency:'FCFA',garage:'Garage Central',notes:'Huile 5W40'},
-      {id:'m2',vehicle:'v2',type:'Freins',date:m(30),km:60000,nextDate:f(180),nextKm:80000,cost:85000,currency:'FCFA',garage:'Auto Express',notes:'Plaquettes + disques avant'},
-      {id:'m3',vehicle:'v3',type:'Révision générale',date:m(10),km:44000,nextDate:f(120),nextKm:54000,cost:150000,currency:'FCFA',garage:'MB Services',notes:'En cours de révision'},
-      {id:'m4',vehicle:'v4',type:'Réparation moteur',date:m(5),km:119000,nextDate:'',nextKm:0,cost:320000,currency:'FCFA',garage:'Mécanique Auto Plus',notes:'Remplacement joint de culasse'},
-      {id:'m5',vehicle:'v5',type:'Vidange huile',date:m(90),km:25000,nextDate:m(-10),nextKm:35000,cost:38000,currency:'FCFA',garage:'Hyundai Center',notes:'Vidange + filtre à huile'},
-      {id:'m6',vehicle:'v1',type:'Pneus',date:m(120),km:75000,nextDate:f(240),nextKm:115000,cost:240000,currency:'FCFA',garage:'Pneu Service',notes:'4 pneus remplacés'},
-      {id:'m7',vehicle:'v2',type:'Climatisation',date:m(45),km:58000,nextDate:f(365),nextKm:78000,cost:65000,currency:'FCFA',garage:'Clim Pro',notes:'Recharge gaz'},
-      {id:'m8',vehicle:'v6',type:'Courroie de distribution',date:m(180),km:150000,nextDate:'',nextKm:0,cost:95000,currency:'FCFA',garage:'Garage Sud',notes:'Véhicule mis hors service après intervention'}
-    ];
+    const maintenance = [];
     save('maintenance', maintenance);
   }
   if (!localStorage.getItem(KEYS.fuel)) {
     const today = new Date();
     const m = (d) => { const dt = new Date(today); dt.setDate(dt.getDate()-d); return dt.toISOString().split('T')[0]; };
-    const fuel = [
-      {id:'f1',vehicle:'v1',date:m(5),type:'Diesel',liters:60,cost:54000,currency:'FCFA',km:85200,station:'Total Plateau'},
-      {id:'f2',vehicle:'v2',date:m(8),type:'Essence',liters:40,cost:40000,currency:'FCFA',km:61800,station:'Shell Cocody'},
-      {id:'f3',vehicle:'v5',date:m(12),type:'Essence',liters:45,cost:45000,currency:'FCFA',km:27800,station:'Total Marcory'},
-      {id:'f4',vehicle:'v1',date:m(35),type:'Diesel',liters:55,cost:49500,currency:'FCFA',km:83100,station:'Total Plateau'},
-      {id:'f5',vehicle:'v2',date:m(40),type:'Essence',liters:38,cost:38000,currency:'FCFA',km:59500,station:'Petro Ivoire'},
-      {id:'f6',vehicle:'v5',date:m(50),type:'Essence',liters:42,cost:42000,currency:'FCFA',km:25500,station:'Shell Cocody'}
-    ];
+    const fuel = [];
     save('fuel', fuel);
   }
   if (!localStorage.getItem(KEYS.insurance)) {
     const today = new Date();
     const t = (d) => { const dt = new Date(today); dt.setDate(dt.getDate()+d); return dt.toISOString().split('T')[0]; };
-    const insurance = [
-      {id:'i1',vehicle:'v1',type:'Assurance',company:'NSIA Assurances',ref:'ASS-2024-001',start:'2024-01-01',end:t(90),cost:180000,currency:'FCFA',notes:'Tous risques'},
-      {id:'i2',vehicle:'v1',type:'Contrôle Technique',company:'Centre CT Abidjan',ref:'CT-2024-001',start:'2024-06-01',end:t(20),cost:25000,currency:'FCFA',notes:''},
-      {id:'i3',vehicle:'v2',type:'Assurance',company:'SUNU Assurances',ref:'ASS-2024-002',start:'2024-01-15',end:t(180),cost:145000,currency:'FCFA',notes:'Tiers collision'},
-      {id:'i4',vehicle:'v3',type:'Assurance',company:'NSIA Assurances',ref:'ASS-2024-003',start:'2024-03-01',end:t(-5),cost:220000,currency:'FCFA',notes:'Tous risques - EXPIRÉE'},
-      {id:'i5',vehicle:'v4',type:'Contrôle Technique',company:'Centre CT Nord',ref:'CT-2023-004',start:'2023-06-01',end:t(-60),cost:25000,currency:'FCFA',notes:'EXPIRÉ'},
-      {id:'i6',vehicle:'v5',type:'Assurance',company:'SUNU Assurances',ref:'ASS-2024-005',start:'2024-02-01',end:t(270),cost:160000,currency:'FCFA',notes:'Tous risques'},
-      {id:'i7',vehicle:'v6',type:'Vignette',company:'Trésor Public',ref:'VIG-2024-006',start:'2024-01-01',end:t(-30),cost:15000,currency:'FCFA',notes:'EXPIRÉE'}
-    ];
+    const insurance = [];
     save('insurance', insurance);
   }
 }
@@ -1492,17 +1456,6 @@ function updateAlertBadge(count) {
   const hbadge=document.getElementById('header-alert-count');
   if(count>0){badge.textContent=count;badge.style.display='';hbadge.textContent=count;hbadge.style.display='';}
   else{badge.style.display='none';hbadge.style.display='none';}
-}
-
-// ========================================
-// RESET
-// ========================================
-function clearAllData() {
-  if(!confirm('⚠️ Réinitialiser TOUTES les données ? Cette action est irréversible !')) return;
-  Object.values(KEYS).forEach(k=>localStorage.removeItem(k));
-  initDemoData();
-  toast('Données réinitialisées avec les données de démonstration.','warning');
-  navigate('dashboard');
 }
 
 // ========================================
