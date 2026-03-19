@@ -72,28 +72,12 @@ header{display:flex;justify-content:space-between;align-items:center;margin-bott
 .card-header h3{font-size:17px;font-weight:600;color:var(--primary);display:flex;align-items:center;gap:10px;}
 .card-header h3 i{color:var(--accent);}
 
-/* Alert Items */
-.alert-item{display:flex;align-items:center;gap:15px;padding:12px;border-radius:8px;margin-bottom:10px;border-left:4px solid transparent;transition:all 0.2s;cursor:pointer;}
-.alert-item:hover{background:#f8f9fa;transform:translateX(5px);}
-.alert-item.critical{border-left-color:var(--danger);background:#fff5f5;}
-.alert-item.warning{border-left-color:var(--warning);background:#fffbeb;}
-.alert-icon{width:35px;height:35px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;}
-.alert-info{flex-grow:1;}
-.alert-info h4{font-size:13px;font-weight:600;margin-bottom:2px;}
-.alert-info p{font-size:11px;color:var(--text-muted);}
-
 /* Tables */
 .table-container{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;}
 th{text-align:left;padding:12px 15px;border-bottom:2px solid var(--border);color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:0.5px;}
 td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
-tr:last-child td{border-bottom:none;}
 tr:hover{background-color:rgba(0,0,0,0.01);}
-
-.vehicle-cell{display:flex;align-items:center;gap:12px;}
-.vehicle-img{width:40px;height:40px;background:#f0f2f5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:18px;}
-.vehicle-info .v-name{display:block;font-weight:600;font-size:14px;}
-.vehicle-info .v-plate{display:block;font-size:11px;color:var(--text-muted);font-family:monospace;background:#eee;padding:1px 4px;border-radius:3px;width:fit-content;margin-top:2px;}
 
 .badge{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;display:inline-block;text-align:center;min-width:80px;}
 .badge-success{background-color:#e8f5e9;color:var(--success);}
@@ -109,59 +93,27 @@ tr:hover{background-color:rgba(0,0,0,0.01);}
 .action-btns{display:flex;gap:5px;}
 .btn-icon{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);background:white;color:var(--text-muted);cursor:pointer;transition:all 0.2s;}
 .btn-icon:hover{background:var(--primary);color:white;border-color:var(--primary);}
-.btn-icon.edit:hover{background:var(--info);border-color:var(--info);}
-.btn-icon.delete:hover{background:var(--danger);border-color:var(--danger);}
 
-/* Form Elements */
+/* Footer Sidebar - Bouton Excel */
+.sidebar-footer{padding:20px;border-top:1px solid rgba(255,255,255,0.1);}
 .btn{padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s;}
 .btn-primary{background:var(--primary);color:white;}
-.btn-primary:hover{background:var(--primary-light);box-shadow:0 4px 12px rgba(26,45,74,0.2);}
-.btn-outline{background:white;border:1px solid var(--border);color:var(--text);}
-.btn-outline:hover{background:#f8f9fa;border-color:var(--text);}
-
-/* Footer Sidebar - MODIFIÉ : Export Excel */
-.sidebar-footer{padding:20px;border-top:1px solid rgba(255,255,255,0.1);}
 .btn-excel{background:#1D6F42;color:white;width:100%;}
-.btn-excel:hover{background:#155231;box-shadow:0 4px 12px rgba(29,111,66,0.2);}
 
 /* Modals */
 .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;backdrop-filter:blur(2px);}
-.modal-content{background:white;width:95%;max-width:700px;border-radius:var(--radius);padding:0;box-shadow:0 10px 40px rgba(0,0,0,0.2);overflow:hidden;animation:modalSlide 0.3s ease-out;}
-@keyframes modalSlide{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.modal-content{background:white;width:95%;max-width:700px;border-radius:var(--radius);padding:0;box-shadow:0 10px 40px rgba(0,0,0,0.2);overflow:hidden;}
 .modal-header{padding:20px 25px;background:var(--primary);color:white;display:flex;justify-content:space-between;align-items:center;}
-.modal-header h3{font-size:18px;font-weight:600;}
-.close-modal{background:none;border:none;color:white;font-size:20px;cursor:pointer;opacity:0.7;transition:0.2s;}
-.close-modal:hover{opacity:1;}
 .modal-body{padding:25px;max-height:80vh;overflow-y:auto;}
 .modal-footer{padding:15px 25px;background:#f8f9fa;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--border);}
+.close-modal{background:none;border:none;color:white;font-size:24px;cursor:pointer;}
 
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
 .form-group{margin-bottom:15px;}
-.form-group.full{grid-column:1 / -1;}
 .form-group label{display:block;margin-bottom:6px;font-weight:600;font-size:12px;color:var(--primary);}
-.form-group input, .form-group select, .form-group textarea{width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;transition:all 0.2s;}
-.form-group input:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 3px rgba(26,45,74,0.1);}
+.form-group input, .form-group select, .form-group textarea{width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;}
 
-/* Toast */
-.toast{position:fixed;bottom:20px;right:20px;background:var(--primary);color:white;padding:12px 25px;border-radius:8px;box-shadow:var(--shadow);display:none;z-index:3000;animation:toastSlide 0.3s ease-out;}
-@keyframes toastSlide{from{transform:translateX(50px);opacity:0;}to{transform:translateX(0);opacity:1;}}
-
-/* Responsiveness */
-@media (max-width: 1024px) {
-  .dashboard-grid{grid-template-columns:1fr;}
-  .sidebar{width:70px;}
-  .sidebar h2, .sidebar span, .sidebar .badge-nav, .sidebar-footer span{display:none;}
-  .sidebar-header{justify-content:center;padding:20px 0;}
-  .sidebar-menu li{justify-content:center;padding:15px 0;}
-  .main-content{margin-left:70px;max-width:calc(100% - 70px);}
-}
-
-@media (max-width: 768px) {
-  .form-grid{grid-template-columns:1fr;}
-  header{flex-direction:column;align-items:flex-start;gap:20px;}
-  .header-actions{width:100%;justify-content:space-between;}
-  .search-bar input{width:150px;}
-}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--primary);color:white;padding:12px 25px;border-radius:8px;box-shadow:var(--shadow);display:none;z-index:3000;}
 </style>
 </head>
 <body>
@@ -172,12 +124,12 @@ tr:hover{background-color:rgba(0,0,0,0.01);}
     <h2>TrustFleet</h2>
   </div>
   <ul class="sidebar-menu">
-    <li class="active" onclick="showSection('dashboard')"><i class="fas fa-th-large"></i> <span>Tableau de bord</span></li>
-    <li onclick="showSection('vehicles')"><i class="fas fa-car"></i> <span>Véhicules</span></li>
-    <li onclick="showSection('drivers')"><i class="fas fa-id-card"></i> <span>Chauffeurs</span></li>
-    <li onclick="showSection('maintenance')"><i class="fas fa-wrench"></i> <span>Entretiens</span></li>
-    <li onclick="showSection('fuel')"><i class="fas fa-gas-pump"></i> <span>Carburant</span></li>
-    <li onclick="showSection('insurance')"><i class="fas fa-file-contract"></i> <span>Documents</span> <span class="badge-nav" id="badge-alerts" style="display:none">0</span></li>
+    <li class="active" onclick="showSection('dashboard', this)"><i class="fas fa-th-large"></i> <span>Tableau de bord</span></li>
+    <li onclick="showSection('vehicles', this)"><i class="fas fa-car"></i> <span>Véhicules</span></li>
+    <li onclick="showSection('drivers', this)"><i class="fas fa-id-card"></i> <span>Chauffeurs</span></li>
+    <li onclick="showSection('maintenance', this)"><i class="fas fa-wrench"></i> <span>Entretiens</span></li>
+    <li onclick="showSection('fuel', this)"><i class="fas fa-gas-pump"></i> <span>Carburant</span></li>
+    <li onclick="showSection('insurance', this)"><i class="fas fa-file-contract"></i> <span>Documents</span> <span class="badge-nav" id="badge-alerts" style="display:none">0</span></li>
   </ul>
   <div class="sidebar-footer">
     <button class="btn btn-excel" onclick="exportToExcel()">
@@ -193,811 +145,168 @@ tr:hover{background-color:rgba(0,0,0,0.01);}
       <p id="current-date"></p>
     </div>
     <div class="header-actions">
-      <div class="search-bar">
-        <i class="fas fa-search"></i>
-        <input type="text" placeholder="Rechercher..." onkeyup="searchGlobal(this.value)">
-      </div>
-      <div class="notifications" onclick="showSection('insurance')">
-        <i class="far fa-bell"></i>
-        <span class="badge-dot" id="header-alert-dot"></span>
-      </div>
-      <div class="user-profile">
-        <div class="user-info">
-          <span class="name">Administrateur</span>
-          <span class="role">Gestion de Parc</span>
-        </div>
-        <div class="avatar">AD</div>
-      </div>
+        <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Rechercher..."></div>
+        <div class="user-profile"><div class="avatar">AD</div></div>
     </div>
   </header>
 
   <div id="section-dashboard" class="content-section">
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon" style="background-color:var(--primary)"><i class="fas fa-car"></i></div>
-        <div class="stat-info"><h3 id="stat-vehicles">0</h3><p>Véhicules</p></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background-color:var(--success)"><i class="fas fa-check-circle"></i></div>
-        <div class="stat-info"><h3 id="stat-active">0</h3><p>En service</p></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background-color:var(--danger)"><i class="fas fa-tools"></i></div>
-        <div class="stat-info"><h3 id="stat-maint">0</h3><p>Entretiens (30j)</p></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background-color:var(--warning)"><i class="fas fa-gas-pump"></i></div>
-        <div class="stat-info"><h3 id="stat-fuel">0</h3><p>Litres (Mois)</p></div>
-      </div>
+        <div class="stat-card"><div class="stat-icon" style="background:var(--primary)"><i class="fas fa-car"></i></div><div class="stat-info"><h3 id="stat-vehicles">0</h3><p>Véhicules</p></div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:var(--success)"><i class="fas fa-check-circle"></i></div><div class="stat-info"><h3 id="stat-active">0</h3><p>En service</p></div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:var(--danger)"><i class="fas fa-tools"></i></div><div class="stat-info"><h3 id="stat-maint">0</h3><p>Entretiens (30j)</p></div></div>
     </div>
-
     <div class="dashboard-grid">
-      <div class="card">
-        <div class="card-header">
-          <h3><i class="fas fa-chart-line"></i> Consommation Mensuelle (Litres)</h3>
-        </div>
-        <canvas id="chart-fuel" height="150"></canvas>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <h3><i class="fas fa-exclamation-triangle"></i> Alertes & Échéances</h3>
-          <span class="badge badge-danger" id="header-alert-count">0</span>
-        </div>
-        <div id="dashboard-alerts" style="max-height:300px; overflow-y:auto;"></div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:25px;">
-      <div class="card-header">
-        <h3><i class="fas fa-tachometer-alt"></i> État Global du Parc</h3>
-      </div>
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Véhicule</th>
-              <th>Dernier Entretien</th>
-              <th>Consommation (L/100km)</th>
-              <th>Coût Total (FCFA)</th>
-              <th>Santé</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-overview"></tbody>
-        </table>
-      </div>
+        <div class="card"><div class="card-header"><h3>Consommation</h3></div><canvas id="chart-fuel" height="150"></canvas></div>
+        <div class="card"><div class="card-header"><h3>Alertes</h3><span class="badge badge-danger" id="header-alert-count">0</span></div><div id="dashboard-alerts"></div></div>
     </div>
   </div>
 
   <div id="section-vehicles" class="content-section" style="display:none">
-    <div class="card">
-      <div class="card-header">
-        <h3><i class="fas fa-car"></i> Liste des Véhicules</h3>
-        <button class="btn btn-primary" onclick="openModal('vehicle')"><i class="fas fa-plus"></i> Nouveau Véhicule</button>
-      </div>
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Véhicule</th>
-              <th>Immatriculation</th>
-              <th>Année</th>
-              <th>KM Actuel</th>
-              <th>État</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-vehicles"></tbody>
-        </table>
-      </div>
-    </div>
+    <div class="card"><div class="card-header"><h3>Liste des Véhicules</h3><button class="btn btn-primary" onclick="openModal('vehicle')">Nouveau Véhicule</button></div>
+    <div class="table-container"><table><thead><tr><th>Véhicule</th><th>Immatriculation</th><th>KM Actuel</th><th>État</th><th>Actions</th></tr></thead><tbody id="tbody-vehicles"></tbody></table></div></div>
   </div>
 
   <div id="section-drivers" class="content-section" style="display:none">
-    <div class="card">
-      <div class="card-header">
-        <h3><i class="fas fa-id-card"></i> Personnel & Chauffeurs</h3>
-        <button class="btn btn-primary" onclick="openModal('driver')"><i class="fas fa-plus"></i> Nouveau Chauffeur</button>
-      </div>
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Nom & Prénom</th>
-              <th>Matricule</th>
-              <th>Téléphone</th>
-              <th>Permis</th>
-              <th>Statut</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-drivers"></tbody>
-        </table>
-      </div>
-    </div>
+    <div class="card"><div class="card-header"><h3>Chauffeurs</h3><button class="btn btn-primary" onclick="openModal('driver')">Nouveau Chauffeur</button></div>
+    <div class="table-container"><table><thead><tr><th>Nom</th><th>Matricule</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="tbody-drivers"></tbody></table></div></div>
   </div>
 
   <div id="section-maintenance" class="content-section" style="display:none">
-    <div class="card">
-      <div class="card-header">
-        <h3><i class="fas fa-history"></i> Historique des Entretiens</h3>
-        <button class="btn btn-primary" onclick="openModal('maintenance')"><i class="fas fa-plus"></i> Saisir Entretien</button>
-      </div>
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Véhicule</th>
-              <th>Type</th>
-              <th>Kilométrage</th>
-              <th>Coût (FCFA)</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-maintenance"></tbody>
-        </table>
-      </div>
-    </div>
+    <div class="card"><div class="card-header"><h3>Entretiens</h3><button class="btn btn-primary" onclick="openModal('maintenance')">Saisir Entretien</button></div>
+    <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Type</th><th>Coût</th><th>Actions</th></tr></thead><tbody id="tbody-maintenance"></tbody></table></div></div>
   </div>
 
   <div id="section-fuel" class="content-section" style="display:none">
-    <div class="card">
-      <div class="card-header">
-        <h3><i class="fas fa-gas-pump"></i> Suivi des Pleins</h3>
-        <button class="btn btn-primary" onclick="openModal('fuel')"><i class="fas fa-plus"></i> Saisir Carburant</button>
-      </div>
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Véhicule</th>
-              <th>Litres</th>
-              <th>Prix/L</th>
-              <th>Total (FCFA)</th>
-              <th>Station</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-fuel"></tbody>
-        </table>
-      </div>
-    </div>
+    <div class="card"><div class="card-header"><h3>Carburant</h3><button class="btn btn-primary" onclick="openModal('fuel')">Saisir Carburant</button></div>
+    <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Litres</th><th>Montant</th><th>Actions</th></tr></thead><tbody id="tbody-fuel"></tbody></table></div></div>
   </div>
 
   <div id="section-insurance" class="content-section" style="display:none">
-    <div class="card">
-      <div class="card-header">
-        <h3><i class="fas fa-file-contract"></i> Documents & Assurances</h3>
-        <button class="btn btn-primary" onclick="openModal('insurance')"><i class="fas fa-plus"></i> Nouveau Document</button>
-      </div>
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Véhicule</th>
-              <th>Type de Document</th>
-              <th>Compagnie</th>
-              <th>Date d'expiration</th>
-              <th>Statut</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-insurance"></tbody>
-        </table>
-      </div>
-    </div>
+    <div class="card"><div class="card-header"><h3>Documents</h3><button class="btn btn-primary" onclick="openModal('insurance')">Nouveau Document</button></div>
+    <div class="table-container"><table><thead><tr><th>Véhicule</th><th>Type</th><th>Expiration</th><th>Actions</th></tr></thead><tbody id="tbody-insurance"></tbody></table></div></div>
   </div>
 </div>
 
-<div id="modal-vehicle" class="modal">
-  <div class="modal-content">
-    <div class="modal-header"><h3>Nouveau Véhicule</h3><button class="close-modal" onclick="closeModal('vehicle')">&times;</button></div>
-    <div class="modal-body">
-      <form id="form-vehicle">
-        <input type="hidden" name="id">
-        <div class="form-grid">
-          <div class="form-group"><label>Marque / Modèle</label><input type="text" name="brand" required placeholder="ex: Toyota Hilux"></div>
-          <div class="form-group"><label>Immatriculation</label><input type="text" name="plate" required placeholder="ex: LT-123-AB"></div>
-          <div class="form-group"><label>Année de mise en circulation</label><input type="number" name="year" required></div>
-          <div class="form-group"><label>Kilométrage Initial</label><input type="number" name="km" required></div>
-          <div class="form-group"><label>Type de Carburant</label><select name="fuelType"><option value="Gasoil">Gasoil</option><option value="Super">Super</option></select></div>
-          <div class="form-group"><label>État Actuel</label><select name="state"><option value="En service">En service</option><option value="En panne">En panne</option><option value="En maintenance">En maintenance</option></select></div>
-        </div>
-      </form>
-    </div>
-    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('vehicle')">Annuler</button><button class="btn btn-primary" onclick="handleSave('vehicles', 'vehicle')">Enregistrer</button></div>
-  </div>
-</div>
+<div id="modal-vehicle" class="modal"><div class="modal-content"><div class="modal-header"><h3>Véhicule</h3><button class="close-modal" onclick="closeModal('vehicle')">&times;</button></div><div class="modal-body"><form id="form-vehicle"><input type="hidden" name="id"><div class="form-grid"><div class="form-group"><label>Marque</label><input type="text" name="brand" required></div><div class="form-group"><label>Immatriculation</label><input type="text" name="plate" required></div><div class="form-group"><label>Année</label><input type="number" name="year" required></div><div class="form-group"><label>KM Actuel</label><input type="number" name="km" required></div><div class="form-group"><label>État</label><select name="state"><option value="En service">En service</option><option value="En panne">En panne</option></select></div></div></form></div><div class="modal-footer"><button class="btn btn-primary" onclick="handleSave('vehicles', 'vehicle')">Enregistrer</button></div></div></div>
 
-<div id="modal-driver" class="modal">
-  <div class="modal-content">
-    <div class="modal-header"><h3>Nouveau Chauffeur</h3><button class="close-modal" onclick="closeModal('driver')">&times;</button></div>
-    <div class="modal-body">
-      <form id="form-driver">
-        <input type="hidden" name="id">
-        <div class="form-grid">
-          <div class="form-group"><label>Nom & Prénom</label><input type="text" name="name" required></div>
-          <div class="form-group"><label>Matricule</label><input type="text" name="mat" required></div>
-          <div class="form-group"><label>Téléphone</label><input type="text" name="phone"></div>
-          <div class="form-group"><label>Catégorie Permis</label><input type="text" name="lic"></div>
-          <div class="form-group"><label>Expiration Permis</label><input type="date" name="licexp"></div>
-          <div class="form-group"><label>Statut</label><select name="status"><option value="Actif">Actif</option><option value="Repos">Repos</option><option value="Congé">Congé</option></select></div>
-        </div>
-      </form>
-    </div>
-    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('driver')">Annuler</button><button class="btn btn-primary" onclick="handleSave('drivers', 'driver')">Enregistrer</button></div>
-  </div>
-</div>
+<div id="modal-driver" class="modal"><div class="modal-content"><div class="modal-header"><h3>Chauffeur</h3><button class="close-modal" onclick="closeModal('driver')">&times;</button></div><div class="modal-body"><form id="form-driver"><input type="hidden" name="id"><div class="form-grid"><div class="form-group"><label>Nom</label><input type="text" name="name" required></div><div class="form-group"><label>Matricule</label><input type="text" name="mat" required></div><div class="form-group"><label>Statut</label><select name="status"><option value="Actif">Actif</option><option value="Repos">Repos</option></select></div></div></form></div><div class="modal-footer"><button class="btn btn-primary" onclick="handleSave('drivers', 'driver')">Enregistrer</button></div></div></div>
 
-<div id="modal-maintenance" class="modal">
-  <div class="modal-content">
-    <div class="modal-header"><h3>Saisir Entretien</h3><button class="close-modal" onclick="closeModal('maintenance')">&times;</button></div>
-    <div class="modal-body">
-      <form id="form-maintenance">
-        <input type="hidden" name="id">
-        <div class="form-grid">
-          <div class="form-group"><label>Date</label><input type="date" name="date" required></div>
-          <div class="form-group"><label>Véhicule</label><select name="vehicle" id="select-m-v" required></select></div>
-          <div class="form-group"><label>Type d'opération</label><select name="type"><option value="Vidange">Vidange</option><option value="Pneumatique">Pneumatique</option><option value="Freinage">Freinage</option><option value="Révision Générale">Révision Générale</option><option value="Réparation">Réparation</option></select></div>
-          <div class="form-group"><label>Kilométrage lors de l'acte</label><input type="number" name="km" required></div>
-          <div class="form-group"><label>Coût (FCFA)</label><input type="number" name="cost" required></div>
-          <div class="form-group"><label>Prochain entretien (Date prévue)</label><input type="date" name="nextDate"></div>
-          <div class="form-group full"><label>Détails / Pièces changées</label><textarea name="notes" rows="3"></textarea></div>
-        </div>
-      </form>
-    </div>
-    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('maintenance')">Annuler</button><button class="btn btn-primary" onclick="handleSave('maintenance', 'maintenance')">Enregistrer</button></div>
-  </div>
-</div>
+<div id="modal-maintenance" class="modal"><div class="modal-content"><div class="modal-header"><h3>Entretien</h3><button class="close-modal" onclick="closeModal('maintenance')">&times;</button></div><div class="modal-body"><form id="form-maintenance"><input type="hidden" name="id"><div class="form-grid"><div class="form-group"><label>Date</label><input type="date" name="date" required></div><div class="form-group"><label>Véhicule</label><select name="vehicle" id="select-m-v" required></select></div><div class="form-group"><label>Type</label><input type="text" name="type" required></div><div class="form-group"><label>Coût</label><input type="number" name="cost" required></div></div></form></div><div class="modal-footer"><button class="btn btn-primary" onclick="handleSave('maintenance', 'maintenance')">Enregistrer</button></div></div></div>
 
-<div id="modal-fuel" class="modal">
-  <div class="modal-content">
-    <div class="modal-header"><h3>Saisir Carburant</h3><button class="close-modal" onclick="closeModal('fuel')">&times;</button></div>
-    <div class="modal-body">
-      <form id="form-fuel">
-        <input type="hidden" name="id">
-        <div class="form-grid">
-          <div class="form-group"><label>Date</label><input type="date" name="date" required></div>
-          <div class="form-group"><label>Véhicule</label><select name="vehicle" id="select-f-v" required></select></div>
-          <div class="form-group"><label>Kilométrage Actuel</label><input type="number" name="km" required></div>
-          <div class="form-group"><label>Nombre de Litres</label><input type="number" name="liters" step="0.01" required></div>
-          <div class="form-group"><label>Prix au Litre (FCFA)</label><input type="number" name="price" required value="840"></div>
-          <div class="form-group"><label>Montant Total (FCFA)</label><input type="number" name="cost" required></div>
-          <div class="form-group full"><label>Station Service / N° Bon</label><input type="text" name="station"></div>
-        </div>
-      </form>
-    </div>
-    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('fuel')">Annuler</button><button class="btn btn-primary" onclick="handleSave('fuel', 'fuel')">Enregistrer</button></div>
-  </div>
-</div>
+<div id="modal-fuel" class="modal"><div class="modal-content"><div class="modal-header"><h3>Carburant</h3><button class="close-modal" onclick="closeModal('fuel')">&times;</button></div><div class="modal-body"><form id="form-fuel"><input type="hidden" name="id"><div class="form-grid"><div class="form-group"><label>Date</label><input type="date" name="date" required></div><div class="form-group"><label>Véhicule</label><select name="vehicle" id="select-f-v" required></select></div><div class="form-group"><label>Litres</label><input type="number" name="liters" required></div><div class="form-group"><label>Montant</label><input type="number" name="cost" required></div></div></form></div><div class="modal-footer"><button class="btn btn-primary" onclick="handleSave('fuel', 'fuel')">Enregistrer</button></div></div></div>
 
-<div id="modal-insurance" class="modal">
-  <div class="modal-content">
-    <div class="modal-header"><h3>Gérer les Documents</h3><button class="close-modal" onclick="closeModal('insurance')">&times;</button></div>
-    <div class="modal-body">
-      <form id="form-insurance">
-        <input type="hidden" name="id">
-        <div class="form-grid">
-          <div class="form-group"><label>Véhicule</label><select name="vehicle" id="select-i-v" required></select></div>
-          <div class="form-group"><label>Type de Document</label><select name="type"><option value="Assurance">Assurance</option><option value="Visite Technique">Visite Technique</option><option value="Vignette">Vignette</option><option value="Carte Grise">Carte Grise</option></select></div>
-          <div class="form-group"><label>Référence / Police</label><input type="text" name="ref"></div>
-          <div class="form-group"><label>Compagnie / Organisme</label><input type="text" name="company"></div>
-          <div class="form-group"><label>Date de début</label><input type="date" name="start"></div>
-          <div class="form-group"><label>Date d'expiration</label><input type="date" name="end" required></div>
-        </div>
-      </form>
-    </div>
-    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('insurance')">Annuler</button><button class="btn btn-primary" onclick="handleSave('insurance', 'insurance')">Enregistrer</button></div>
-  </div>
-</div>
+<div id="modal-insurance" class="modal"><div class="modal-content"><div class="modal-header"><h3>Document</h3><button class="close-modal" onclick="closeModal('insurance')">&times;</button></div><div class="modal-body"><form id="form-insurance"><input type="hidden" name="id"><div class="form-grid"><div class="form-group"><label>Véhicule</label><select name="vehicle" id="select-i-v" required></select></div><div class="form-group"><label>Type</label><select name="type"><option value="Assurance">Assurance</option><option value="Visite">Visite</option></select></div><div class="form-group"><label>Expiration</label><input type="date" name="end" required></div></div></form></div><div class="modal-footer"><button class="btn btn-primary" onclick="handleSave('insurance', 'insurance')">Enregistrer</button></div></div></div>
 
 <div id="toast" class="toast"></div>
 
 <script>
-// ========================================
-// CONFIGURATION & KEYS
-// ========================================
-const KEYS = {
-  vehicles: 'tf_v1_vehicles',
-  drivers: 'tf_v1_drivers',
-  maintenance: 'tf_v1_maintenance',
-  fuel: 'tf_v1_fuel',
-  insurance: 'tf_v1_insurance'
-};
+// CONFIGURATION
+const KEYS = { vehicles: 'tf_v1_v', drivers: 'tf_v1_d', maintenance: 'tf_v1_m', fuel: 'tf_v1_f', insurance: 'tf_v1_i' };
 
-let fuelChart = null;
-
-// ========================================
 // CORE FUNCTIONS
-// ========================================
-function load(key) {
-  const data = localStorage.getItem(KEYS[key]);
-  return data ? JSON.parse(data) : [];
+function load(key) { return JSON.parse(localStorage.getItem(KEYS[key])) || []; }
+function save(key, data) { localStorage.setItem(KEYS[key], JSON.stringify(data)); refreshUI(); }
+
+function showSection(id, element) {
+    document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+    document.getElementById('section-' + id).style.display = 'block';
+    document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+    element.classList.add('active');
+    document.getElementById('section-title').textContent = element.innerText;
 }
 
-function save(key, data) {
-  localStorage.setItem(KEYS[key], JSON.stringify(data));
-  refreshUI();
-}
-
-function refreshUI() {
-  renderVehicles();
-  renderDrivers();
-  renderMaintenance();
-  renderFuel();
-  renderInsurance();
-  renderDashboard();
-  updateAlertBadge();
-  populateSelects();
-}
-
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 3000);
-}
-
-// ========================================
-// MODAL MANAGEMENT
-// ========================================
-function openModal(type, id = null) {
-  const modal = document.getElementById('modal-' + type);
-  const form = document.getElementById('form-' + type);
-  form.reset();
-  form.id.value = '';
-  
-  if (id) {
-    const data = load(type === 'vehicle' ? 'vehicles' : (type === 'driver' ? 'drivers' : type));
-    const item = data.find(x => x.id === id);
-    if (item) {
-      Object.keys(item).forEach(key => {
-        if (form[key]) form[key].value = item[key];
-      });
-      modal.querySelector('h3').textContent = 'Modifier';
+// MODAL CONTROLLERS (FIXED)
+function openModal(type) {
+    const modal = document.getElementById('modal-' + type);
+    const form = document.getElementById('form-' + type);
+    if(modal && form) {
+        form.reset();
+        form.id.value = '';
+        modal.style.display = 'flex';
     }
-  } else {
-    modal.querySelector('h3').textContent = 'Ajouter';
-  }
-  
-  modal.style.display = 'flex';
 }
 
 function closeModal(type) {
-  document.getElementById('modal-' + type).style.display = 'none';
+    document.getElementById('modal-' + type).style.display = 'none';
 }
 
 function handleSave(key, modalType) {
-  const form = document.getElementById('form-' + modalType);
-  if (!form.reportValidity()) return;
-  
-  const formData = new FormData(form);
-  const item = Object.fromEntries(formData.entries());
-  
-  let data = load(key);
-  
-  if (item.id) {
-    const index = data.findIndex(x => x.id === item.id);
-    data[index] = item;
-    toast('Mise à jour réussie');
-  } else {
+    const form = document.getElementById('form-' + modalType);
+    if(!form.reportValidity()) return;
+    const data = load(key);
+    const item = Object.fromEntries(new FormData(form).entries());
     item.id = Date.now().toString();
     data.push(item);
-    
-    // Si carburant ou entretien, mettre à jour le kilométrage du véhicule
-    if ((key === 'fuel' || key === 'maintenance') && item.km) {
-      updateVehicleKM(item.vehicle, item.km);
-    }
-    
-    toast('Ajout réussi');
-  }
-  
-  save(key, data);
-  closeModal(modalType);
-}
-
-function updateVehicleKM(plate, newKM) {
-  let vs = load('vehicles');
-  const idx = vs.findIndex(v => v.plate === plate);
-  if (idx !== -1) {
-    if (parseInt(newKM) > parseInt(vs[idx].km)) {
-      vs[idx].km = newKM;
-      localStorage.setItem(KEYS.vehicles, JSON.stringify(vs));
-    }
-  }
+    save(key, data);
+    closeModal(modalType);
+    toast("Enregistré avec succès !");
 }
 
 function deleteItem(key, id) {
-  if (!confirm('Supprimer cet élément ?')) return;
-  let data = load(key);
-  data = data.filter(x => x.id !== id);
-  save(key, data);
-  toast('Suppression effectuée');
+    if(!confirm("Supprimer ?")) return;
+    save(key, load(key).filter(x => x.id !== id));
 }
 
-// ========================================
-// RENDERING FUNCTIONS
-// ========================================
+// RENDERING
+function refreshUI() {
+    renderVehicles(); renderDrivers(); renderMaintenance(); renderFuel(); renderInsurance(); populateSelects(); renderDashboard();
+}
+
 function renderVehicles() {
-  const data = load('vehicles');
-  const tbody = document.getElementById('tbody-vehicles');
-  tbody.innerHTML = data.map(v => `
-    <tr>
-      <td>
-        <div class="vehicle-cell">
-          <div class="vehicle-img"><i class="fas fa-car"></i></div>
-          <div class="vehicle-info"><span class="v-name">${v.brand}</span><span class="v-plate">${v.plate}</span></div>
-        </div>
-      </td>
-      <td><code>${v.plate}</code></td>
-      <td>${v.year}</td>
-      <td>${parseInt(v.km).toLocaleString()} km</td>
-      <td><span class="badge ${v.state === 'En service' ? 'badge-success' : (v.state === 'En panne' ? 'badge-danger' : 'badge-warning')}">${v.state}</span></td>
-      <td>
-        <div class="action-btns">
-          <button class="btn-icon edit" onclick="openModal('vehicle', '${v.id}')"><i class="fas fa-edit"></i></button>
-          <button class="btn-icon delete" onclick="deleteItem('vehicles', '${v.id}')"><i class="fas fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>
-  `).join('') || '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Aucun véhicule. Cliquez sur "Nouveau Véhicule" pour commencer.</td></tr>';
+    const tbody = document.getElementById('tbody-vehicles');
+    tbody.innerHTML = load('vehicles').map(v => `<tr><td>${v.brand}</td><td>${v.plate}</td><td>${v.km} km</td><td>${v.state}</td><td><button onclick="deleteItem('vehicles','${v.id}')">Suppr</button></td></tr>`).join('') || '<tr><td colspan="5">Aucun véhicule</td></tr>';
 }
 
 function renderDrivers() {
-  const data = load('drivers');
-  const tbody = document.getElementById('tbody-drivers');
-  tbody.innerHTML = data.map(d => `
-    <tr>
-      <td><b>${d.name}</b></td>
-      <td><code>${d.mat}</code></td>
-      <td>${d.phone || '-'}</td>
-      <td>${d.lic || '-'}</td>
-      <td><span class="badge ${d.status === 'Actif' ? 'badge-success' : 'badge-info'}">${d.status}</span></td>
-      <td>
-        <div class="action-btns">
-          <button class="btn-icon edit" onclick="openModal('driver', '${d.id}')"><i class="fas fa-edit"></i></button>
-          <button class="btn-icon delete" onclick="deleteItem('drivers', '${d.id}')"><i class="fas fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>
-  `).join('') || '<tr><td colspan="6" style="text-align:center; padding:20px;">Aucun chauffeur enregistré.</td></tr>';
+    const tbody = document.getElementById('tbody-drivers');
+    tbody.innerHTML = load('drivers').map(d => `<tr><td>${d.name}</td><td>${d.mat}</td><td>${d.status}</td><td><button onclick="deleteItem('drivers','${d.id}')">Suppr</button></td></tr>`).join('');
 }
 
 function renderMaintenance() {
-  const data = load('maintenance');
-  const tbody = document.getElementById('tbody-maintenance');
-  tbody.innerHTML = data.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(m => `
-    <tr>
-      <td>${new Date(m.date).toLocaleDateString()}</td>
-      <td><b>${m.vehicle}</b></td>
-      <td><span class="badge badge-info">${m.type}</span></td>
-      <td>${parseInt(m.km).toLocaleString()} km</td>
-      <td>${parseInt(m.cost).toLocaleString()}</td>
-      <td>
-        <div class="action-btns">
-          <button class="btn-icon delete" onclick="deleteItem('maintenance', '${m.id}')"><i class="fas fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
+    const tbody = document.getElementById('tbody-maintenance');
+    tbody.innerHTML = load('maintenance').map(m => `<tr><td>${m.date}</td><td>${m.vehicle}</td><td>${m.type}</td><td>${m.cost}</td><td><button onclick="deleteItem('maintenance','${m.id}')">Suppr</button></td></tr>`).join('');
 }
 
 function renderFuel() {
-  const data = load('fuel');
-  const tbody = document.getElementById('tbody-fuel');
-  tbody.innerHTML = data.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(f => `
-    <tr>
-      <td>${new Date(f.date).toLocaleDateString()}</td>
-      <td><b>${f.vehicle}</b></td>
-      <td>${f.liters} L</td>
-      <td>${f.price}</td>
-      <td><b>${parseInt(f.cost).toLocaleString()}</b></td>
-      <td>${f.station || '-'}</td>
-      <td>
-        <div class="action-btns">
-          <button class="btn-icon delete" onclick="deleteItem('fuel', '${f.id}')"><i class="fas fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
+    const tbody = document.getElementById('tbody-fuel');
+    tbody.innerHTML = load('fuel').map(f => `<tr><td>${f.date}</td><td>${f.vehicle}</td><td>${f.liters} L</td><td>${f.cost}</td><td><button onclick="deleteItem('fuel','${f.id}')">Suppr</button></td></tr>`).join('');
 }
 
 function renderInsurance() {
-  const data = load('insurance');
-  const tbody = document.getElementById('tbody-insurance');
-  const today = new Date();
-  
-  tbody.innerHTML = data.map(i => {
-    const end = new Date(i.end);
-    const diff = (end - today) / (1000 * 60 * 60 * 24);
-    let status = 'badge-success';
-    let label = 'À jour';
-    
-    if (diff < 0) { status = 'badge-danger'; label = 'Expiré'; }
-    else if (diff < 15) { status = 'badge-warning'; label = 'Bientôt'; }
-    
-    return `
-      <tr>
-        <td><b>${i.vehicle}</b></td>
-        <td>${i.type}</td>
-        <td>${i.company || '-'}</td>
-        <td>${end.toLocaleDateString()}</td>
-        <td><span class="badge ${status}">${label}</span></td>
-        <td>
-          <div class="action-btns">
-            <button class="btn-icon delete" onclick="deleteItem('insurance', '${i.id}')"><i class="fas fa-trash"></i></button>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join('');
+    const tbody = document.getElementById('tbody-insurance');
+    tbody.innerHTML = load('insurance').map(i => `<tr><td>${i.vehicle}</td><td>${i.type}</td><td>${i.end}</td><td><button onclick="deleteItem('insurance','${i.id}')">Suppr</button></td></tr>`).join('');
 }
 
-// ========================================
-// DASHBOARD LOGIC
-// ========================================
-function renderDashboard() {
-  const v = load('vehicles');
-  const f = load('fuel');
-  const m = load('maintenance');
-  const today = new Date();
-  const currentMonth = today.getMonth();
-  const currentYear = today.getFullYear();
-
-  // Stats
-  document.getElementById('stat-vehicles').textContent = v.length;
-  document.getElementById('stat-active').textContent = v.filter(x => x.state === 'En service').length;
-  
-  const m30 = m.filter(x => {
-    const d = new Date(x.date);
-    return (today - d) / (1000*60*60*24) <= 30;
-  }).length;
-  document.getElementById('stat-maint').textContent = m30;
-
-  const fMonth = f.filter(x => {
-    const d = new Date(x.date);
-    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-  }).reduce((acc, curr) => acc + parseFloat(curr.liters), 0);
-  document.getElementById('stat-fuel').textContent = Math.round(fMonth);
-
-  renderFuelChart();
-  renderAlerts();
-  renderOverviewTable();
-}
-
-function renderFuelChart() {
-  const fuel = load('fuel');
-  const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
-  const data = new Array(12).fill(0);
-  
-  fuel.forEach(f => {
-    const d = new Date(f.date);
-    if (d.getFullYear() === new Date().getFullYear()) {
-      data[d.getMonth()] += parseFloat(f.liters);
-    }
-  });
-
-  const ctx = document.getElementById('chart-fuel').getContext('2d');
-  if (fuelChart) fuelChart.destroy();
-  
-  fuelChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: months,
-      datasets: [{
-        label: 'Consommation (Litres)',
-        data: data,
-        borderColor: '#1a2d4a',
-        backgroundColor: 'rgba(26, 45, 74, 0.1)',
-        fill: true,
-        tension: 0.4,
-        borderWidth: 3,
-        pointBackgroundColor: '#ff6b35'
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, grid: { borderDash: [5, 5] } }, x: { grid: { display: false } } }
-    }
-  });
-}
-
-function renderAlerts() {
-  const container = document.getElementById('dashboard-alerts');
-  const today = new Date();
-  let alerts = [];
-
-  // Documents alert
-  load('insurance').forEach(i => {
-    const diff = (new Date(i.end) - today) / 86400000;
-    if (diff < 30) {
-      alerts.push({
-        type: diff < 0 ? 'critical' : 'warning',
-        icon: 'fa-file-contract',
-        title: `${i.type} - ${i.vehicle}`,
-        desc: diff < 0 ? `Expiré depuis ${Math.abs(Math.floor(diff))} jours` : `Expire dans ${Math.floor(diff)} jours`
-      });
-    }
-  });
-
-  // Maintenance alert
-  load('maintenance').forEach(m => {
-    if (m.nextDate) {
-      const diff = (new Date(m.nextDate) - today) / 86400000;
-      if (diff < 15) {
-        alerts.push({
-          type: diff < 0 ? 'critical' : 'warning',
-          icon: 'fa-tools',
-          title: `Entretien prévu - ${m.vehicle}`,
-          desc: diff < 0 ? `En retard de ${Math.abs(Math.floor(diff))} jours` : `Prévu dans ${Math.floor(diff)} jours`
-        });
-      }
-    }
-  });
-
-  // Drivers License
-  load('drivers').forEach(d => {
-    if (d.licexp) {
-      const diff = (new Date(d.licexp) - today) / 86400000;
-      if (diff < 30) {
-        alerts.push({
-          type: diff < 0 ? 'critical' : 'warning',
-          icon: 'fa-id-card',
-          title: `Permis : ${d.name}`,
-          desc: diff < 0 ? `Expiré` : `Expire dans ${Math.floor(diff)} jours`
-        });
-      }
-    }
-  });
-
-  document.getElementById('header-alert-count').textContent = alerts.length;
-  document.getElementById('header-alert-dot').style.display = alerts.length > 0 ? 'block' : 'none';
-
-  if (alerts.length === 0) {
-    container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-muted);"><i class="fas fa-check-circle" style="font-size:30px; color:var(--success); margin-bottom:10px; display:block;"></i>Tout est en règle</div>';
-    return;
-  }
-
-  container.innerHTML = alerts.sort((a,b) => a.type === 'critical' ? -1 : 1).map(a => `
-    <div class="alert-item ${a.type}">
-      <div class="alert-icon" style="background:${a.type === 'critical' ? 'var(--danger)' : 'var(--warning)'}; color:white;">
-        <i class="fas ${a.icon}"></i>
-      </div>
-      <div class="alert-info">
-        <h4>${a.title}</h4>
-        <p>${a.desc}</p>
-      </div>
-      <i class="fas fa-chevron-right" style="font-size:10px; color:var(--text-muted);"></i>
-    </div>
-  `).join('');
-}
-
-function renderOverviewTable() {
-  const vs = load('vehicles');
-  const fuel = load('fuel');
-  const maint = load('maintenance');
-  const tbody = document.getElementById('tbody-overview');
-  
-  tbody.innerHTML = vs.map(v => {
-    const fuelV = fuel.filter(f => f.vehicle === v.plate);
-    const maintV = maint.filter(m => m.vehicle === v.plate).sort((a,b) => new Date(b.date)-new Date(a.date));
-    
-    // Calcul conso (approximation sur les 2 derniers pleins)
-    let conso = "N/A";
-    if (fuelV.length >= 2) {
-      const last = fuelV.sort((a,b) => new Date(b.date)-new Date(a.date));
-      const dist = parseInt(last[0].km) - parseInt(last[1].km);
-      if (dist > 0) conso = ((last[0].liters / dist) * 100).toFixed(1);
-    }
-    
-    const totalCost = fuelV.reduce((s,f) => s + parseInt(f.cost||0), 0) + maintV.reduce((s,m) => s + parseInt(m.cost||0), 0);
-    
-    return `
-      <tr>
-        <td><b>${v.brand}</b> <br> <small>${v.plate}</small></td>
-        <td>${maintV.length ? new Date(maintV[0].date).toLocaleDateString() : 'Aucun'}</td>
-        <td><i class="fas fa-burn" style="color:var(--accent)"></i> ${conso} L</td>
-        <td><b>${totalCost.toLocaleString()}</b></td>
-        <td>
-          <div class="progress-container">
-            <div class="progress-bar" style="width: ${v.state === 'En service' ? '100%' : '30%'}; background:${v.state === 'En service' ? 'var(--success)' : 'var(--danger)'}"></div>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-// ========================================
-// UTILS
-// ========================================
 function populateSelects() {
-  const vs = load('vehicles');
-  const options = vs.map(v => `<option value="${v.plate}">${v.brand} (${v.plate})</option>`).join('');
-  ['select-m-v', 'select-f-v', 'select-i-v'].forEach(id => {
-    document.getElementById(id).innerHTML = options;
-  });
+    const options = load('vehicles').map(v => `<option value="${v.plate}">${v.plate}</option>`).join('');
+    ['select-m-v', 'select-f-v', 'select-i-v'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.innerHTML = options;
+    });
 }
 
-function searchGlobal(query) {
-  // Simple filtrage visuel sur la section active
+function renderDashboard() {
+    const v = load('vehicles');
+    document.getElementById('stat-vehicles').textContent = v.length;
+    document.getElementById('stat-active').textContent = v.filter(x => x.state === 'En service').length;
 }
 
-// ========================================
-// EXPORTATION VERS EXCEL (CSV) - REMPLACE RESET
-// ========================================
+function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2000); }
+
 function exportToExcel() {
-  const v = load('vehicles');
-  const d = load('drivers');
-  const m = load('maintenance');
-  const f = load('fuel');
-  const i = load('insurance');
-
-  if (v.length === 0) {
-    toast("Aucune donnée à exporter.");
-    return;
-  }
-
-  let csv = "\uFEFF"; // BOM pour les accents Excel
-  
-  // Section Véhicules
-  csv += "SECTION VEHICULES\nMarque;Immatriculation;KM;Etat\n";
-  v.forEach(x => { csv += `${x.brand};${x.plate};${x.km};${x.state}\n`; });
-
-  // Section Carburant
-  csv += "\nSECTION CARBURANT\nDate;Vehicule;Litres;Montant;Station\n";
-  f.forEach(x => { csv += `${x.date};${x.vehicle};${x.liters};${x.cost};${x.station}\n`; });
-
-  // Section Chauffeurs
-  csv += "\nSECTION CHAUFFEURS\nNom;Matricule;Statut\n";
-  d.forEach(x => { csv += `${x.name};${x.mat};${x.status}\n`; });
-
-  // Section Entretiens
-  csv += "\nSECTION ENTRETIENS\nDate;Vehicule;Type;Cout\n";
-  m.forEach(x => { csv += `${x.date};${x.vehicle};${x.type};${x.cost}\n`; });
-
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "TrustFleet_Rapport_" + new Date().toISOString().slice(0,10) + ".csv";
-  link.click();
-  toast("Exportation réussie !");
+    let csv = "SECTION;DETAIL1;DETAIL2\n";
+    load('vehicles').forEach(v => csv += `VEHICULE;${v.brand};${v.plate}\n`);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'TrustFleet_Export.csv';
+    a.click();
 }
 
-function showSection(id) {
-  document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
-  document.getElementById('section-' + id).style.display = 'block';
-  document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-  document.getElementById('section-title').textContent = event.currentTarget.innerText;
-}
-
-// ALERT BADGE
-function updateAlertBadge(count) {
-  if (count === undefined) {
-    const today=new Date(); today.setHours(0,0,0,0);
-    const m=load('maintenance').filter(x=>{if(!x.nextDate)return false;const d=new Date(x.nextDate);d.setHours(0,0,0,0);return (d-today)/86400000<=30;}).length;
-    const i=load('insurance').filter(x=>{const d=new Date(x.end);d.setHours(0,0,0,0);return (d-today)/86400000<=30;}).length;
-    const d=load('drivers').filter(x=>{if(!x.licexp)return false;const dt=new Date(x.licexp);dt.setHours(0,0,0,0);return (dt-today)/86400000<=30;}).length;
-    count=m+i+d+load('vehicles').filter(v=>v.state==='En panne').length;
-  }
-  const badge=document.getElementById('badge-alerts');
-  const hbadge=document.getElementById('header-alert-count');
-  if(count>0){badge.textContent=count;badge.style.display='';hbadge.textContent=count;hbadge.style.display='';}
-  else{badge.style.display='none';hbadge.style.display='none';}
-}
-
-// ========================================
-// ONLOAD
-// ========================================
-window.onload = function() {
-  document.getElementById('current-date').textContent = new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  
-  // initDemoData(); <--- SUPPRIMÉ : L'application démarre vide.
-  
-  refreshUI();
+window.onload = () => {
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString();
+    refreshUI();
 };
 </script>
 </body>
