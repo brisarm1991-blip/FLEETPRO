@@ -15,7 +15,7 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Segoe UI', Tahoma, sans-serif; background:var(--bg); color:var(--text); min-height:100vh;}
 
-/* --- ZOOM PHOTO --- */
+/* --- EFFET ZOOM PHOTO --- */
 .img-preview { width:45px; height:45px; border-radius:8px; object-fit:cover; border:1px solid var(--border); cursor: pointer; transition: transform 0.2s ease-in-out; }
 .img-preview:hover { transform: scale(4); position: relative; z-index: 1000; box-shadow: var(--shadow); }
 
@@ -88,7 +88,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
   <div class="sidebar">
     <div class="sidebar-header"><i class="fas fa-fighter-jet"></i> CI BA301</div>
     <ul class="sidebar-menu">
-      <li class="active" onclick="showSection('dashboard', this)"><i class="fas fa-tachometer-alt"></i> Dashboard</li>
+      <li class="active" onclick="showSection('dashboard', this)"><i class="fas fa-tachometer-alt"></i> Tableau de bord</li>
       <li onclick="showSection('vehicles', this)"><i class="fas fa-car-side"></i> Véhicules</li>
       <li onclick="showSection('drivers', this)"><i class="fas fa-user-shield"></i> Chauffeurs</li>
       <li onclick="showSection('maintenance', this)"><i class="fas fa-tools"></i> Entretiens</li>
@@ -108,7 +108,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
         <div class="stat-card"><h4>Effectif</h4><h2 id="dash-counts">0 / 0</h2></div>
       </div>
       <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:25px;">
-        <div class="card"><h3>Consommation</h3><canvas id="fuelChart" height="140"></canvas></div>
+        <div class="card"><h3>Consommation (L)</h3><canvas id="fuelChart" height="140"></canvas></div>
         <div class="card"><h3>Répartition KM</h3><canvas id="kmPieChart" height="200"></canvas></div>
       </div>
     </div>
@@ -146,7 +146,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
 
 <div id="modal-vehicle" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h3>Véhicule</h3><button onclick="closeModal('vehicle')">&times;</button></div>
+        <div class="modal-header"><h3>Fiche Véhicule</h3><button onclick="closeModal('vehicle')">&times;</button></div>
         <form id="form-vehicle" class="modal-body">
             <div class="form-grid">
                 <input type="text" name="brand" placeholder="Marque" required>
@@ -154,7 +154,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
                 <input type="text" name="plate" placeholder="Immatriculation" required>
                 <input type="text" name="chassis" placeholder="N° Châssis">
                 <input type="number" name="year" placeholder="Année de dotation">
-                <input type="number" name="km" placeholder="KM Actuel" required>
+                <input type="number" name="km" placeholder="Kilométrage Actuel" required>
                 <select name="status"><option value="En service">En service</option><option value="Indisponible">Indisponible</option></select>
                 <input type="file" accept="image/*" onchange="compressAndEncode(this, 'h-v')">
                 <input type="hidden" name="image" id="h-v">
@@ -166,7 +166,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
 
 <div id="modal-driver" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h3>Chauffeur</h3><button onclick="closeModal('driver')">&times;</button></div>
+        <div class="modal-header"><h3>Fiche Chauffeur</h3><button onclick="closeModal('driver')">&times;</button></div>
         <form id="form-driver" class="modal-body">
             <div class="form-grid">
                 <input type="text" name="grade" placeholder="Grade" required>
@@ -190,7 +190,7 @@ const KEYS = { vehicles: 'tf_v3_v', drivers: 'tf_v3_d', maintenance: 'tf_v3_m', 
 function checkAuth() {
     const u = document.getElementById('user-id').value, p = document.getElementById('user-pass').value;
     const cfg = JSON.parse(localStorage.getItem(KEYS.auth)) || {id:"admin", pw:"1234"};
-    if(u === cfg.id && p === cfg.pw) { launch(); } else { alert("Erreur"); }
+    if(u === cfg.id && p === cfg.pw) { launch(); } else { alert("Identifiants incorrects"); }
 }
 
 function launch() { 
@@ -241,9 +241,9 @@ function printVehicle(id) {
 
 function deleteItem(key, id) { if(confirm("Supprimer ?")) { localStorage.setItem(KEYS[key], JSON.stringify(load(key).filter(x => x.id != id))); refreshUI(); } }
 
-let fChart, kChart;
+let kChart;
 function refreshUI() {
-    const v = load('vehicles'), dr = load('drivers'), m = load('maintenance');
+    const v = load('vehicles'), dr = load('drivers');
     document.getElementById('dash-km-total').textContent = v.reduce((s,c)=>s+parseInt(c.km||0),0).toLocaleString() + " km";
     document.getElementById('dash-counts').textContent = `${v.length} vhc / ${dr.length} chf`;
 
