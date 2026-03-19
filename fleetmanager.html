@@ -35,7 +35,7 @@ body{font-family:'Segoe UI', Tahoma, sans-serif; background:var(--bg); color:var
 .stat-card h4 { font-size:11px; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px; }
 .stat-card h2 { font-size:22px; color:var(--primary); }
 
-/* --- TABLES & CARDS --- */
+/* --- TABLES --- */
 .card { background:white; padding:20px; border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:25px; }
 .table-container { overflow-x:auto; margin-top:15px; }
 table { width:100%; border-collapse:collapse; }
@@ -45,6 +45,14 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
 .status-badge { padding:4px 10px; border-radius:20px; font-size:10px; font-weight:bold; color:white; }
 .bg-success { background: var(--success); }
 .bg-danger { background: var(--danger); }
+
+/* --- ACTIONS --- */
+.actions { display: flex; gap: 8px; }
+.btn-icon { border: none; background: none; cursor: pointer; padding: 5px; border-radius: 4px; transition: 0.2s; }
+.btn-edit { color: var(--info); }
+.btn-edit:hover { background: rgba(23, 162, 184, 0.1); }
+.btn-delete { color: var(--danger); }
+.btn-delete:hover { background: rgba(220, 53, 69, 0.1); }
 
 /* --- MODALS --- */
 .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
@@ -109,7 +117,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
         <div style="display:flex; justify-content:space-between;"><h3>Véhicules</h3><button class="btn btn-accent" onclick="openModal('vehicle')">+ Ajouter</button></div>
         <div class="table-container">
             <table>
-                <thead><tr><th>Photo</th><th>Modèle</th><th>Immatriculation</th><th>KM</th><th>Position</th></tr></thead>
+                <thead><tr><th>Photo</th><th>Modèle</th><th>Immatriculation</th><th>KM</th><th>Position</th><th>Actions</th></tr></thead>
                 <tbody id="tbody-vehicles"></tbody>
             </table>
         </div>
@@ -121,7 +129,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
         <div style="display:flex; justify-content:space-between;"><h3>Chauffeurs</h3><button class="btn btn-accent" onclick="openModal('driver')">+ Ajouter</button></div>
         <div class="table-container">
             <table>
-                <thead><tr><th>Photo</th><th>Grade & Nom</th><th>Matricule</th><th>Permis</th><th>Position</th></tr></thead>
+                <thead><tr><th>Photo</th><th>Grade & Nom</th><th>Matricule</th><th>Permis</th><th>Position</th><th>Actions</th></tr></thead>
                 <tbody id="tbody-drivers"></tbody>
             </table>
         </div>
@@ -130,12 +138,12 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
 
     <div id="section-maintenance" class="content-section" style="display:none">
         <div class="card"><h3>Maintenance</h3><button class="btn btn-primary" onclick="openModal('maintenance')">Saisir</button>
-        <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Type</th><th>KM</th><th>Coût</th></tr></thead><tbody id="tbody-m"></tbody></table></div></div>
+        <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Type</th><th>KM</th><th>Coût</th><th>Actions</th></tr></thead><tbody id="tbody-m"></tbody></table></div></div>
     </div>
 
     <div id="section-fuel" class="content-section" style="display:none">
         <div class="card"><h3>Carburant</h3><button class="btn btn-primary" onclick="openModal('fuel')">Saisir</button>
-        <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>L</th><th>KM</th><th>Prix</th></tr></thead><tbody id="tbody-f"></tbody></table></div></div>
+        <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>L</th><th>KM</th><th>Prix</th><th>Actions</th></tr></thead><tbody id="tbody-f"></tbody></table></div></div>
     </div>
   </div>
 </div>
@@ -144,10 +152,11 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
     <div class="modal-content">
         <div class="modal-header"><h3>Véhicule</h3><button onclick="closeModal('vehicle')">&times;</button></div>
         <form id="form-vehicle" class="modal-body">
+            <input type="hidden" name="id">
             <div class="form-grid">
                 <input type="text" name="brand" placeholder="Marque" required>
                 <input type="text" name="plate" placeholder="Immatriculation" required>
-                <input type="number" name="km" placeholder="KM Initial" required>
+                <input type="number" name="km" placeholder="KM Actuel" required>
                 <select name="status"><option value="En service">En service</option><option value="Indisponible">Indisponible</option></select>
                 <input type="file" accept="image/*" onchange="compressAndEncode(this, 'h-v')">
                 <input type="hidden" name="image" id="h-v">
@@ -161,6 +170,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
     <div class="modal-content">
         <div class="modal-header"><h3>Chauffeur</h3><button onclick="closeModal('driver')">&times;</button></div>
         <form id="form-driver" class="modal-body">
+            <input type="hidden" name="id">
             <div class="form-grid">
                 <input type="text" name="grade" placeholder="Grade" required>
                 <input type="text" name="name" placeholder="Nom Complet" required>
@@ -175,13 +185,10 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
     </div>
 </div>
 
-<div id="modal-maintenance" class="modal"><div class="modal-content"><div class="modal-header"><h3>Entretien</h3><button onclick="closeModal('maintenance')">&times;</button></div><form id="form-maintenance" class="modal-body"><div class="form-grid"><select name="vehicle" class="v-select"></select><input type="text" name="type" placeholder="Nature"><input type="number" name="km" placeholder="KM actuel"><input type="number" name="cost" placeholder="Coût"></div><br><button type="button" class="btn btn-primary" onclick="handleSave('maintenance','maintenance')">Valider</button></form></div></div>
-<div id="modal-fuel" class="modal"><div class="modal-content"><div class="modal-header"><h3>Carburant</h3><button onclick="closeModal('fuel')">&times;</button></div><form id="form-fuel" class="modal-body"><div class="form-grid"><select name="vehicle" class="v-select"></select><input type="number" name="liters" placeholder="Litres"><input type="number" name="km" placeholder="KM actuel"><input type="number" name="cost" placeholder="Montant"></div><br><button type="button" class="btn btn-primary" onclick="handleSave('fuel','fuel')">Valider</button></form></div></div>
+<div id="modal-maintenance" class="modal"><div class="modal-content"><div class="modal-header"><h3>Entretien</h3><button onclick="closeModal('maintenance')">&times;</button></div><form id="form-maintenance" class="modal-body"><input type="hidden" name="id"><div class="form-grid"><select name="vehicle" class="v-select"></select><input type="text" name="type" placeholder="Nature"><input type="number" name="km" placeholder="KM actuel"><input type="number" name="cost" placeholder="Coût"></div><br><button type="button" class="btn btn-primary" onclick="handleSave('maintenance','maintenance')">Valider</button></form></div></div>
+<div id="modal-fuel" class="modal"><div class="modal-content"><div class="modal-header"><h3>Carburant</h3><button onclick="closeModal('fuel')">&times;</button></div><form id="form-fuel" class="modal-body"><input type="hidden" name="id"><div class="form-grid"><select name="vehicle" class="v-select"></select><input type="number" name="liters" placeholder="Litres"><input type="number" name="km" placeholder="KM actuel"><input type="number" name="cost" placeholder="Montant"></div><br><button type="button" class="btn btn-primary" onclick="handleSave('fuel','fuel')">Valider</button></form></div></div>
 
 <script>
-// ========================================
-// LOGIQUE DE STOCKAGE & COMPRESSION
-// ========================================
 const KEYS = { vehicles: 'tf_v3_v', drivers: 'tf_v3_d', maintenance: 'tf_v3_m', fuel: 'tf_v3_f', auth: 'tf_secure_v3' };
 
 function checkAuth() {
@@ -220,11 +227,24 @@ function load(k) { try { return JSON.parse(localStorage.getItem(KEYS[k])) || [];
 
 function handleSave(k, type) {
     const f = document.getElementById('form-'+type), d = load(k);
-    const item = Object.fromEntries(new FormData(f).entries());
-    item.id = Date.now();
-    item.date = new Date().toLocaleDateString('fr-FR');
-    d.push(item);
+    const formData = new FormData(f);
+    const item = Object.fromEntries(formData.entries());
     
+    if(item.id) {
+        const idx = d.findIndex(x => x.id == item.id);
+        if(idx !== -1) {
+            // Garder l'image existante si pas de nouvelle image
+            if(!item.image && d[idx].image) item.image = d[idx].image;
+            item.date = d[idx].date;
+            d[idx] = item;
+        }
+    } else {
+        item.id = Date.now();
+        item.date = new Date().toLocaleDateString('fr-FR');
+        d.push(item);
+    }
+    
+    // Auto-update KM véhicule
     if(item.vehicle && item.km) {
         let vs = load('vehicles');
         let idx = vs.findIndex(v => v.plate === item.vehicle);
@@ -233,6 +253,7 @@ function handleSave(k, type) {
             localStorage.setItem(KEYS.vehicles, JSON.stringify(vs));
         }
     }
+
     try {
         localStorage.setItem(KEYS[k], JSON.stringify(d)); 
         refreshUI();
@@ -240,37 +261,73 @@ function handleSave(k, type) {
     } catch (e) { alert("⚠️ Mémoire saturée !"); }
 }
 
-// ========================================
-// AFFICHAGE & GRAPHIQUES
-// ========================================
+function editItem(key, type, id) {
+    const data = load(key);
+    const item = data.find(x => x.id == id);
+    if(!item) return;
+    
+    const f = document.getElementById('form-'+type);
+    openModal(type);
+    
+    Object.keys(item).forEach(k => {
+        if(f.elements[k] && f.elements[k].type !== 'file') {
+            f.elements[k].value = item[k];
+        }
+    });
+}
+
+function deleteItem(key, id) {
+    if(!confirm("Êtes-vous sûr de vouloir supprimer cet enregistrement ?")) return;
+    let data = load(key);
+    data = data.filter(x => x.id != id);
+    localStorage.setItem(KEYS[key], JSON.stringify(data));
+    refreshUI();
+}
+
 let fChart, kChart;
 function refreshUI() {
-    const v = load('vehicles'), d = load('drivers'), m = load('maintenance'), f = load('fuel');
+    const v = load('vehicles'), dr = load('drivers'), m = load('maintenance'), fu = load('fuel');
     
     document.getElementById('dash-km-total').textContent = v.reduce((s,c)=>s+parseInt(c.km||0),0).toLocaleString() + " km";
-    const totalCost = m.reduce((a,b)=>a+parseInt(b.cost||0),0) + f.reduce((a,b)=>a+parseInt(b.cost||0),0);
+    const totalCost = m.reduce((a,b)=>a+parseInt(b.cost||0),0) + fu.reduce((a,b)=>a+parseInt(b.cost||0),0);
     document.getElementById('dash-cost-total').textContent = totalCost.toLocaleString() + " FCFA";
-    document.getElementById('dash-counts').textContent = `${v.length} vhc / ${d.length} chf`;
+    document.getElementById('dash-counts').textContent = `${v.length} vhc / ${dr.length} chf`;
 
-    // Tables avec Position (Statut)
     document.getElementById('tbody-vehicles').innerHTML = v.map(x=>`<tr>
         <td><img src="${x.image || ''}" class="img-preview"></td>
         <td>${x.brand}</td><td>${x.plate}</td><td>${x.km}</td>
         <td><span class="status-badge ${x.status==='En service'?'bg-success':'bg-danger'}">${x.status}</span></td>
+        <td class="actions">
+            <button class="btn-icon btn-edit" onclick="editItem('vehicles','vehicle',${x.id})"><i class="fas fa-edit"></i></button>
+            <button class="btn-icon btn-delete" onclick="deleteItem('vehicles',${x.id})"><i class="fas fa-trash"></i></button>
+        </td>
     </tr>`).join('');
 
-    document.getElementById('tbody-drivers').innerHTML = d.map(x=>`<tr>
+    document.getElementById('tbody-drivers').innerHTML = dr.map(x=>`<tr>
         <td><img src="${x.image || ''}" class="img-preview" style="border-radius:50%"></td>
         <td>${x.grade} ${x.name}</td><td>${x.mat}</td><td>${x.lictype}</td>
         <td><span class="status-badge ${x.status==='Actif'?'bg-success':'bg-danger'}">${x.status}</span></td>
+        <td class="actions">
+            <button class="btn-icon btn-edit" onclick="editItem('drivers','driver',${x.id})"><i class="fas fa-edit"></i></button>
+            <button class="btn-icon btn-delete" onclick="deleteItem('drivers',${x.id})"><i class="fas fa-trash"></i></button>
+        </td>
     </tr>`).join('');
 
-    document.getElementById('tbody-m').innerHTML = m.map(x=>`<tr><td>${x.date}</td><td>${x.vehicle}</td><td>${x.type}</td><td>${x.km}</td><td>${x.cost}</td></tr>`).join('');
-    document.getElementById('tbody-f').innerHTML = f.map(x=>`<tr><td>${x.date}</td><td>${x.vehicle}</td><td>${x.liters}</td><td>${x.km}</td><td>${x.cost}</td></tr>`).join('');
+    document.getElementById('tbody-m').innerHTML = m.map(x=>`<tr><td>${x.date}</td><td>${x.vehicle}</td><td>${x.type}</td><td>${x.km}</td><td>${x.cost}</td>
+        <td class="actions">
+            <button class="btn-icon btn-edit" onclick="editItem('maintenance','maintenance',${x.id})"><i class="fas fa-edit"></i></button>
+            <button class="btn-icon btn-delete" onclick="deleteItem('maintenance',${x.id})"><i class="fas fa-trash"></i></button>
+        </td></tr>`).join('');
+
+    document.getElementById('tbody-f').innerHTML = fu.map(x=>`<tr><td>${x.date}</td><td>${x.vehicle}</td><td>${x.liters}</td><td>${x.km}</td><td>${x.cost}</td>
+        <td class="actions">
+            <button class="btn-icon btn-edit" onclick="editItem('fuel','fuel',${x.id})"><i class="fas fa-edit"></i></button>
+            <button class="btn-icon btn-delete" onclick="deleteItem('fuel',${x.id})"><i class="fas fa-trash"></i></button>
+        </td></tr>`).join('');
 
     const opts = v.map(x => `<option value="${x.plate}">${x.plate}</option>`).join('');
     document.querySelectorAll('.v-select').forEach(s => s.innerHTML = opts);
-    renderCharts(v, f);
+    renderCharts(v, fu);
 }
 
 function renderCharts(v, f) {
@@ -278,7 +335,7 @@ function renderCharts(v, f) {
     const ctxF = document.getElementById('fuelChart'), ctxK = document.getElementById('kmPieChart');
     if(!ctxF || !ctxK) return;
     fChart = new Chart(ctxF, { type:'bar', data:{ labels:f.slice(-5).map(x=>x.date), datasets:[{label:'L', data:f.slice(-5).map(x=>x.liters), backgroundColor:'#ff6b35'}] } });
-    kChart = new Chart(ctxK, { type:'doughnut', data:{ labels:v.map(x=>x.plate), datasets:[{data:v.map(x=>x.km), backgroundColor:['#1a2d4a','#ff6b35','#28a745']}] } });
+    kChart = new Chart(ctxK, { type:'doughnut', data:{ labels:v.map(x=>x.plate), datasets:[{data:v.map(x=>x.km), backgroundColor:['#1a2d4a','#ff6b35','#28a745','#17a2b8']}] } });
 }
 
 function exportToCSV() {
@@ -297,7 +354,11 @@ function showSection(id, el) {
     el.classList.add('active');
 }
 function openModal(t) { document.getElementById('modal-'+t).style.display='flex'; }
-function closeModal(t) { document.getElementById('modal-'+t).style.display='none'; }
+function closeModal(t) { 
+    document.getElementById('modal-'+t).style.display='none'; 
+    document.getElementById('form-'+t).reset();
+    document.getElementById('form-'+t).querySelector('input[name="id"]').value = "";
+}
 window.onload = () => { document.getElementById('date-display').textContent = new Date().toLocaleDateString(); };
 </script>
 </body>
