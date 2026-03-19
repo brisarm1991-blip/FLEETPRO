@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TrustFleet Pro v3.7 | Gestion du Personnel & Flotte</title>
+<title>TrustFleet Pro | Gestion Militaire de Parc</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -20,7 +20,7 @@ body{font-family:'Segoe UI', Tahoma, sans-serif; background:var(--bg); color:var
 .login-box { background:white; color:var(--text); padding:40px; border-radius:var(--radius); width:100%; max-width:400px; text-align:center; box-shadow:var(--shadow); }
 .login-box input { width:100%; padding:12px; margin:10px 0; border:1px solid var(--border); border-radius:8px; }
 
-/* --- INTERFACE --- */
+/* --- SIDEBAR & LAYOUT --- */
 #app-interface { display:none; }
 .sidebar { width:260px; background:var(--primary); color:white; position:fixed; height:100vh; display:flex; flex-direction:column; }
 .sidebar-header { padding:25px; border-bottom:1px solid rgba(255,255,255,0.1); font-weight:bold; font-size:20px; color:var(--accent); text-align:center; }
@@ -32,132 +32,142 @@ body{font-family:'Segoe UI', Tahoma, sans-serif; background:var(--bg); color:var
 .main-content { margin-left:260px; padding:30px; width:calc(100% - 260px); }
 .card { background:white; padding:20px; border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:25px; }
 
-/* --- CHAUFFEUR STYLES --- */
-.driver-badge { display: flex; align-items: center; gap: 15px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; background: #fff; }
-.driver-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); }
-.license-tag { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background: var(--primary); color: white; text-transform: uppercase; }
-
+/* --- TABLES & UI --- */
 table { width:100%; border-collapse:collapse; margin-top:15px; }
 th { text-align:left; padding:12px; border-bottom:2px solid var(--border); font-size:11px; color:#888; text-transform:uppercase; }
-td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; }
+td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertical-align:middle; }
+.img-preview { width:45px; height:45px; border-radius:8px; object-fit:cover; border:1px solid var(--border); }
+.img-circle { border-radius:50%; }
+.status-badge { padding:4px 10px; border-radius:20px; font-size:10px; font-weight:bold; color:white; }
+.bg-success { background: var(--success); }
+.bg-danger { background: var(--danger); }
 
 .btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; display:flex; align-items:center; gap:8px; }
 .btn-primary { background:var(--primary); color:white; }
 .btn-accent { background:var(--accent); color:white; }
+.btn-excel { background: #1D6F42; color:white; margin: 10px 25px; font-size: 13px; }
+
+/* --- MODALS --- */
 .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
-.modal-content { background:white; width:95%; max-width:600px; border-radius:var(--radius); padding:20px; }
+.modal-content { background:white; width:95%; max-width:700px; border-radius:var(--radius); overflow:hidden; }
+.modal-header { padding:15px 20px; background:var(--primary); color:white; display:flex; justify-content:space-between; align-items:center; }
+.modal-body { padding:20px; max-height:80vh; overflow-y:auto; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
-.form-grid input, .form-grid select { width:100%; padding:10px; border:1px solid var(--border); border-radius:6px; }
+.form-group label { display:block; font-size:11px; font-weight:bold; margin-bottom:5px; color:var(--primary); }
+.form-group input, .form-group select { width:100%; padding:10px; border:1px solid var(--border); border-radius:6px; font-size:13px; }
 </style>
 </head>
 <body>
 
 <div id="login-screen">
   <div class="login-box">
-    <i class="fas fa-user-shield fa-3x" style="color:var(--primary); margin-bottom:15px;"></i>
+    <i class="fas fa-lock fa-3x" style="color:var(--primary); margin-bottom:15px;"></i>
     <h2>TrustFleet Security</h2>
     <input type="text" id="user-id" placeholder="Identifiant">
     <input type="password" id="user-pass" placeholder="Mot de passe">
-    <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="checkAuth()">Accéder</button>
+    <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:10px;" onclick="checkAuth()">Connexion</button>
   </div>
 </div>
 
 <div id="app-interface">
   <div class="sidebar">
-    <div class="sidebar-header">TrustFleet Pro</div>
+    <div class="sidebar-header"><i class="fas fa-fighter-jet"></i> TrustFleet Pro</div>
     <ul class="sidebar-menu">
-      <li class="active" onclick="showSection('dashboard', this)"><i class="fas fa-home"></i> Dashboard</li>
-      <li onclick="showSection('drivers', this)"><i class="fas fa-users"></i> Chauffeurs</li>
-      <li onclick="showSection('vehicles', this)"><i class="fas fa-car"></i> Véhicules</li>
+      <li class="active" onclick="showSection('dashboard', this)"><i class="fas fa-tachometer-alt"></i> Tableau de bord</li>
+      <li onclick="showSection('vehicles', this)"><i class="fas fa-car-side"></i> Véhicules</li>
+      <li onclick="showSection('drivers', this)"><i class="fas fa-user-shield"></i> Chauffeurs</li>
+      <li onclick="showSection('maintenance', this)"><i class="fas fa-tools"></i> Entretiens</li>
+      <li onclick="showSection('fuel', this)"><i class="fas fa-gas-pump"></i> Carburant</li>
     </ul>
+    <button class="btn btn-excel" onclick="exportToCSV()"><i class="fas fa-file-csv"></i> Exporter en CSV</button>
   </div>
 
   <div class="main-content">
-    <header style="display:flex; justify-content:space-between; margin-bottom:20px;">
-      <h1 id="section-title">Gestion des Chauffeurs</h1>
+    <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+      <h1 id="section-title">Tableau de Bord</h1>
+      <div id="date-display" style="font-weight:600; color:var(--primary);"></div>
     </header>
 
-    <div id="section-drivers" class="content-section">
+    <div id="section-dashboard" class="content-section">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:30px;">
+        <div class="card" style="text-align:center;"><h4>KM Total Flotte</h4><h2 id="dash-km-total">0 km</h2></div>
+        <div class="card" style="text-align:center;"><h4>Chauffeurs Actifs</h4><h2 id="dash-drivers-active">0</h2></div>
+        <div class="card" style="text-align:center;"><h4>Véhicules en Service</h4><h2 id="dash-vehicles-active">0</h2></div>
+      </div>
+      <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:25px;">
+        <div class="card"><h3>Consommation</h3><canvas id="fuelChart" height="140"></canvas></div>
+        <div class="card"><h3>Répartition KM</h3><canvas id="kmPieChart" height="200"></canvas></div>
+      </div>
+    </div>
+
+    <div id="section-vehicles" class="content-section" style="display:none">
       <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <h3>Répertoire du Personnel</h3>
-          <button class="btn btn-accent" onclick="openModal('driver')">+ Nouveau Chauffeur</button>
-        </div>
-        
+        <div style="display:flex; justify-content:space-between; align-items:center;"><h3>Parc Automobile</h3><button class="btn btn-accent" onclick="openModal('vehicle')">+ Ajouter Véhicule</button></div>
         <table>
-          <thead>
-            <tr>
-              <th>Photo</th>
-              <th>Grade & Nom</th>
-              <th>Matricule</th>
-              <th>Permis</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Photo</th><th>Modèle</th><th>Immatriculation</th><th>KM</th><th>Position</th><th>Actions</th></tr></thead>
+          <tbody id="tbody-vehicles"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="section-drivers" class="content-section" style="display:none">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;"><h3>Personnel Navigant</h3><button class="btn btn-accent" onclick="openModal('driver')">+ Ajouter Chauffeur</button></div>
+        <table>
+          <thead><tr><th>Photo</th><th>Grade & Nom</th><th>Matricule</th><th>Permis</th><th>Position</th><th>Actions</th></tr></thead>
           <tbody id="tbody-drivers"></tbody>
         </table>
       </div>
     </div>
 
-    <div id="section-dashboard" class="content-section" style="display:none">
-        <div class="card"><h3>Bienvenue dans votre interface de gestion.</h3><p>Utilisez le menu à gauche pour naviguer.</p></div>
+    <div id="section-maintenance" class="content-section" style="display:none">
+        <div class="card"><h3>Maintenance</h3><button class="btn btn-primary" onclick="openModal('maintenance')">Saisir</button>
+        <table><thead><tr><th>Date</th><th>Véhicule</th><th>Type</th><th>KM</th><th>Coût</th></tr></thead><tbody id="tbody-m"></tbody></table></div>
     </div>
-    <div id="section-vehicles" class="content-section" style="display:none">
-        <div class="card"><h3>Gestion des Véhicules</h3><p>Section en cours de chargement...</p></div>
+    <div id="section-fuel" class="content-section" style="display:none">
+        <div class="card"><h3>Carburant</h3><button class="btn btn-primary" onclick="openModal('fuel')">Saisir</button>
+        <table><thead><tr><th>Date</th><th>Véhicule</th><th>Litres</th><th>KM</th><th>Montant</th></tr></thead><tbody id="tbody-f"></tbody></table></div>
     </div>
   </div>
 </div>
 
-<div id="modal-driver" class="modal">
-  <div class="modal-content">
-    <h3>Ajouter un Chauffeur</h3><br>
-    <form id="form-driver">
-      <div class="form-grid">
-        <div><label>Grade</label><input type="text" name="grade" placeholder="ex: Adjudant" required></div>
-        <div><label>Nom Complet</label><input type="text" name="name" placeholder="Prénom et Nom" required></div>
-        <div><label>Matricule</label><input type="text" name="mat" placeholder="Numéro matricule" required></div>
-        <div><label>Type de Permis</label>
-            <select name="lictype">
-                <option value="VL">VL (Léger)</option>
-                <option value="PL">PL (Poids Lourd)</option>
-                <option value="VL-PL">VL-PL (Mixte)</option>
-            </select>
-        </div>
-        <div style="grid-column: span 2;">
-            <label>Photo</label>
-            <input type="file" accept="image/*" onchange="compressImg(this, 'h-d')">
-            <input type="hidden" name="image" id="h-d">
-        </div>
-      </div>
-      <br>
-      <div style="display:flex; gap:10px; justify-content:flex-end;">
-        <button type="button" class="btn" onclick="closeModal('driver')">Annuler</button>
-        <button type="button" class="btn btn-primary" onclick="saveDriver()">Enregistrer</button>
-      </div>
-    </form>
-  </div>
-</div>
+<div id="modal-vehicle" class="modal"><div class="modal-content"><div class="modal-header"><h3>Nouveau Véhicule</h3><button onclick="closeModal('vehicle')">&times;</button></div><form id="form-vehicle" class="modal-body"><div class="form-grid">
+    <div class="form-group"><label>Marque/Modèle</label><input type="text" name="brand" required></div>
+    <div class="form-group"><label>Immatriculation</label><input type="text" name="plate" required></div>
+    <div class="form-group"><label>KM Actuel</label><input type="number" name="km" required></div>
+    <div class="form-group"><label>Position</label><select name="status"><option value="En service">En service</option><option value="Indisponible">Indisponible</option></select></div>
+    <div class="form-group"><label>Photo</label><input type="file" onchange="compressImg(this,'h-v')"><input type="hidden" name="image" id="h-v"></div>
+</div><br><button type="button" class="btn btn-primary" onclick="handleSave('vehicles','vehicle')">Enregistrer</button></form></div></div>
+
+<div id="modal-driver" class="modal"><div class="modal-content"><div class="modal-header"><h3>Nouveau Chauffeur</h3><button onclick="closeModal('driver')">&times;</button></div><form id="form-driver" class="modal-body"><div class="form-grid">
+    <div class="form-group"><label>Grade</label><input type="text" name="grade" placeholder="ex: Adjudant" required></div>
+    <div class="form-group"><label>Nom Complet</label><input type="text" name="name" required></div>
+    <div class="form-group"><label>Matricule</label><input type="text" name="mat" required></div>
+    <div class="form-group"><label>Type Permis</label><select name="lictype"><option value="VL">VL</option><option value="PL">PL</option><option value="VL-PL">VL-PL</option></select></div>
+    <div class="form-group"><label>Position</label><select name="status"><option value="Actif">Actif</option><option value="Indisponible">Indisponible</option></select></div>
+    <div class="form-group"><label>Photo</label><input type="file" onchange="compressImg(this,'h-d')"><input type="hidden" name="image" id="h-d"></div>
+</div><br><button type="button" class="btn btn-primary" onclick="handleSave('drivers','driver')">Enregistrer</button></form></div></div>
+
+<div id="modal-maintenance" class="modal"><div class="modal-content"><div class="modal-header"><h3>Saisir Entretien</h3><button onclick="closeModal('maintenance')">&times;</button></div><form id="form-maintenance" class="modal-body"><div class="form-grid"><select name="vehicle" class="v-select"></select><input type="text" name="type" placeholder="Type"><input type="number" name="km" placeholder="KM"><input type="number" name="cost" placeholder="Coût"></div><br><button type="button" class="btn btn-primary" onclick="handleSave('maintenance','maintenance')">Valider</button></form></div></div>
+<div id="modal-fuel" class="modal"><div class="modal-content"><div class="modal-header"><h3>Saisir Plein</h3><button onclick="closeModal('fuel')">&times;</button></div><form id="form-fuel" class="modal-body"><div class="form-grid"><select name="vehicle" class="v-select"></select><input type="number" name="liters" placeholder="L"><input type="number" name="km" placeholder="KM"><input type="number" name="cost" placeholder="Prix"></div><br><button type="button" class="btn btn-primary" onclick="handleSave('fuel','fuel')">Valider</button></form></div></div>
 
 <script>
-const KEYS = { drivers: 'tf_drivers_v3', auth: 'tf_auth_v3' };
+const KEYS = { vehicles: 'tf_v4_v', drivers: 'tf_v4_d', maintenance: 'tf_v4_m', fuel: 'tf_v4_f', auth: 'tf_v4_auth' };
 
-// AUTHENTIFICATION
 function checkAuth() {
-    const u = document.getElementById('user-id').value;
-    const p = document.getElementById('user-pass').value;
+    const u = document.getElementById('user-id').value, p = document.getElementById('user-pass').value;
     const cfg = JSON.parse(localStorage.getItem(KEYS.auth));
-    if(!cfg) {
-        if(confirm("Créer ce compte ?")) { localStorage.setItem(KEYS.auth, JSON.stringify({id:u, pw:p})); launch(); }
-    } else if(u === cfg.id && p === cfg.pw) { launch(); } else { alert("Erreur d'accès"); }
+    if(!cfg) { if(confirm("Créer ce compte ?")) { localStorage.setItem(KEYS.auth, JSON.stringify({id:u, pw:p})); launch(); } }
+    else if(u === cfg.id && p === cfg.pw) launch(); else alert("Accès incorrect");
 }
 
-function launch() {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app-interface').style.display = 'block';
-    renderDrivers();
+function launch() { 
+    document.getElementById('login-screen').style.display='none'; 
+    document.getElementById('app-interface').style.display='block'; 
+    refreshUI(); 
 }
 
-// GESTION DES IMAGES (COMPRESSION)
+// --- SOLUTION AU PROBLÈME D'ENREGISTREMENT : COMPRESSION ---
 function compressImg(input, hid) {
     const file = input.files[0];
     const reader = new FileReader();
@@ -165,62 +175,102 @@ function compressImg(input, hid) {
         const img = new Image();
         img.onload = function() {
             const canvas = document.createElement('canvas');
-            const size = 200; 
-            canvas.width = size; canvas.height = size;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, size, size);
+            const MAX_SIZE = 250; // On réduit à 250px
+            canvas.width = MAX_SIZE; canvas.height = MAX_SIZE;
+            canvas.getContext('2d').drawImage(img, 0, 0, MAX_SIZE, MAX_SIZE);
             document.getElementById(hid).value = canvas.toDataURL('image/jpeg', 0.7);
         };
         img.src = e.target.result;
     };
-    reader.readAsDataURL(file);
+    if(file) reader.readAsDataURL(file);
 }
 
-// ACTIONS CHAUFFEURS
-function saveDriver() {
-    const f = document.getElementById('form-driver');
-    const d = JSON.parse(localStorage.getItem(KEYS.drivers)) || [];
+function load(k) { return JSON.parse(localStorage.getItem(KEYS[k])) || []; }
+
+function handleSave(key, type) {
+    const f = document.getElementById('form-'+type), d = load(key);
     const item = Object.fromEntries(new FormData(f).entries());
     item.id = Date.now();
+    item.date = new Date().toLocaleDateString('fr-FR');
     d.push(item);
-    localStorage.setItem(KEYS.drivers, JSON.stringify(d));
-    f.reset();
-    closeModal('driver');
-    renderDrivers();
-}
-
-function renderDrivers() {
-    const d = JSON.parse(localStorage.getItem(KEYS.drivers)) || [];
-    document.getElementById('tbody-drivers').innerHTML = d.map(x => `
-        <tr>
-            <td><img src="${x.image || 'https://via.placeholder.com/50'}" class="driver-img"></td>
-            <td><b>${x.grade}</b><br>${x.name}</td>
-            <td><code>${x.mat}</code></td>
-            <td><span class="license-tag">${x.lictype}</span></td>
-            <td><button class="btn" onclick="deleteDriver(${x.id})" style="color:var(--danger)"><i class="fas fa-trash"></i></button></td>
-        </tr>
-    `).join('');
-}
-
-function deleteDriver(id) {
-    if(confirm("Supprimer ce chauffeur ?")) {
-        let d = JSON.parse(localStorage.getItem(KEYS.drivers)) || [];
-        d = d.filter(x => x.id !== id);
-        localStorage.setItem(KEYS.drivers, JSON.stringify(d));
-        renderDrivers();
+    
+    // Auto-update KM véhicule
+    if(item.vehicle && item.km) {
+        let vs = load('vehicles');
+        let idx = vs.findIndex(v => v.plate === item.vehicle);
+        if(idx !== -1 && parseInt(item.km) > parseInt(vs[idx].km)) {
+            vs[idx].km = item.km;
+            localStorage.setItem(KEYS.vehicles, JSON.stringify(vs));
+        }
     }
+
+    try {
+        localStorage.setItem(KEYS[key], JSON.stringify(d));
+        f.reset(); closeModal(type); refreshUI();
+    } catch(e) { alert("Mémoire pleine ! Supprimez d'anciens éléments."); }
 }
 
-// NAVIGATION
+let fChart, kChart;
+function refreshUI() {
+    const v = load('vehicles'), d = load('drivers'), m = load('maintenance'), f = load('fuel');
+    
+    // Stats
+    document.getElementById('dash-km-total').textContent = v.reduce((s,x)=>s+parseInt(x.km||0),0).toLocaleString() + " km";
+    document.getElementById('dash-drivers-active').textContent = d.filter(x=>x.status==='Actif').length;
+    document.getElementById('dash-vehicles-active').textContent = v.filter(x=>x.status==='En service').length;
+
+    // Table Véhicules
+    document.getElementById('tbody-vehicles').innerHTML = v.map(x=>`<tr>
+        <td><img src="${x.image || ''}" class="img-preview"></td>
+        <td>${x.brand}</td><td>${x.plate}</td><td><b>${x.km} km</b></td>
+        <td><span class="status-badge ${x.status==='En service'?'bg-success':'bg-danger'}">${x.status}</span></td>
+        <td><button onclick="del('vehicles',${x.id})">❌</button></td></tr>`).join('');
+
+    // Table Chauffeurs
+    document.getElementById('tbody-drivers').innerHTML = d.map(x=>`<tr>
+        <td><img src="${x.image || ''}" class="img-preview img-circle"></td>
+        <td><b>${x.grade}</b> ${x.name}</td><td>${x.mat}</td><td>${x.lictype}</td>
+        <td><span class="status-badge ${x.status==='Actif'?'bg-success':'bg-danger'}">${x.status}</span></td>
+        <td><button onclick="del('drivers',${x.id})">❌</button></td></tr>`).join('');
+
+    document.getElementById('tbody-m').innerHTML = m.map(x=>`<tr><td>${x.date}</td><td>${x.vehicle}</td><td>${x.type}</td><td>${x.km}</td><td>${x.cost}</td></tr>`).join('');
+    document.getElementById('tbody-f').innerHTML = f.map(x=>`<tr><td>${x.date}</td><td>${x.vehicle}</td><td>${x.liters}</td><td>${x.km}</td><td>${x.cost}</td></tr>`).join('');
+
+    const opts = v.map(x => `<option value="${x.plate}">${x.plate}</option>`).join('');
+    document.querySelectorAll('.v-select').forEach(s => s.innerHTML = opts);
+    
+    renderCharts(v, f);
+}
+
+function renderCharts(v, f) {
+    if(fChart) fChart.destroy(); if(kChart) kChart.destroy();
+    fChart = new Chart(document.getElementById('fuelChart'), { type:'bar', data:{ labels:f.slice(-5).map(x=>x.date), datasets:[{label:'L', data:f.slice(-5).map(x=>x.liters), backgroundColor:'#ff6b35'}] } });
+    kChart = new Chart(document.getElementById('kmPieChart'), { type:'doughnut', data:{ labels:v.map(x=>x.plate), datasets:[{data:v.map(x=>x.km), backgroundColor:['#1a2d4a','#ff6b35','#28a745']}] } });
+}
+
+function exportToCSV() {
+    let csv = "\uFEFFDate;Type;Identifiant;Status;KM;Cout\n";
+    load('fuel').forEach(x=> csv+=`${x.date};Plein;${x.vehicle};-;${x.km};${x.cost}\n`);
+    load('maintenance').forEach(x=> csv+=`${x.date};Entretien;${x.vehicle};-;${x.km};${x.cost}\n`);
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
+    link.download = "Rapport_Parc.csv"; link.click();
+}
+
 function showSection(id, el) {
-    document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
-    document.getElementById('section-' + id).style.display = 'block';
+    document.querySelectorAll('.content-section').forEach(s => s.style.display='none');
+    document.getElementById('section-'+id).style.display='block';
     document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
     el.classList.add('active');
 }
-function openModal(t) { document.getElementById('modal-' + t).style.display = 'flex'; }
-function closeModal(t) { document.getElementById('modal-' + t).style.display = 'none'; }
-</script>
+function openModal(t) { document.getElementById('modal-'+t).style.display='flex'; }
+function closeModal(t) { document.getElementById('modal-'+t).style.display='none'; }
+function del(k,id) { if(confirm("Supprimer ?")) { 
+    localStorage.setItem(KEYS[k], JSON.stringify(load(k).filter(x=>x.id!==id)));
+    refreshUI();
+}}
 
+window.onload = () => { document.getElementById('date-display').textContent = new Date().toLocaleDateString('fr-FR'); };
+</script>
 </body>
 </html>
