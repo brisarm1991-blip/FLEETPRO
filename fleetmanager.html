@@ -1,125 +1,120 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TrustFleet Pro v3.9 | CI BA301</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --primary: #1a2d4a; --primary-light: #243d63; --accent: #ff6b35; --success: #28a745;
-            --danger: #dc3545; --bg: #f0f4f8; --text: #2c3e50; --border: #dee2e6; --shadow: 0 4px 15px rgba(0,0,0,0.1); --radius: 12px;
-        }
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Segoe UI', Tahoma, sans-serif; background:var(--bg); color:var(--text); min-height:100vh;}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrustFleet Pro v3.6</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --primary: #1a2d4a; --primary-light: #243d63; --accent: #ff6b35; --success: #28a745;
+  --danger: #dc3545; --bg: #f0f4f8; --text: #2c3e50; --border: #dee2e6; --shadow: 0 4px 15px rgba(0,0,0,0.1); --radius: 12px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI', Tahoma, sans-serif; background:var(--bg); color:var(--text); min-height:100vh;}
 
-        /* --- EFFET ZOOM PHOTO --- */
-        .img-preview { width:45px; height:45px; border-radius:8px; object-fit:cover; border:1px solid var(--border); cursor: pointer; transition: transform 0.2s ease-in-out; }
-        .img-preview:hover { transform: scale(5); position: relative; z-index: 1000; box-shadow: var(--shadow); border-radius: 4px; }
+/* --- EFFET ZOOM PHOTO --- */
+.img-preview { width:45px; height:45px; border-radius:8px; object-fit:cover; border:1px solid var(--border); cursor: pointer; transition: transform 0.2s ease-in-out; }
+.img-preview:hover { transform: scale(4); position: relative; z-index: 1000; box-shadow: var(--shadow); }
 
-        #login-screen { position:fixed; inset:0; background:var(--primary); display:flex; align-items:center; justify-content:center; z-index:9999; color:white; }
-        .login-box { background:white; color:var(--text); padding:40px; border-radius:var(--radius); width:100%; max-width:400px; text-align:center; }
-        .login-box input { width:100%; padding:12px; margin:10px 0; border:1px solid var(--border); border-radius:8px; }
+#login-screen { position:fixed; inset:0; background:var(--primary); display:flex; align-items:center; justify-content:center; z-index:9999; color:white; }
+.login-box { background:white; color:var(--text); padding:40px; border-radius:var(--radius); width:100%; max-width:400px; text-align:center; }
+.login-box input { width:100%; padding:12px; margin:10px 0; border:1px solid var(--border); border-radius:8px; }
 
-        #app-interface { display:none; }
-        .sidebar { width:260px; background:var(--primary); color:white; position:fixed; height:100vh; display:flex; flex-direction:column; }
-        .sidebar-header { padding:25px; border-bottom:1px solid rgba(255,255,255,0.1); text-align:center; font-weight:bold; }
-        .sidebar-header i { font-size: 30px; color: var(--accent); display: block; margin-bottom: 10px; }
-        .sidebar-menu { list-style:none; padding:20px 0; flex-grow:1; }
-        .sidebar-menu li { padding:12px 25px; cursor:pointer; color:rgba(255,255,255,0.7); display:flex; align-items:center; gap:15px; }
-        .sidebar-menu li.active { background:var(--primary-light); color:white; border-left:5px solid var(--accent); }
+#app-interface { display:none; }
+.sidebar { width:260px; background:var(--primary); color:white; position:fixed; height:100vh; display:flex; flex-direction:column; }
+.sidebar-header { padding:25px; border-bottom:1px solid rgba(255,255,255,0.1); text-align:center; font-weight:bold; }
+.sidebar-header i { font-size: 30px; color: var(--accent); display: block; margin-bottom: 10px; }
+.sidebar-menu { list-style:none; padding:20px 0; flex-grow:1; }
+.sidebar-menu li { padding:12px 25px; cursor:pointer; color:rgba(255,255,255,0.7); display:flex; align-items:center; gap:15px; }
+.sidebar-menu li.active { background:var(--primary-light); color:white; border-left:5px solid var(--accent); }
 
-        .main-content { margin-left:260px; padding:30px; width:calc(100% - 260px); }
-        .card { background:white; padding:20px; border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:25px; }
-        .table-container { overflow-x:auto; margin-top:15px; }
-        table { width:100%; border-collapse:collapse; }
-        th { text-align:left; padding:12px; border-bottom:2px solid var(--border); font-size:11px; color:#888; text-transform:uppercase; }
-        td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertical-align:middle; }
+.main-content { margin-left:260px; padding:30px; width:calc(100% - 260px); }
+.card { background:white; padding:20px; border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:25px; }
+.table-container { overflow-x:auto; margin-top:15px; }
+table { width:100%; border-collapse:collapse; }
+th { text-align:left; padding:12px; border-bottom:2px solid var(--border); font-size:11px; color:#888; text-transform:uppercase; }
+td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; }
 
-        .actions { display: flex; gap: 10px; }
-        .btn-edit { color: var(--primary); cursor: pointer; }
-        .btn-delete { color: var(--danger); cursor: pointer; }
-        .btn-print { color: #17a2b8; cursor: pointer; }
+.actions { display: flex; gap: 10px; }
+.btn-edit { color: var(--primary); cursor: pointer; }
+.btn-delete { color: var(--danger); cursor: pointer; }
+.btn-print { color: #17a2b8; cursor: pointer; }
 
-        .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center; }
-        .modal-content { background:white; width:90%; max-width:600px; border-radius:var(--radius); padding:20px; }
-        .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
-        .form-grid input, .form-grid select { width:100%; padding:10px; border:1px solid var(--border); border-radius:6px; }
-        
-        .btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; }
-        .btn-primary { background:var(--primary); color:white; }
-        .btn-accent { background:var(--accent); color:white; }
+.modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center; }
+.modal-content { background:white; width:90%; max-width:600px; border-radius:var(--radius); padding:20px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+.form-grid input, .form-grid select { width:100%; padding:10px; border:1px solid var(--border); border-radius:6px; }
+.btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; }
+.btn-primary { background:var(--primary); color:white; }
+.btn-accent { background:var(--accent); color:white; }
 
-        /* Style Impression */
-        @media print {
-            body * { visibility: hidden; }
-            #print-area, #print-area * { visibility: visible; }
-            #print-area { position: absolute; left: 0; top: 0; width: 100%; }
-        }
-    </style>
+@media print {
+    body * { visibility: hidden; }
+    #print-area, #print-area * { visibility: visible; }
+    #print-area { position: absolute; left:0; top:0; width:100%; }
+}
+</style>
 </head>
 <body>
 
 <div id="print-area" style="display:none;"></div>
 
 <div id="login-screen">
-    <div class="login-box">
-        <i class="fas fa-truck-pickup fa-3x" style="color:var(--primary); margin-bottom:15px;"></i>
-        <h2>TrustFleet Security</h2>
-        <input type="text" id="user-id" placeholder="Identifiant">
-        <input type="password" id="user-pass" placeholder="Mot de passe">
-        <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="checkAuth()">Connexion</button>
-    </div>
+  <div class="login-box">
+    <i class="fas fa-truck-moving fa-3x" style="color:var(--primary); margin-bottom:15px;"></i>
+    <h2>TrustFleet Security</h2>
+    <input type="text" id="user-id" placeholder="Identifiant">
+    <input type="password" id="user-pass" placeholder="Mot de passe">
+    <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="checkAuth()">Connexion</button>
+  </div>
 </div>
 
 <div id="app-interface">
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <i class="fas fa-truck-pickup"></i>
-            CI BA301 GAROUA
-        </div>
-        <ul class="sidebar-menu">
-            <li class="active" onclick="showSection('dashboard', this)"><i class="fas fa-home"></i> Dashboard</li>
-            <li onclick="showSection('vehicles', this)"><i class="fas fa-car"></i> Véhicules</li>
-            <li onclick="showSection('drivers', this)"><i class="fas fa-users"></i> Chauffeurs</li>
-        </ul>
+  <div class="sidebar">
+    <div class="sidebar-header"><i class="fas fa-truck-pickup"></i> CI BA301 GAROUA</div>
+    <ul class="sidebar-menu">
+      <li class="active" onclick="showSection('dashboard', this)"><i class="fas fa-home"></i> Dashboard</li>
+      <li onclick="showSection('vehicles', this)"><i class="fas fa-car"></i> Véhicules</li>
+      <li onclick="showSection('drivers', this)"><i class="fas fa-users"></i> Chauffeurs</li>
+    </ul>
+  </div>
+
+  <div class="main-content">
+    <header style="display:flex; justify-content:space-between; margin-bottom:25px;">
+      <h1 id="section-title">Tableau de Bord</h1>
+      <div id="date-display"></div>
+    </header>
+
+    <div id="section-dashboard" class="content-section">
+        <div class="card"><h3>Statistiques</h3><canvas id="kmChart" height="100"></canvas></div>
     </div>
 
-    <div class="main-content">
-        <header style="display:flex; justify-content:space-between; margin-bottom:25px;">
-            <h1 id="section-title">Tableau de Bord</h1>
-            <div id="date-display"></div>
-        </header>
-
-        <div id="section-dashboard" class="content-section">
-            <div class="card"><h3>Statistiques</h3><canvas id="kmChart" height="100"></canvas></div>
+    <div id="section-vehicles" class="content-section" style="display:none">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between;"><h3>Parc Automobile</h3><button class="btn btn-accent" onclick="openModal('vehicle')">+ Ajouter</button></div>
+        <div class="table-container">
+            <table>
+                <thead><tr><th>Photo</th><th>Marque</th><th>Modèle</th><th>Immat.</th><th>Châssis</th><th>Dotation</th><th>KM</th><th>Actions</th></tr></thead>
+                <tbody id="tbody-vehicles"></tbody>
+            </table>
         </div>
+      </div>
+    </div>
 
-        <div id="section-vehicles" class="content-section" style="display:none">
-            <div class="card">
-                <div style="display:flex; justify-content:space-between;"><h3>Parc Automobile</h3><button class="btn btn-accent" onclick="openModal('vehicle')">+ Ajouter</button></div>
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>Photo</th><th>Marque</th><th>Modèle</th><th>Immat.</th><th>Châssis</th><th>Dotation</th><th>KM</th><th>Actions</th></tr></thead>
-                        <tbody id="tbody-vehicles"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="section-drivers" class="content-section" style="display:none">
-            <div class="card">
-                <div style="display:flex; justify-content:space-between;"><h3>Chauffeurs</h3><button class="btn btn-accent" onclick="openModal('driver')">+ Ajouter</button></div>
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>Photo</th><th>Nom</th><th>Matricule</th><th>Actions</th></tr></thead>
-                        <tbody id="tbody-drivers"></tbody>
-                    </table>
-                </div>
+    <div id="section-drivers" class="content-section" style="display:none">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between;"><h3>Chauffeurs</h3><button class="btn btn-accent" onclick="openModal('driver')">+ Ajouter</button></div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Photo</th><th>Nom</th><th>Matricule</th><th>Actions</th></tr></thead>
+                    <tbody id="tbody-drivers"></tbody>
+                </table>
             </div>
         </div>
     </div>
+  </div>
 </div>
 
 <div id="modal-vehicle" class="modal">
@@ -131,8 +126,8 @@
                 <input type="text" name="brand" placeholder="Marque" required>
                 <input type="text" name="model" placeholder="Modèle" required>
                 <input type="text" name="plate" placeholder="Immatriculation" required>
-                <input type="text" name="chassis" placeholder="Numéro de Châssis">
-                <input type="number" name="year" placeholder="Année de dotation">
+                <input type="text" name="chassis" placeholder="N° Châssis">
+                <input type="number" name="year" placeholder="Année dotation">
                 <input type="number" name="km" placeholder="KM Actuel" required>
                 <input type="file" accept="image/*" onchange="compressImg(this, 'h-v')">
                 <input type="hidden" name="image" id="h-v">
@@ -161,11 +156,11 @@
 </div>
 
 <script>
-const KEYS = { vehicles: 'tf_v_db', drivers: 'tf_d_db', auth: 'tf_auth' };
+const KEYS = { vehicles: 'tf_v_db', drivers: 'tf_d_db' };
 
 function checkAuth() {
     const u = document.getElementById('user-id').value, p = document.getElementById('user-pass').value;
-    if(u === "admin" && p === "1234") { launch(); } else { alert("Erreur d'identifiants"); }
+    if(u === "admin" && p === "1234") { launch(); } else { alert("Erreur"); }
 }
 
 function launch() { document.getElementById('login-screen').style.display='none'; document.getElementById('app-interface').style.display='block'; refreshUI(); }
@@ -199,31 +194,16 @@ function handleSave(k, type) {
     localStorage.setItem(KEYS[k], JSON.stringify(d)); refreshUI(); closeModal(type);
 }
 
-function printVehicle(id) {
+function printItem(id) {
     const v = load('vehicles').find(x => x.id == id);
     const area = document.getElementById('print-area');
-    area.innerHTML = `
-        <div style="padding:40px; color:black; background:white;">
-            <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:20px;">
-                <h2>ARMEE DE L'AIR - BA 301 GAROUA</h2>
-                <h3>FICHE DE DETENTION VEHICULE</h3>
-            </div>
-            <div style="display:flex; gap:20px;">
-                <img src="${v.image}" style="width:250px; height:180px; object-fit:cover; border:1px solid #000;">
-                <div style="font-size:18px;">
-                    <p><b>Marque :</b> ${v.brand}</p>
-                    <p><b>Modèle :</b> ${v.model}</p>
-                    <p><b>Immatriculation :</b> ${v.plate}</p>
-                    <p><b>N° Châssis :</b> ${v.chassis || '-'}</p>
-                    <p><b>Année Dotation :</b> ${v.year || '-'}</p>
-                    <p><b>Kilométrage :</b> ${v.km} KM</p>
-                </div>
-            </div>
-            <div style="margin-top:40px; display:flex; justify-content:space-between;">
-                <p>Signature Chauffeur</p>
-                <p>Le Chef de Garage</p>
-            </div>
-        </div>`;
+    area.innerHTML = `<div style="padding:30px; color:black; background:white;">
+        <h2 style="text-align:center; border-bottom:2px solid #000;">FICHE VEHICULE - CI BA301</h2><br>
+        <img src="${v.image}" style="width:200px; border:1px solid #000;"><br><br>
+        <p><b>Marque :</b> ${v.brand}</p><p><b>Modèle :</b> ${v.model}</p>
+        <p><b>Immatriculation :</b> ${v.plate}</p><p><b>Châssis :</b> ${v.chassis || '-'}</p>
+        <p><b>Dotation :</b> ${v.year || '-'}</p><p><b>Kilométrage :</b> ${v.km} KM</p>
+    </div>`;
     window.print();
 }
 
@@ -234,25 +214,19 @@ function editItem(key, type, id) {
     Object.keys(item).forEach(k => { if(f.elements[k] && f.elements[k].type !== 'file') f.elements[k].value = item[k]; });
 }
 
-function deleteItem(key, id) {
-    if(confirm("Supprimer définitivement ?")) {
-        const data = load(key).filter(x => x.id != id);
-        localStorage.setItem(KEYS[key], JSON.stringify(data)); refreshUI();
-    }
-}
+function deleteItem(key, id) { if(confirm("Supprimer ?")) { localStorage.setItem(KEYS[key], JSON.stringify(load(key).filter(x => x.id != id))); refreshUI(); } }
 
 function refreshUI() {
     const v = load('vehicles'), dr = load('drivers');
     document.getElementById('tbody-vehicles').innerHTML = v.map(x=>`<tr>
-        <td><img src="${x.image || ''}" class="img-preview" title="Cliquez pour zoomer"></td>
+        <td><img src="${x.image || ''}" class="img-preview"></td>
         <td>${x.brand}</td><td>${x.model}</td><td>${x.plate}</td><td>${x.chassis || '-'}</td><td>${x.year || '-'}</td><td>${x.km}</td>
         <td class="actions">
-            <i class="fas fa-print btn-print" onclick="printVehicle(${x.id})"></i>
+            <i class="fas fa-print btn-print" onclick="printItem(${x.id})"></i>
             <i class="fas fa-edit btn-edit" onclick="editItem('vehicles','vehicle',${x.id})"></i>
             <i class="fas fa-trash btn-delete" onclick="deleteItem('vehicles',${x.id})"></i>
         </td>
     </tr>`).join('');
-
     document.getElementById('tbody-drivers').innerHTML = dr.map(x=>`<tr>
         <td><img src="${x.image || ''}" class="img-preview" style="border-radius:50%"></td>
         <td>${x.name}</td><td>${x.mat}</td>
@@ -271,7 +245,7 @@ function showSection(id, el) {
 }
 function openModal(t) { document.getElementById('modal-'+t).style.display='flex'; }
 function closeModal(t) { document.getElementById('modal-'+t).style.display='none'; document.getElementById('form-'+t).reset(); }
-window.onload = () => { document.getElementById('date-display').textContent = new Date().toLocaleDateString('fr-FR'); };
+window.onload = () => { document.getElementById('date-display').textContent = new Date().toLocaleDateString(); };
 </script>
 </body>
 </html>
