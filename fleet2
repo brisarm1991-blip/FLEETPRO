@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚗 TrustFleet - Portable</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --primary: #1a2d4a; --accent: #ff6b35; --success: #28a745; --bg: #f0f4f8; --border: #dee2e6;
+  --sidebar-width: 260px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);display:flex;min-height:100vh;}
+.sidebar{width:var(--sidebar-width);background:var(--primary);color:white;display:flex;flex-direction:column;position:fixed;height:100vh;}
+.sidebar-header{padding:25px 20px;border-bottom:1px solid rgba(255,255,255,0.1);}
+.sidebar-menu{list-style:none;padding:20px 0;flex-grow:1;}
+.sidebar-menu li{padding:12px 25px;cursor:pointer;transition:0.2s;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:10px;}
+.sidebar-menu li:hover, .sidebar-menu li.active{background:#243d63;color:white;}
+.main-content{flex-grow:1;margin-left:var(--sidebar-width);padding:30px;}
+.card{background:white;border-radius:10px;padding:25px;box-shadow:0 2px 12px rgba(0,0,0,0.08);margin-bottom:20px;}
+.btn{padding:10px 15px;border-radius:6px;border:none;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;}
+.btn-primary{background:var(--primary);color:white;}
+.btn-export{background:var(--accent);color:white;width:100%;margin-top:20px;}
+table{width:100%;border-collapse:collapse;margin-top:15px;}
+th, td{text-align:left;padding:12px;border-bottom:1px solid var(--border);}
+.badge{padding:4px 8px;border-radius:12px;font-size:11px;background:#e8f5e9;color:#2e7d32;font-weight:bold;}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-header"><h2>FleetManager Pro</h2></div>
+  <ul class="sidebar-menu">
+    <li class="active" onclick="showSection('dashboard')"><i class="fas fa-home"></i> Dashboard</li>
+    <li onclick="showSection('vehicles')"><i class="fas fa-car"></i> Véhicules</li>
+    <li onclick="showSection('drivers')"><i class="fas fa-users"></i> Chauffeurs</li>
+  </ul>
+  <div style="padding:20px;">
+    <button class="btn btn-export" onclick="exportSelf()"><i class="fas fa-file-download"></i> EXPORTER LE LOGICIEL AVEC DONNÉES</button>
+  </div>
+</div>
+
+<div class="main-content">
+  <div id="section-dashboard" class="content-section">
+    <div class="card">
+        <h3>Statistiques</h3>
+        <p>Véhicules enregistrés : <span id="count-v">0</span></p>
+    </div>
+  </div>
+
+  <div id="section-vehicles" class="content-section" style="display:none">
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>Liste des Véhicules</h3>
+            <button class="btn btn-primary" onclick="addVehicle()"><i class="fas fa-plus"></i> Ajouter</button>
+        </div>
+        <table>
+            <thead><tr><th>Véhicule</th><th>Immatriculation</th><th>État</th></tr></thead>
+            <tbody id="list-v"></tbody>
+        </table>
+    </div>
+  </div>
+</div>
+
+<script id="data-container">
+// ========================================
+// ZONE DE DONNÉES AUTO-INJECTÉES
+// ========================================
+// Si vous exportez le fichier, vos données seront écrites ci-dessous :
+const MON_PARC_DONNEES = {
+    vehicles: [],
+    drivers: []
+};
+</script>
+
+<script>
+const KEYS = { v: 'fleet_v_data', d: 'fleet_d_data' };
+
+// Chargement initial
+function loadData() {
+    const localV = localStorage.getItem(KEYS.v);
+    const localD = localStorage.getItem(KEYS.d);
+
+    // Priorité aux données locales, sinon on prend les données injectées
+    const vs = localV ? JSON.parse(localV) : MON_PARC_DONNEES.vehicles;
+    const ds = localD ? JSON.parse(localD) : MON_PARC_DONNEES.drivers;
+    
+    return { vs, ds };
+}
+
+function updateUI() {
+    const data = loadData();
+    document.getElementById('count-v').textContent = data.vs.length;
+    document.getElementById('list-v').innerHTML = data.vs.map(v => `
+        <tr><td><strong>${v.brand}</strong></td><td>${v.immat}</td><td><span class="badge">En service</span></td></tr>
+    `).join('') || '<tr><td colspan="3">Aucun véhicule</td></tr>';
+}
+
+function addVehicle() {
+    const brand = prompt("Marque/Modèle :");
+    const immat = prompt("Immatriculation :");
+    if(brand && immat) {
+        const data = loadData();
+        data.vs.push({ brand, immat });
+        localStorage.setItem(KEYS.v, JSON.stringify(data.vs));
+        updateUI();
+    }
+}
+
+function showSection(id) {
+    document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+    document.getElementById('section-' + id).style.display = 'block';
+}
+
+// ========================================
+// FONCTION D'EXPORTATION MAGIQUE
+// ========================================
+function exportSelf() {
+    const currentData = loadData();
+    const dataString = `const MON_PARC_DONNEES = ${JSON.stringify({vehicles: currentData.vs, drivers: currentData.ds}, null, 4)};`;
+    
+    // On récupère tout le code HTML du fichier actuel
+    let fullHtml = document.documentElement.outerHTML;
+    
+    // On remplace la section de données vide par la section remplie
+    const regex = /const MON_PARC_DONNEES = \{[\s\S]*?\};/;
+    fullHtml = fullHtml.replace(regex, dataString);
+
+    // Création du nouveau fichier
+    const blob = new Blob(['<!DOCTYPE html>\n' + fullHtml], { type: 'text/html' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'FleetManager_AVEC_DONNEES.html';
+    a.click();
+    
+    alert("Succès ! Un nouveau fichier contenant vos données a été téléchargé.");
+}
+
+window.onload = updateUI;
+</script>
+</body>
+</html>
