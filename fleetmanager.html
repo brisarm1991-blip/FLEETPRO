@@ -15,28 +15,21 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Segoe UI', Tahoma, sans-serif; background:var(--bg); color:var(--text); min-height:100vh;}
 
-/* --- EFFET ZOOM PHOTO --- */
-.img-preview { width:45px; height:45px; border-radius:8px; object-fit:cover; border:1px solid var(--border); cursor: pointer; transition: transform 0.2s ease-in-out; }
+.img-preview { width:45px; height:45px; border-radius:8px; object-fit:cover; border:1px solid var(--border); cursor: pointer; transition: transform 0.2s; }
 .img-preview:hover { transform: scale(4); position: relative; z-index: 1000; box-shadow: var(--shadow); }
 
 #login-screen { position:fixed; inset:0; background:var(--primary); display:flex; align-items:center; justify-content:center; z-index:9999; color:white; }
-.login-box { background:white; color:var(--text); padding:40px; border-radius:var(--radius); width:100%; max-width:400px; text-align:center; box-shadow:var(--shadow); }
+.login-box { background:white; color:var(--text); padding:40px; border-radius:var(--radius); width:100%; max-width:400px; text-align:center; }
 .login-box input { width:100%; padding:12px; margin:10px 0; border:1px solid var(--border); border-radius:8px; }
 
 #app-interface { display:none; }
 .sidebar { width:260px; background:var(--primary); color:white; position:fixed; height:100vh; display:flex; flex-direction:column; }
 .sidebar-header { padding:25px; border-bottom:1px solid rgba(255,255,255,0.1); font-weight:bold; font-size:20px; color:var(--accent); text-align:center; }
 .sidebar-menu { list-style:none; padding:20px 0; flex-grow:1; }
-.sidebar-menu li { padding:12px 25px; cursor:pointer; transition:0.2s; color:rgba(255,255,255,0.7); display:flex; align-items:center; gap:15px; }
-.sidebar-menu li:hover, .sidebar-menu li.active { background:var(--primary-light); color:white; }
-.sidebar-menu li.active { border-left:5px solid var(--accent); }
+.sidebar-menu li { padding:12px 25px; cursor:pointer; color:rgba(255,255,255,0.7); display:flex; align-items:center; gap:15px; }
+.sidebar-menu li.active { background:var(--primary-light); color:white; border-left:5px solid var(--accent); }
 
 .main-content { margin-left:260px; padding:30px; width:calc(100% - 260px); }
-.stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:30px; }
-.stat-card { background:white; padding:20px; border-radius:var(--radius); box-shadow:var(--shadow); border-top:4px solid var(--primary); text-align:center; }
-.stat-card h4 { font-size:11px; text-transform:uppercase; color:#888; margin-bottom:10px; }
-.stat-card h2 { font-size:22px; color:var(--primary); }
-
 .card { background:white; padding:20px; border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:25px; }
 .table-container { overflow-x:auto; margin-top:15px; }
 table { width:100%; border-collapse:collapse; }
@@ -47,27 +40,21 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
 .bg-success { background: var(--success); }
 .bg-danger { background: var(--danger); }
 
-.actions { display: flex; gap: 10px; }
-.btn-print { color: #17a2b8; cursor: pointer; }
+.actions { display: flex; gap: 12px; font-size: 16px; }
+.btn-edit { color: var(--primary); cursor: pointer; }
+.btn-print { color: var(--info); cursor: pointer; }
 .btn-delete { color: var(--danger); cursor: pointer; }
 
 .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
-.modal-content { background:white; width:95%; max-width:700px; border-radius:var(--radius); overflow:hidden; }
-.modal-header { padding:15px 20px; background:var(--primary); color:white; display:flex; justify-content:space-between; align-items:center; }
-.modal-body { padding:20px; max-height:80vh; overflow-y:auto; }
+.modal-content { background:white; width:95%; max-width:650px; border-radius:var(--radius); padding:25px; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
-.form-group input, .form-group select { width:100%; padding:10px; border:1px solid var(--border); border-radius:6px; font-size:13px; }
+.form-grid input, .form-grid select { width:100%; padding:10px; border:1px solid var(--border); border-radius:6px; }
 
-.btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; display:flex; align-items:center; gap:8px; }
+.btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; }
 .btn-primary { background:var(--primary); color:white; }
 .btn-accent { background:var(--accent); color:white; }
-.btn-excel { background: #1D6F42; color:white; margin: 10px 25px; font-size: 13px; }
 
-@media print {
-    body * { visibility: hidden; }
-    #print-area, #print-area * { visibility: visible; }
-    #print-area { position: absolute; left:0; top:0; width:100%; }
-}
+@media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left:0; top:0; width:100%; } }
 </style>
 </head>
 <body>
@@ -80,7 +67,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
     <h2>TrustFleet Security</h2>
     <input type="text" id="user-id" placeholder="Identifiant">
     <input type="password" id="user-pass" placeholder="Mot de passe">
-    <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:10px;" onclick="checkAuth()">Connexion</button>
+    <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="checkAuth()">Connexion</button>
   </div>
 </div>
 
@@ -88,37 +75,34 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
   <div class="sidebar">
     <div class="sidebar-header"><i class="fas fa-fighter-jet"></i> CI BA301</div>
     <ul class="sidebar-menu">
-      <li class="active" onclick="showSection('dashboard', this)"><i class="fas fa-tachometer-alt"></i> Tableau de bord</li>
+      <li class="active" onclick="showSection('dashboard', this)"><i class="fas fa-tachometer-alt"></i> Dashboard</li>
       <li onclick="showSection('vehicles', this)"><i class="fas fa-car-side"></i> Véhicules</li>
       <li onclick="showSection('drivers', this)"><i class="fas fa-user-shield"></i> Chauffeurs</li>
-      <li onclick="showSection('maintenance', this)"><i class="fas fa-tools"></i> Entretiens</li>
+      <li onclick="showSection('fuel', this)"><i class="fas fa-gas-pump"></i> Carburant</li>
+      <li onclick="showSection('settings', this)"><i class="fas fa-cog"></i> Paramètres</li>
     </ul>
-    <button class="btn btn-excel" onclick="exportToCSV()"><i class="fas fa-file-csv"></i> Exporter CSV</button>
   </div>
 
   <div class="main-content">
-    <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+    <header style="display:flex; justify-content:space-between; margin-bottom:25px;">
       <h1 id="section-title">Tableau de Bord</h1>
-      <div id="date-display" style="font-weight:600;"></div>
+      <div id="date-display" style="font-weight:bold;"></div>
     </header>
 
     <div id="section-dashboard" class="content-section">
-      <div class="stats-grid">
-        <div class="stat-card"><h4>KM Flotte</h4><h2 id="dash-km-total">0 km</h2></div>
-        <div class="stat-card"><h4>Effectif</h4><h2 id="dash-counts">0 / 0</h2></div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:25px;">
+        <div class="card" style="text-align:center;"><h4>Kilométrage Total</h4><h2 id="dash-km">0 km</h2></div>
+        <div class="card" style="text-align:center;"><h4>Effectif</h4><h2 id="dash-counts">0 / 0</h2></div>
       </div>
-      <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:25px;">
-        <div class="card"><h3>Consommation (L)</h3><canvas id="fuelChart" height="140"></canvas></div>
-        <div class="card"><h3>Répartition KM</h3><canvas id="kmPieChart" height="200"></canvas></div>
-      </div>
+      <div class="card"><h3>Répartition KM</h3><canvas id="kmPieChart" height="100"></canvas></div>
     </div>
 
     <div id="section-vehicles" class="content-section" style="display:none">
       <div class="card">
-        <div style="display:flex; justify-content:space-between;"><h3>Véhicules</h3><button class="btn btn-accent" onclick="openModal('vehicle')">+ Ajouter</button></div>
+        <div style="display:flex; justify-content:space-between;"><h3>Parc Automobile</h3><button class="btn btn-accent" onclick="openModal('vehicle')">+ Ajouter</button></div>
         <div class="table-container">
             <table>
-                <thead><tr><th>Photo</th><th>Marque</th><th>Immat.</th><th>Châssis</th><th>Dotation</th><th>KM</th><th>Position</th><th>Action</th></tr></thead>
+                <thead><tr><th>Photo</th><th>Marque</th><th>Immat.</th><th>Châssis</th><th>Dotation</th><th>KM</th><th>Position</th><th>Actions</th></tr></thead>
                 <tbody id="tbody-vehicles"></tbody>
             </table>
         </div>
@@ -130,77 +114,115 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
         <div style="display:flex; justify-content:space-between;"><h3>Chauffeurs</h3><button class="btn btn-accent" onclick="openModal('driver')">+ Ajouter</button></div>
         <div class="table-container">
             <table>
-                <thead><tr><th>Photo</th><th>Grade & Nom</th><th>Matricule</th><th>Permis</th><th>Position</th><th>Action</th></tr></thead>
+                <thead><tr><th>Photo</th><th>Nom</th><th>Matricule</th><th>Permis</th><th>Position</th><th>Actions</th></tr></thead>
                 <tbody id="tbody-drivers"></tbody>
             </table>
         </div>
       </div>
     </div>
 
-    <div id="section-maintenance" class="content-section" style="display:none">
-        <div class="card"><h3>Maintenance</h3><button class="btn btn-primary" onclick="openModal('maintenance')">Saisir</button>
-        <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Type</th><th>KM</th><th>Coût</th></tr></thead><tbody id="tbody-m"></tbody></table></div></div>
+    <div id="section-fuel" class="content-section" style="display:none">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between;"><h3>Suivi Carburant</h3><button class="btn btn-primary" onclick="openModal('fuel')">Saisir Plein</button></div>
+            <div class="table-container">
+                <table><thead><tr><th>Date</th><th>Véhicule</th><th>Litres</th><th>KM</th><th>Coût (FCFA)</th><th>Action</th></tr></thead><tbody id="tbody-fuel"></tbody></table>
+            </div>
+        </div>
+    </div>
+
+    <div id="section-settings" class="content-section" style="display:none">
+        <div class="card" style="max-width:400px;">
+            <h3>Modifier les Identifiants</h3><br>
+            <input type="text" id="new-id" class="login-box" style="border:1px solid #ddd; margin-bottom:10px; padding:10px; width:100%" placeholder="Nouvel Identifiant">
+            <input type="password" id="new-pass" class="login-box" style="border:1px solid #ddd; margin-bottom:10px; padding:10px; width:100%" placeholder="Nouveau Mot de passe">
+            <button class="btn btn-primary" onclick="updateAuth()">Enregistrer</button>
+        </div>
     </div>
   </div>
 </div>
 
 <div id="modal-vehicle" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h3>Fiche Véhicule</h3><button onclick="closeModal('vehicle')">&times;</button></div>
-        <form id="form-vehicle" class="modal-body">
+        <h3>Fiche Véhicule</h3><br>
+        <form id="form-vehicle">
+            <input type="hidden" name="id">
             <div class="form-grid">
                 <input type="text" name="brand" placeholder="Marque" required>
-                <input type="text" name="model" placeholder="Modèle">
                 <input type="text" name="plate" placeholder="Immatriculation" required>
                 <input type="text" name="chassis" placeholder="N° Châssis">
                 <input type="number" name="year" placeholder="Année de dotation">
-                <input type="number" name="km" placeholder="Kilométrage Actuel" required>
+                <input type="number" name="km" placeholder="KM actuel" required>
                 <select name="status"><option value="En service">En service</option><option value="Indisponible">Indisponible</option></select>
-                <input type="file" accept="image/*" onchange="compressAndEncode(this, 'h-v')">
+                <input type="file" accept="image/*" onchange="compressImg(this, 'h-v')">
                 <input type="hidden" name="image" id="h-v">
             </div><br>
-            <button type="button" class="btn btn-primary" onclick="handleSave('vehicles','vehicle')">Enregistrer</button>
+            <button type="button" class="btn btn-primary" onclick="handleSave('vehicles','vehicle')">Valider</button>
+            <button type="button" class="btn" onclick="closeModal('vehicle')">Annuler</button>
         </form>
     </div>
 </div>
 
 <div id="modal-driver" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h3>Fiche Chauffeur</h3><button onclick="closeModal('driver')">&times;</button></div>
-        <form id="form-driver" class="modal-body">
+        <h3>Fiche Chauffeur</h3><br>
+        <form id="form-driver">
+            <input type="hidden" name="id">
             <div class="form-grid">
-                <input type="text" name="grade" placeholder="Grade" required>
-                <input type="text" name="name" placeholder="Nom Complet" required>
+                <input type="text" name="name" placeholder="Grade & Nom" required>
                 <input type="text" name="mat" placeholder="Matricule" required>
                 <select name="lictype"><option value="VL">VL</option><option value="PL">PL</option><option value="VL-PL">VL-PL</option></select>
                 <select name="status"><option value="Actif">Actif</option><option value="Indisponible">Indisponible</option></select>
-                <input type="file" accept="image/*" onchange="compressAndEncode(this, 'h-d')">
+                <input type="file" accept="image/*" onchange="compressImg(this, 'h-d')">
                 <input type="hidden" name="image" id="h-d">
             </div><br>
-            <button type="button" class="btn btn-primary" onclick="handleSave('drivers','driver')">Enregistrer</button>
+            <button type="button" class="btn btn-primary" onclick="handleSave('drivers','driver')">Valider</button>
+            <button type="button" class="btn" onclick="closeModal('driver')">Annuler</button>
         </form>
     </div>
 </div>
 
-<div id="modal-maintenance" class="modal"><div class="modal-content"><div class="modal-header"><h3>Entretien</h3><button onclick="closeModal('maintenance')">&times;</button></div><form id="form-maintenance" class="modal-body"><div class="form-grid"><select name="vehicle" class="v-select"></select><input type="text" name="type" placeholder="Nature"><input type="number" name="km" placeholder="KM actuel"><input type="number" name="cost" placeholder="Coût"></div><br><button type="button" class="btn btn-primary" onclick="handleSave('maintenance','maintenance')">Valider</button></form></div></div>
+<div id="modal-fuel" class="modal">
+    <div class="modal-content">
+        <h3>Saisie Carburant</h3><br>
+        <form id="form-fuel">
+            <input type="hidden" name="id">
+            <div class="form-grid">
+                <select name="vehicle" id="fuel-v-list" required></select>
+                <input type="number" name="liters" placeholder="Nombre de Litres" required>
+                <input type="number" name="km" placeholder="KM au compteur" required>
+                <input type="number" name="cost" placeholder="Montant Total FCFA" required>
+            </div><br>
+            <button type="button" class="btn btn-primary" onclick="handleSave('fuel','fuel')">Valider</button>
+            <button type="button" class="btn" onclick="closeModal('fuel')">Annuler</button>
+        </form>
+    </div>
+</div>
 
 <script>
-const KEYS = { vehicles: 'tf_v3_v', drivers: 'tf_v3_d', maintenance: 'tf_v3_m', auth: 'tf_secure_v3' };
+const KEYS = { vehicles: 'tf_v3_v', drivers: 'tf_v3_d', fuel: 'tf_v3_f', auth: 'tf_auth_301' };
 
+// AUTHENTIFICATION
 function checkAuth() {
     const u = document.getElementById('user-id').value, p = document.getElementById('user-pass').value;
     const cfg = JSON.parse(localStorage.getItem(KEYS.auth)) || {id:"admin", pw:"1234"};
-    if(u === cfg.id && p === cfg.pw) { launch(); } else { alert("Identifiants incorrects"); }
+    if(u === cfg.id && p === cfg.pw) { 
+        document.getElementById('login-screen').style.display='none'; 
+        document.getElementById('app-interface').style.display='block'; 
+        refreshUI(); 
+    } else { alert("Accès refusé"); }
 }
 
-function launch() { 
-    document.getElementById('login-screen').style.display='none'; 
-    document.getElementById('app-interface').style.display='block'; 
-    refreshUI(); 
+function updateAuth() {
+    const ni = document.getElementById('new-id').value, np = document.getElementById('new-pass').value;
+    if(ni && np) {
+        localStorage.setItem(KEYS.auth, JSON.stringify({id:ni, pw:np}));
+        alert("Identifiants mis à jour !");
+    }
 }
 
-function compressAndEncode(input, hid) {
-    const file = input.files[0]; if (!file) return;
+// COMPRESSION IMAGE
+function compressImg(input, hid) {
+    const file = input.files[0]; if(!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
         const img = new Image();
@@ -215,80 +237,84 @@ function compressAndEncode(input, hid) {
     reader.readAsDataURL(file);
 }
 
+// LOGIQUE DATA
 function load(k) { return JSON.parse(localStorage.getItem(KEYS[k])) || []; }
 
 function handleSave(k, type) {
     const f = document.getElementById('form-'+type), d = load(k);
     const item = Object.fromEntries(new FormData(f).entries());
-    item.id = Date.now(); item.date = new Date().toLocaleDateString('fr-FR');
-    d.push(item);
-    localStorage.setItem(KEYS[k], JSON.stringify(d)); 
-    refreshUI(); closeModal(type); f.reset();
+    if(item.id) {
+        const idx = d.findIndex(x => x.id == item.id);
+        if(!item.image && d[idx].image) item.image = d[idx].image;
+        item.date = d[idx].date;
+        d[idx] = item;
+    } else {
+        item.id = Date.now(); item.date = new Date().toLocaleDateString('fr-FR');
+        d.push(item);
+    }
+    localStorage.setItem(KEYS[k], JSON.stringify(d)); refreshUI(); closeModal(type);
 }
 
-function printVehicle(id) {
+function editItem(key, type, id) {
+    const item = load(key).find(x => x.id == id);
+    openModal(type);
+    const f = document.getElementById('form-'+type);
+    Object.keys(item).forEach(k => { if(f.elements[k] && f.elements[k].type !== 'file') f.elements[k].value = item[k]; });
+}
+
+function deleteItem(key, id) { if(confirm("Supprimer définitivement ?")) { localStorage.setItem(KEYS[key], JSON.stringify(load(key).filter(x => x.id != id))); refreshUI(); } }
+
+function printItem(id) {
     const v = load('vehicles').find(x => x.id == id);
     const area = document.getElementById('print-area');
-    area.innerHTML = `<div style="padding:40px; color:black; background:white; font-family:sans-serif;">
-        <h2 style="text-align:center; border-bottom:2px solid #000;">FICHE VEHICULE - CI BA301</h2><br>
-        <img src="${v.image}" style="width:250px; border:1px solid #000;"><br><br>
-        <p><b>Marque :</b> ${v.brand}</p><p><b>Immatriculation :</b> ${v.plate}</p>
-        <p><b>Châssis :</b> ${v.chassis || '-'}</p><p><b>Dotation :</b> ${v.year || '-'}</p>
-        <p><b>Kilométrage :</b> ${v.km} KM</p>
-    </div>`;
+    area.innerHTML = `<div style="padding:40px; color:black; background:white;"><h2 style="text-align:center; border-bottom:2px solid #000;">FICHE VÉHICULE - CI BA301</h2><br><img src="${v.image}" style="width:200px;"><p><br><b>Marque :</b> ${v.brand}<br><b>Immat :</b> ${v.plate}<br><b>Châssis :</b> ${v.chassis}<br><b>KM :</b> ${v.km}</p></div>`;
     window.print();
 }
 
-function deleteItem(key, id) { if(confirm("Supprimer ?")) { localStorage.setItem(KEYS[key], JSON.stringify(load(key).filter(x => x.id != id))); refreshUI(); } }
-
 let kChart;
 function refreshUI() {
-    const v = load('vehicles'), dr = load('drivers');
-    document.getElementById('dash-km-total').textContent = v.reduce((s,c)=>s+parseInt(c.km||0),0).toLocaleString() + " km";
+    const v = load('vehicles'), dr = load('drivers'), f = load('fuel');
+    document.getElementById('dash-km').textContent = v.reduce((s,c)=>s+parseInt(c.km||0),0).toLocaleString() + " km";
     document.getElementById('dash-counts').textContent = `${v.length} vhc / ${dr.length} chf`;
 
     document.getElementById('tbody-vehicles').innerHTML = v.map(x=>`<tr>
         <td><img src="${x.image || ''}" class="img-preview"></td>
         <td>${x.brand}</td><td>${x.plate}</td><td>${x.chassis || '-'}</td><td>${x.year || '-'}</td><td>${x.km}</td>
         <td><span class="status-badge ${x.status==='En service'?'bg-success':'bg-danger'}">${x.status}</span></td>
-        <td class="actions"><i class="fas fa-print btn-print" onclick="printVehicle(${x.id})"></i> <i class="fas fa-trash btn-delete" onclick="deleteItem('vehicles',${x.id})"></i></td>
+        <td class="actions">
+            <i class="fas fa-edit btn-edit" onclick="editItem('vehicles','vehicle',${x.id})"></i>
+            <i class="fas fa-print btn-print" onclick="printItem(${x.id})"></i>
+            <i class="fas fa-trash btn-delete" onclick="deleteItem('vehicles',${x.id})"></i>
+        </td>
     </tr>`).join('');
 
     document.getElementById('tbody-drivers').innerHTML = dr.map(x=>`<tr>
         <td><img src="${x.image || ''}" class="img-preview" style="border-radius:50%"></td>
-        <td>${x.grade} ${x.name}</td><td>${x.mat}</td><td>${x.lictype}</td>
+        <td>${x.name}</td><td>${x.mat}</td><td>${x.lictype}</td>
         <td><span class="status-badge ${x.status==='Actif'?'bg-success':'bg-danger'}">${x.status}</span></td>
-        <td class="actions"><i class="fas fa-trash btn-delete" onclick="deleteItem('drivers',${x.id})"></i></td>
+        <td class="actions">
+            <i class="fas fa-edit btn-edit" onclick="editItem('drivers','driver',${x.id})"></i>
+            <i class="fas fa-trash btn-delete" onclick="deleteItem('drivers',${x.id})"></i>
+        </td>
     </tr>`).join('');
 
-    const opts = v.map(x => `<option value="${x.plate}">${x.plate}</option>`).join('');
-    document.querySelectorAll('.v-select').forEach(s => s.innerHTML = opts);
-    renderCharts(v);
-}
+    document.getElementById('tbody-fuel').innerHTML = f.map(x=>`<tr><td>${x.date}</td><td>${x.vehicle}</td><td>${x.liters}</td><td>${x.km}</td><td>${x.cost}</td><td><i class="fas fa-trash btn-delete" onclick="deleteItem('fuel',${x.id})"></i></td></tr>`).join('');
 
-function renderCharts(v) {
+    document.getElementById('fuel-v-list').innerHTML = v.map(x=>`<option value="${x.plate}">${x.brand} (${x.plate})</option>`).join('');
+
     if(kChart) kChart.destroy();
-    const ctxK = document.getElementById('kmPieChart');
-    if(!ctxK) return;
-    kChart = new Chart(ctxK, { type:'doughnut', data:{ labels:v.map(x=>x.plate), datasets:[{data:v.map(x=>x.km), backgroundColor:['#1a2d4a','#ff6b35','#28a745','#17a2b8','#ffc107']}] } });
-}
-
-function exportToCSV() {
-    let csv = "\uFEFFMarque;Immat;Chassis;Dotation;KM;Statut\n";
-    load('vehicles').forEach(x=> csv+=`${x.brand};${x.plate};${x.chassis};${x.year};${x.km};${x.status}\n`);
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
-    link.download = "TrustFleet_CI_BA301.csv"; link.click();
+    kChart = new Chart(document.getElementById('kmPieChart'), { type:'doughnut', data:{ labels:v.map(x=>x.plate), datasets:[{data:v.map(x=>x.km), backgroundColor:['#1a2d4a','#ff6b35','#28a745','#17a2b8','#ffc107']}] } });
 }
 
 function showSection(id, el) {
     document.querySelectorAll('.content-section').forEach(s => s.style.display='none');
     document.getElementById('section-'+id).style.display='block';
+    document.getElementById('section-title').textContent = el.textContent;
     document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
     el.classList.add('active');
 }
 function openModal(t) { document.getElementById('modal-'+t).style.display='flex'; }
-function closeModal(t) { document.getElementById('modal-'+t).style.display='none'; }
+function closeModal(t) { document.getElementById('modal-'+t).style.display='none'; document.getElementById('form-'+t).reset(); }
 window.onload = () => { document.getElementById('date-display').textContent = new Date().toLocaleDateString(); };
 </script>
 </body>
