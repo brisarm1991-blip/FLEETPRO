@@ -14,7 +14,7 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Segoe UI', Tahoma, sans-serif; background:var(--bg); color:var(--text); min-height:100vh;}
 
-/* --- EFFET ZOOM PHOTO --- */
+/* --- AJUSTEMENT : ZOOM PHOTO --- */
 .img-preview { width:45px; height:45px; border-radius:8px; object-fit:cover; border:1px solid var(--border); cursor: pointer; transition: transform 0.2s ease-in-out; }
 .img-preview:hover { transform: scale(4); position: relative; z-index: 1000; box-shadow: var(--shadow); }
 
@@ -40,7 +40,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; }
 .actions { display: flex; gap: 10px; }
 .btn-edit { color: var(--primary); cursor: pointer; }
 .btn-delete { color: var(--danger); cursor: pointer; }
-.btn-print { color: #17a2b8; cursor: pointer; }
+.btn-print { color: #17a2b8; cursor: pointer; } /* AJOUT : COULEUR PRINT */
 
 .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center; }
 .modal-content { background:white; width:90%; max-width:600px; border-radius:var(--radius); padding:20px; }
@@ -50,6 +50,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; }
 .btn-primary { background:var(--primary); color:white; }
 .btn-accent { background:var(--accent); color:white; }
 
+/* STYLE IMPRESSION */
 @media print {
     body * { visibility: hidden; }
     #print-area, #print-area * { visibility: visible; }
@@ -73,7 +74,10 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; }
 
 <div id="app-interface">
   <div class="sidebar">
-    <div class="sidebar-header"><i class="fas fa-truck-pickup"></i> CI BA301 GAROUA</div>
+    <div class="sidebar-header">
+        <i class="fas fa-truck-pickup"></i>
+        CI BA301 GAROUA
+    </div>
     <ul class="sidebar-menu">
       <li class="active" onclick="showSection('dashboard', this)"><i class="fas fa-home"></i> Dashboard</li>
       <li onclick="showSection('vehicles', this)"><i class="fas fa-car"></i> Véhicules</li>
@@ -126,8 +130,8 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; }
                 <input type="text" name="brand" placeholder="Marque" required>
                 <input type="text" name="model" placeholder="Modèle" required>
                 <input type="text" name="plate" placeholder="Immatriculation" required>
-                <input type="text" name="chassis" placeholder="N° Châssis">
-                <input type="number" name="year" placeholder="Année dotation">
+                <input type="text" name="chassis" placeholder="Numéro de Châssis">
+                <input type="number" name="year" placeholder="Année de dotation">
                 <input type="number" name="km" placeholder="KM Actuel" required>
                 <input type="file" accept="image/*" onchange="compressImg(this, 'h-v')">
                 <input type="hidden" name="image" id="h-v">
@@ -156,7 +160,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; }
 </div>
 
 <script>
-const KEYS = { vehicles: 'tf_v_db', drivers: 'tf_d_db' };
+const KEYS = { vehicles: 'tf_v_db', drivers: 'tf_d_db', auth: 'tf_auth' };
 
 function checkAuth() {
     const u = document.getElementById('user-id').value, p = document.getElementById('user-pass').value;
@@ -190,20 +194,24 @@ function handleSave(k, type) {
         const idx = d.findIndex(x => x.id == item.id);
         if(!item.image && d[idx].image) item.image = d[idx].image;
         d[idx] = item;
-    } else { item.id = Date.now(); d.push(item); }
+    } else {
+        item.id = Date.now(); d.push(item);
+    }
     localStorage.setItem(KEYS[k], JSON.stringify(d)); refreshUI(); closeModal(type);
 }
 
+// AJUSTEMENT : FONCTION IMPRESSION
 function printItem(id) {
     const v = load('vehicles').find(x => x.id == id);
     const area = document.getElementById('print-area');
-    area.innerHTML = `<div style="padding:30px; color:black; background:white;">
-        <h2 style="text-align:center; border-bottom:2px solid #000;">FICHE VEHICULE - CI BA301</h2><br>
-        <img src="${v.image}" style="width:200px; border:1px solid #000;"><br><br>
-        <p><b>Marque :</b> ${v.brand}</p><p><b>Modèle :</b> ${v.model}</p>
-        <p><b>Immatriculation :</b> ${v.plate}</p><p><b>Châssis :</b> ${v.chassis || '-'}</p>
-        <p><b>Dotation :</b> ${v.year || '-'}</p><p><b>Kilométrage :</b> ${v.km} KM</p>
-    </div>`;
+    area.innerHTML = `
+        <div style="padding:30px; color:black; background:white; font-family: sans-serif;">
+            <h2 style="text-align:center; border-bottom:2px solid #000;">FICHE VEHICULE - CI BA301</h2><br>
+            <img src="${v.image}" style="width:200px; border:1px solid #000;"><br><br>
+            <p><b>Marque :</b> ${v.brand}</p><p><b>Modèle :</b> ${v.model}</p>
+            <p><b>Immatriculation :</b> ${v.plate}</p><p><b>Châssis :</b> ${v.chassis || '-'}</p>
+            <p><b>Dotation :</b> ${v.year || '-'}</p><p><b>Kilométrage :</b> ${v.km} KM</p>
+        </div>`;
     window.print();
 }
 
@@ -214,7 +222,12 @@ function editItem(key, type, id) {
     Object.keys(item).forEach(k => { if(f.elements[k] && f.elements[k].type !== 'file') f.elements[k].value = item[k]; });
 }
 
-function deleteItem(key, id) { if(confirm("Supprimer ?")) { localStorage.setItem(KEYS[key], JSON.stringify(load(key).filter(x => x.id != id))); refreshUI(); } }
+function deleteItem(key, id) {
+    if(confirm("Supprimer ?")) {
+        const data = load(key).filter(x => x.id != id);
+        localStorage.setItem(KEYS[key], JSON.stringify(data)); refreshUI();
+    }
+}
 
 function refreshUI() {
     const v = load('vehicles'), dr = load('drivers');
@@ -227,6 +240,7 @@ function refreshUI() {
             <i class="fas fa-trash btn-delete" onclick="deleteItem('vehicles',${x.id})"></i>
         </td>
     </tr>`).join('');
+
     document.getElementById('tbody-drivers').innerHTML = dr.map(x=>`<tr>
         <td><img src="${x.image || ''}" class="img-preview" style="border-radius:50%"></td>
         <td>${x.name}</td><td>${x.mat}</td>
