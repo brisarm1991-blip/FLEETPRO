@@ -3,234 +3,213 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🚗 TrustFleet Pro</title>
+<title>🚗 TrustFleet</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root {
-  --primary: #1a2d4a; --primary-light: #243d63; --accent: #ff6b35;
-  --success: #28a745; --danger: #dc3545; --warning: #ffc107;
-  --info: #17a2b8; --bg: #f0f4f8; --card-bg: #ffffff;
-  --text: #2c3e50; --text-muted: #6c757d; --border: #dee2e6;
-  --shadow: 0 2px 12px rgba(0,0,0,0.08); --radius: 10px;
+  --primary: #1a2d4a;
+  --primary-light: #243d63;
+  --accent: #ff6b35;
+  --success: #28a745;
+  --danger: #dc3545;
+  --warning: #ffc107;
+  --info: #17a2b8;
+  --bg: #f0f4f8;
+  --card-bg: #ffffff;
+  --text: #2c3e50;
+  --text-muted: #6c757d;
+  --border: #dee2e6;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --radius: 10px;
   --sidebar-width: 260px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden;}
 
 /* Sidebar */
-.sidebar{width:var(--sidebar-width);background:var(--primary);color:white;display:flex;flex-direction:column;position:fixed;height:100vh;z-index:1000;}
+.sidebar{width:var(--sidebar-width);background:var(--primary);color:white;display:flex;flex-direction:column;position:fixed;height:100vh;transition:all 0.3s ease;z-index:1000;}
 .sidebar-header{padding:25px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,0.1);}
 .sidebar-header i{font-size:24px;color:var(--accent);}
-.sidebar-menu{list-style:none;padding:20px 0;flex-grow:1;}
-.sidebar-menu li{padding:12px 25px;display:flex;align-items:center;gap:15px;cursor:pointer;transition:0.2s;color:rgba(255,255,255,0.7);}
+.sidebar-header h2{font-size:18px;font-weight:600;letter-spacing:0.5px;}
+.sidebar-menu{list-style:none;padding:20px 0;flex-grow:1;overflow-y:auto;}
+.sidebar-menu li{padding:12px 25px;display:flex;align-items:center;gap:15px;cursor:pointer;transition:all 0.2s;color:rgba(255,255,255,0.7);font-size:15px;position:relative;}
 .sidebar-menu li:hover, .sidebar-menu li.active{background:var(--primary-light);color:white;}
 .sidebar-menu li.active{border-left:4px solid var(--accent);}
+.sidebar-menu li i{width:20px;text-align:center;font-size:18px;}
 
 /* Main Content */
-.main-content{flex-grow:1;margin-left:var(--sidebar-width);padding:30px;width:calc(100% - var(--sidebar-width));}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;}
+.main-content{flex-grow:1;margin-left:var(--sidebar-width);padding:30px;transition:all 0.3s ease;max-width:calc(100% - var(--sidebar-width));}
 .card{background:white;padding:25px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:25px;}
 
-/* Tables */
-table{width:100%;border-collapse:collapse;margin-top:15px;}
-th{text-align:left;padding:12px;border-bottom:2px solid var(--border);font-size:12px;color:var(--text-muted);text-transform:uppercase;}
+/* Table Styles */
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th{text-align:left;padding:12px;border-bottom:2px solid var(--border);color:var(--text-muted);font-weight:600;font-size:12px;}
 td{padding:12px;border-bottom:1px solid var(--border);font-size:14px;}
 
 /* Buttons */
-.btn{padding:10px 18px;border-radius:8px;border:none;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;}
+.btn{padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px;}
 .btn-primary{background:var(--primary);color:white;}
-.btn-excel{background:#1D6F42;color:white;width:100%;justify-content:center;margin-top:10px;}
-.sidebar-footer{padding:20px;border-top:1px solid rgba(255,255,255,0.1);}
-
-.badge{padding:4px 8px;border-radius:12px;font-size:11px;font-weight:bold;}
-.bg-success{background:#e8f5e9;color:#2e7d32;}
-.bg-danger{background:#ffebee;color:#c62828;}
+.btn-excel{background:#1D6F42;color:white;width:calc(100% - 40px);margin:20px;justify-content:center;}
 </style>
 </head>
 <body>
 
 <div class="sidebar">
-  <div class="sidebar-header"><i class="fas fa-shield-alt"></i><h2>TrustFleet</h2></div>
-  <ul class="sidebar-menu">
-    <li class="active" onclick="showSection('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</li>
-    <li onclick="showSection('vehicles')"><i class="fas fa-car"></i> Véhicules</li>
-    <li onclick="showSection('drivers')"><i class="fas fa-users"></i> Chauffeurs</li>
-    <li onclick="showSection('fuel')"><i class="fas fa-gas-pump"></i> Carburant</li>
-  </ul>
-  <div class="sidebar-footer">
-    <button class="btn btn-excel" onclick="exportToExcel()">
-      <i class="fas fa-file-excel"></i> Exporter vers Excel
-    </button>
+  <div class="sidebar-header">
+    <i class="fas fa-shield-alt"></i>
+    <h2>TrustFleet</h2>
   </div>
+  <ul class="sidebar-menu">
+    <li class="active" onclick="showSection('dashboard')"><i class="fas fa-th-large"></i> <span>Tableau de bord</span></li>
+    <li onclick="showSection('vehicles')"><i class="fas fa-car"></i> <span>Véhicules</span></li>
+    <li onclick="showSection('drivers')"><i class="fas fa-id-card"></i> <span>Chauffeurs</span></li>
+    <li onclick="showSection('fuel')"><i class="fas fa-gas-pump"></i> <span>Carburant</span></li>
+  </ul>
+  <button class="btn btn-excel" onclick="exportToExcel()">
+    <i class="fas fa-file-excel"></i> <span>Exporter vers Excel</span>
+  </button>
 </div>
 
 <div class="main-content">
-  <header>
-    <h1>Gestion de Parc</h1>
-    <div id="current-date"></div>
-  </header>
-
   <div id="section-dashboard" class="content-section">
     <div class="card">
-        <h3>Résumé de la Flotte</h3>
-        <p>Utilisez le menu latéral pour ajouter vos données. Cliquez sur le bouton vert pour générer un rapport Excel.</p>
+      <h2>Bienvenue sur TrustFleet</h2>
+      <p>Votre base de données est prête. Utilisez le menu pour commencer la saisie.</p>
     </div>
   </div>
 
   <div id="section-vehicles" class="content-section" style="display:none">
     <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h3>Véhicules</h3>
-            <button class="btn btn-primary" onclick="addVehicle()"><i class="fas fa-plus"></i> Ajouter</button>
-        </div>
-        <table id="table-v">
-            <thead><tr><th>Modèle</th><th>Immatriculation</th><th>KM</th><th>État</th></tr></thead>
-            <tbody id="body-v"></tbody>
-        </table>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3>Véhicules</h3>
+        <button class="btn btn-primary" onclick="addVehicle()">+ Ajouter</button>
+      </div>
+      <table>
+        <thead><tr><th>Modèle</th><th>Immatriculation</th><th>KM</th><th>État</th></tr></thead>
+        <tbody id="list-v"></tbody>
+      </table>
     </div>
   </div>
-
+  
   <div id="section-drivers" class="content-section" style="display:none">
     <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
             <h3>Chauffeurs</h3>
-            <button class="btn btn-primary" onclick="addDriver()"><i class="fas fa-plus"></i> Ajouter</button>
+            <button class="btn btn-primary" onclick="addDriver()">+ Ajouter</button>
         </div>
-        <table id="table-d">
+        <table>
             <thead><tr><th>Nom</th><th>Matricule</th><th>Statut</th></tr></thead>
-            <tbody id="body-d"></tbody>
+            <tbody id="list-d"></tbody>
         </table>
     </div>
   </div>
 
   <div id="section-fuel" class="content-section" style="display:none">
     <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
             <h3>Consommation</h3>
-            <button class="btn btn-primary" onclick="addFuel()"><i class="fas fa-plus"></i> Saisir Plein</button>
+            <button class="btn btn-primary" onclick="addFuel()">+ Saisir Plein</button>
         </div>
-        <table id="table-f">
+        <table>
             <thead><tr><th>Date</th><th>Véhicule</th><th>Litres</th><th>Montant</th></tr></thead>
-            <tbody id="body-f"></tbody>
+            <tbody id="list-f"></tbody>
         </table>
     </div>
   </div>
 </div>
 
 <script>
-const KEYS = { v: 'tf_v', d: 'tf_d', f: 'tf_f' };
+const KEYS = { v: 'tf_vehicles', d: 'tf_drivers', f: 'tf_fuel' };
 
 function load(key) {
-    const data = localStorage.getItem(KEYS[key]);
-    return data ? JSON.parse(data) : [];
+  const data = localStorage.getItem(KEYS[key]);
+  return data ? JSON.parse(data) : [];
 }
 
 function save(key, data) {
-    localStorage.setItem(KEYS[key], JSON.stringify(data));
-    updateUI();
+  localStorage.setItem(KEYS[key], JSON.stringify(data));
+  updateUI();
 }
 
 function updateUI() {
-    const vs = load('v');
-    document.getElementById('body-v').innerHTML = vs.map(v => `
-        <tr><td>${v.brand}</td><td><code>${v.plate}</code></td><td>${v.km} km</td><td><span class="badge bg-success">${v.state}</span></td></tr>
-    `).join('') || '<tr><td colspan="4">Aucune donnée</td></tr>';
+  const vs = load('v');
+  document.getElementById('list-v').innerHTML = vs.map(v => `
+    <tr><td>${v.brand}</td><td>${v.plate}</td><td>${v.km}</td><td>${v.state}</td></tr>
+  `).join('') || '<tr><td colspan="4">Aucun véhicule</td></tr>';
 
-    const ds = load('d');
-    document.getElementById('body-d').innerHTML = ds.map(d => `
-        <tr><td>${d.name}</td><td>${d.mat}</td><td>${d.status}</td></tr>
-    `).join('') || '<tr><td colspan="3">Aucune donnée</td></tr>';
+  const ds = load('d');
+  document.getElementById('list-d').innerHTML = ds.map(d => `
+    <tr><td>${d.name}</td><td>${d.mat}</td><td>${d.status}</td></tr>
+  `).join('') || '<tr><td colspan="3">Aucun chauffeur</td></tr>';
 
-    const fs = load('f');
-    document.getElementById('body-f').innerHTML = fs.map(f => `
-        <tr><td>${f.date}</td><td>${f.vehicle}</td><td>${f.liters} L</td><td>${f.cost} FCFA</td></tr>
-    `).join('') || '<tr><td colspan="4">Aucune donnée</td></tr>';
+  const fs = load('f');
+  document.getElementById('list-f').innerHTML = fs.map(f => `
+    <tr><td>${f.date}</td><td>${f.vehicle}</td><td>${f.liters}</td><td>${f.cost}</td></tr>
+  `).join('') || '<tr><td colspan="4">Aucune donnée</td></tr>';
 }
 
 function addVehicle() {
-    const brand = prompt("Marque/Modèle :");
-    const plate = prompt("Immatriculation :");
-    const km = prompt("Kilométrage :");
-    if(brand && plate) {
-        const vs = load('v');
-        vs.push({ brand, plate, km, state: 'En service' });
-        save('v', vs);
-    }
+  const brand = prompt("Modèle :");
+  const plate = prompt("Plaque :");
+  const km = prompt("KM :");
+  if(brand && plate) {
+    const data = load('v');
+    data.push({brand, plate, km, state:'En service'});
+    save('v', data);
+  }
 }
 
 function addDriver() {
-    const name = prompt("Nom complet :");
+    const name = prompt("Nom :");
     const mat = prompt("Matricule :");
     if(name && mat) {
-        const ds = load('d');
-        ds.push({ name, mat, status: 'Actif' });
-        save('d', ds);
+        const data = load('d');
+        data.push({name, mat, status:'Actif'});
+        save('d', data);
     }
 }
 
 function addFuel() {
-    const date = new Date().toLocaleDateString();
-    const vehicle = prompt("Immatriculation du véhicule :");
-    const liters = prompt("Nombre de litres :");
-    const cost = prompt("Montant total :");
+    const vehicle = prompt("Immatriculation :");
+    const liters = prompt("Litres :");
+    const cost = prompt("Coût :");
     if(vehicle && liters) {
-        const fs = load('f');
-        fs.push({ date, vehicle, liters, cost });
-        save('f', fs);
+        const data = load('f');
+        data.push({date: new Date().toLocaleDateString(), vehicle, liters, cost});
+        save('f', data);
     }
 }
 
 function showSection(id) {
-    document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
-    document.getElementById('section-' + id).style.display = 'block';
-    document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
-    event.currentTarget.classList.add('active');
+  document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+  document.getElementById('section-'+id).style.display = 'block';
+  document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+  event.currentTarget.classList.add('active');
 }
 
-// ========================================
-// EXPORTATION EXCEL (CSV)
-// ========================================
 function exportToExcel() {
-    const vs = load('v');
-    const ds = load('d');
-    const fs = load('f');
+  const vs = load('v');
+  const ds = load('d');
+  const fs = load('f');
+  
+  let csv = "\uFEFFSECTION VEHICULES\nModèle;Plaque;KM;Etat\n";
+  vs.forEach(v => csv += `${v.brand};${v.plate};${v.km};${v.state}\n`);
+  
+  csv += "\nSECTION CHAUFFEURS\nNom;Matricule;Statut\n";
+  ds.forEach(d => csv += `${d.name};${d.mat};${d.status}\n`);
 
-    if (vs.length === 0 && ds.length === 0 && fs.length === 0) {
-        alert("Aucune donnée à exporter.");
-        return;
-    }
+  csv += "\nSECTION CARBURANT\nDate;Véhicule;Litres;Coût\n";
+  fs.forEach(f => csv += `${f.date};${f.vehicle};${f.liters};${f.cost}\n`);
 
-    let csvContent = "\uFEFF"; // BOM pour les accents en Excel
-    
-    // Section Véhicules
-    csvContent += "SECTION : VEHICULES\n";
-    csvContent += "Modele;Immatriculation;Kilometrage;Etat\n";
-    vs.forEach(v => { csvContent += `${v.brand};${v.plate};${v.km};${v.state}\n`; });
-    
-    csvContent += "\nSECTION : CHAUFFEURS\n";
-    csvContent += "Nom;Matricule;Statut\n";
-    ds.forEach(d => { csvContent += `${d.name};${d.mat};${d.status}\n`; });
-
-    csvContent += "\nSECTION : CARBURANT\n";
-    csvContent += "Date;Vehicule;Litres;Montant\n";
-    fs.forEach(f => { csvContent += `${f.date};${f.vehicle};${f.liters};${f.cost}\n`; });
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", "Rapport_TrustFleet_" + new Date().toLocaleDateString() + ".csv");
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "TrustFleet_Rapport.csv";
+  link.click();
 }
 
-window.onload = function() {
-    document.getElementById('current-date').textContent = new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    updateUI();
-};
+window.onload = updateUI;
 </script>
 </body>
 </html>
