@@ -38,24 +38,23 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);di
 table{width:100%; border-collapse:collapse;}
 th{background:#f8f9fa; padding:12px; text-align:left; font-size:.75rem; text-transform:uppercase; border-bottom:2px solid var(--border);}
 td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertical-align:middle;}
-
-/* MODALS */
-.modal-overlay{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(3px);}
-.modal-overlay.open{display:flex;}
-.modal{background:white; border-radius:12px; width:90%; max-width:600px; padding:25px;}
-
 .btn{padding:10px 18px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:8px;}
 .btn-primary{background:var(--primary); color:white;}
 .btn-accent{background:var(--accent); color:white;}
 .btn-secondary{background:#6c757d; color:white;}
 
-/* 🖨️ RÉGLAGES SPÉCIFIQUES POUR L'EXPORT PDF */
+/* MODALS */
+.modal-overlay{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(3px);}
+.modal-overlay.open{display:flex;}
+.modal{background:white; border-radius:12px; width:90%; max-width:600px; padding:25px; max-height:90vh; overflow-y:auto;}
+
+/* 🖨️ RÈGLES D'EXPORT PDF (PRINT) */
 @media print {
   .sidebar, .btn, .header-btns, .modal-overlay, #page-settings, .fa-trash, .fa-edit { display: none !important; }
   .main { margin-left: 0 !important; display: block !important; }
   .page { display: block !important; border:none !important; }
-  .header { border-bottom: 2px solid #000; justify-content: center; }
-  #title-header { font-size: 26pt !important; color: #000 !important; }
+  .header { border-bottom: 2px solid #000; justify-content: center; height: auto; padding: 20px 0; }
+  #title-header { font-size: 26pt !important; color: #000 !important; text-align: center; width: 100%; }
   .card { box-shadow: none; border: 1px solid #eee; }
 }
 </style>
@@ -88,12 +87,11 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
   <header class="header">
     <h2 id="title-header">TrustFleet</h2>
     <div class="header-btns">
-        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> PDF</button>
+        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
     </div>
   </header>
 
   <div class="content">
-    
     <div id="page-dashboard" class="page active">
       <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:15px; margin-bottom:20px;">
         <div class="card"><h4>Flotte</h4><h2 id="s-v">0</h2></div>
@@ -117,29 +115,25 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
       </div>
     </div>
 
-    <div id="page-drivers" class="page">
-        <h3>Personnel</h3>
-        <div id="t-d"></div>
-    </div>
+    <div id="page-drivers" class="page"><h3>Personnel</h3><div id="t-d"></div></div>
 
     <div id="page-settings" class="page">
-        <h3>Paramètres de la Structure</h3><br>
+        <h3>Configuration Générale</h3><br>
         <div class="card" style="max-width:500px">
             <div style="margin-bottom:15px">
-                <label style="display:block; margin-bottom:5px; font-weight:bold;">Nom de l'Unité (Entête PDF)</label>
+                <label style="display:block; margin-bottom:5px; font-weight:bold;">Nom de l'Unité / Structure</label>
                 <input type="text" id="set-unit-name" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:6px;">
             </div>
             <div style="margin-bottom:15px">
                 <label style="display:block; margin-bottom:5px; font-weight:bold;">Code d'Accès</label>
-                <input type="password" id="set-new-pass" placeholder="Laisser vide pour ne pas changer" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:6px;">
+                <input type="password" id="set-new-pass" placeholder="Nouveau code (si changement)" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:6px;">
             </div>
             <div style="display:flex; gap:10px">
-                <button class="btn btn-accent" onclick="saveSettings()">Valider et Appliquer</button>
+                <button class="btn btn-accent" onclick="saveSettings()">Appliquer les modifications</button>
                 <button class="btn btn-secondary" onclick="showPage('dashboard')">Annuler</button>
             </div>
         </div>
     </div>
-
   </div>
 </div>
 
@@ -161,18 +155,19 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 </form></div></div>
 
 <script>
-// INITIALISATION
+// CONFIGURATION ET BASE DE DONNEES
 let config = JSON.parse(localStorage.getItem('trust_config')) || { pass: '301', unit: 'TrustFleet' };
 let db = { v: JSON.parse(localStorage.getItem('v_301')) || [] };
+let chart;
 
-// APPLICATION DU NOM PARTOUT
+// FONCTION POUR APPLIQUER LE NOM PARTOUT (Y COMPRIS ENTÊTE PDF)
 function applyConfig() {
-    const unitName = config.unit || 'TrustFleet';
-    document.title = unitName;
-    document.getElementById('side-title').innerText = unitName;
-    document.getElementById('lock-title').innerText = unitName;
-    document.getElementById('title-header').innerText = unitName.toUpperCase();
-    document.getElementById('set-unit-name').value = unitName;
+    const name = config.unit || 'TrustFleet';
+    document.title = name;
+    document.getElementById('side-title').innerText = name;
+    document.getElementById('lock-title').innerText = name;
+    document.getElementById('title-header').innerText = name.toUpperCase();
+    document.getElementById('set-unit-name').value = name;
 }
 
 function login() { 
@@ -184,14 +179,12 @@ function login() {
 }
 
 function saveSettings() {
-    const newName = document.getElementById('set-unit-name').value;
-    const newPass = document.getElementById('set-new-pass').value;
-    
-    if(newName.trim() !== "") config.unit = newName;
-    if(newPass.trim() !== "") config.pass = newPass;
-    
+    const n = document.getElementById('set-unit-name').value;
+    const p = document.getElementById('set-new-pass').value;
+    if(n.trim() !== "") config.unit = n;
+    if(p.trim() !== "") config.pass = p;
     localStorage.setItem('trust_config', JSON.stringify(config));
-    applyConfig(); // Applique le nom immédiatement
+    applyConfig();
     alert('Structure mise à jour !');
 }
 
@@ -199,8 +192,6 @@ function showPage(pId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('page-' + pId).classList.add('active');
-    
-    // Garde le nom de la structure en entête même si on change de page
     document.getElementById('title-header').innerText = config.unit.toUpperCase();
 }
 
@@ -228,8 +219,7 @@ function refresh() {
 
 function del(k, id) { if(confirm('Supprimer ?')) { db[k] = db[k].filter(x=>x.id!==id); localStorage.setItem(k+'_301', JSON.stringify(db[k])); refresh(); } }
 
-let chart;
-applyConfig(); // Force l'affichage du nom dès le départ
+applyConfig();
 </script>
 </body>
 </html>
