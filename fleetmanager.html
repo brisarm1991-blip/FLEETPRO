@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CI BA301 - FleetManager Pro v7.0</title>
+<title>TrustFleet - Gestion de Parc</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -64,15 +64,18 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 
 <div id="lock-screen">
   <div class="lock-box">
-    <i class="fas fa-shield-alt fa-3x" style="color:var(--primary)"></i>
-    <h2>CI BA301 GAROUA</h2>
+    <i class="fas fa-car fa-3x" style="color:var(--primary)"></i>
+    <h2 style="margin:10px 0">TrustFleet</h2>
     <input type="password" id="pass" placeholder="Code d'accès">
-    <button class="btn btn-primary" style="width:100%; justify-content:center" onclick="login()">Connexion</button>
+    <button class="btn btn-primary" style="width:100%; justify-content:center" onclick="login()">Accéder</button>
   </div>
 </div>
 
 <nav class="sidebar">
-  <div class="sidebar-header"><h3>LOGISTIQUE</h3></div>
+  <div class="sidebar-header">
+    <i class="fas fa-car fa-2x" style="color:var(--accent)"></i>
+    <h3>TrustFleet</h3>
+  </div>
   <div class="nav-section">
     <div class="nav-item active" onclick="showPage('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</div>
     <div class="nav-item" onclick="showPage('vehicles')"><i class="fas fa-truck"></i> Véhicules</div>
@@ -80,14 +83,15 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
     <div class="nav-item" onclick="showPage('maint')"><i class="fas fa-tools"></i> Entretien Tech</div>
     <div class="nav-item" onclick="showPage('fuel')"><i class="fas fa-gas-pump"></i> Carburant</div>
     <div class="nav-item" onclick="showPage('interviews')"><i class="fas fa-clipboard-list"></i> Entretiens Perso</div>
+    <div class="nav-item" onclick="showPage('settings')" style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.1)"><i class="fas fa-cog"></i> Paramètres</div>
   </div>
 </nav>
 
 <div class="main" id="app">
   <header class="header">
-    <h2 id="title">Dashboard</h2>
+    <h2 id="title-header">Dashboard</h2>
     <div class="header-btns">
-        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> EXPORT PDF</button>
+        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> PDF</button>
     </div>
   </header>
 
@@ -95,7 +99,7 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
     <div id="page-dashboard" class="page active">
       <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:15px; margin-bottom:20px;">
         <div class="card"><h4>Flotte</h4><h2 id="s-v">0</h2></div>
-        <div class="card" style="color:var(--danger)"><h4>Pannes</h4><h2 id="s-p">0</h2></div>
+        <div class="card" style="color:var(--danger)"><h4>En Panne</h4><h2 id="s-p">0</h2></div>
         <div class="card"><h4>Chauffeurs</h4><h2 id="s-d">0</h2></div>
         <div class="card"><h4>Interviews</h4><h2 id="s-i">0</h2></div>
       </div>
@@ -109,7 +113,7 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Photo</th><th>Marque & Modèle</th><th>Immat.</th><th>Année Dotation</th><th>KM</th><th>État</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Photo</th><th>Modèle</th><th>Immat.</th><th>Année Dotation</th><th>KM</th><th>État</th><th>Actions</th></tr></thead>
           <tbody id="t-v"></tbody>
         </table>
       </div>
@@ -117,8 +121,8 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 
     <div id="page-drivers" class="page">
         <div style="display:flex; justify-content:space-between; margin-bottom:15px">
-          <h3>Registre des Chauffeurs</h3>
-          <button class="btn btn-primary" onclick="openM('m-d')">Ajouter Chauffeur</button>
+          <h3>Chauffeurs</h3>
+          <button class="btn btn-primary" onclick="openM('m-d')">Nouveau</button>
         </div>
         <div class="table-wrap">
           <table>
@@ -127,10 +131,27 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
           </table>
         </div>
     </div>
-    
-    <div id="page-maint" class="page"><h3>Maintenance</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Désignation</th><th>Coût</th><th>Action</th></tr></thead><tbody id="t-m"></tbody></table></div></div>
-    <div id="page-fuel" class="page"><h3>Carburant</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Litres</th><th>Coût</th><th>Action</th></tr></thead><tbody id="t-f"></tbody></table></div></div>
-    <div id="page-interviews" class="page"><h3>Entretiens Personnel</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Personnel</th><th>Objet</th><th>Action</th></tr></thead><tbody id="t-i"></tbody></table></div></div>
+
+    <div id="page-settings" class="page">
+        <h3>Paramètres Généraux</h3><br>
+        <div class="card" style="max-width:500px">
+            <div class="form-group">
+                <label>Nom de l'Unité / Application</label>
+                <input type="text" id="set-unit-name" placeholder="Ex: CI BA301">
+            </div>
+            <div class="form-group">
+                <label>Nouveau Code d'Accès</label>
+                <input type="password" id="set-new-pass" placeholder="Laisser vide pour ne pas changer">
+            </div>
+            <br>
+            <button class="btn btn-accent" onclick="saveSettings()">Enregistrer les Paramètres</button>
+        </div>
+    </div>
+
+    <div id="page-maint" class="page"><h3>Maintenance</h3><div id="t-m"></div></div>
+    <div id="page-fuel" class="page"><h3>Carburant</h3><div id="t-f"></div></div>
+    <div id="page-interviews" class="page"><h3>Entretiens</h3><div id="t-i"></div></div>
+
   </div>
 </div>
 
@@ -141,7 +162,7 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
     <div class="form-group"><label>Marque</label><input type="text" id="v1" required></div>
     <div class="form-group"><label>Modèle</label><input type="text" id="v2" required></div>
     <div class="form-group"><label>Immatriculation</label><input type="text" id="v3" required></div>
-    <div class="form-group"><label>Année de Dotation</label><input type="number" id="v_year" placeholder="Ex: 2024" required></div>
+    <div class="form-group"><label>Année de Dotation</label><input type="number" id="v_year" required></div>
     <div class="form-group"><label>Kilométrage</label><input type="number" id="v4" required></div>
     <div class="form-group"><label>État</label><select id="v5"><option>En service</option><option>En panne</option></select></div>
     <div class="form-group"><label>Photo</label><input type="file" onchange="up(this,'v_img')"><input type="hidden" id="v_img"></div>
@@ -158,7 +179,7 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
     <div class="form-grid">
       <div class="form-group"><label>Grade & Nom</label><input type="text" id="d1" required></div>
       <div class="form-group"><label>Matricule</label><input type="text" id="d2" required></div>
-      <div class="form-group"><label>Permis</label><input type="text" id="d3" required></div>
+      <div class="form-group"><label>Type Permis</label><input type="text" id="d3" required></div>
       <div class="form-group"><label>Photo</label><input type="file" onchange="up(this,'d_img')"><input type="hidden" id="d_img"></div>
     </div><br>
     <div style="display:flex; gap:10px; justify-content:flex-end">
@@ -168,16 +189,35 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 </form></div></div>
 
 <script>
+// INITIALISATION DES PARAMETRES
+let config = JSON.parse(localStorage.getItem('trust_config')) || { pass: '301', unit: 'TrustFleet' };
 let db = {
     v: JSON.parse(localStorage.getItem('v_301')) || [],
-    d: JSON.parse(localStorage.getItem('d_301')) || [],
-    m: JSON.parse(localStorage.getItem('m_301')) || [],
-    f: JSON.parse(localStorage.getItem('f_301')) || [],
-    i: JSON.parse(localStorage.getItem('i_301')) || []
+    d: JSON.parse(localStorage.getItem('d_301')) || []
 };
 
-function login() { if(document.getElementById('pass').value === '301') { document.getElementById('lock-screen').style.display='none'; document.getElementById('app').style.display='block'; refresh(); } else alert('Accès refusé'); }
+// SÉCURITÉ
+function login() { 
+    if(document.getElementById('pass').value === config.pass) { 
+        document.getElementById('lock-screen').style.display='none'; 
+        document.getElementById('app').style.display='block'; 
+        document.getElementById('set-unit-name').value = config.unit;
+        refresh(); 
+    } else alert('Code d\'accès erroné'); 
+}
 
+// PARAMETRES
+function saveSettings() {
+    const newName = document.getElementById('set-unit-name').value;
+    const newPass = document.getElementById('set-new-pass').value;
+    if(newName) config.unit = newName;
+    if(newPass) config.pass = newPass;
+    localStorage.setItem('trust_config', JSON.stringify(config));
+    alert('Paramètres enregistrés. Le nouveau code sera effectif au prochain accès.');
+    location.reload();
+}
+
+// GESTION PHOTOS
 function up(input, hid) {
     const r = new FileReader();
     r.onload = (e) => {
@@ -190,9 +230,10 @@ function up(input, hid) {
         };
         img.src = e.target.result;
     };
-    r.readAsDataURL(input.files[0]);
+    if(input.files[0]) r.readAsDataURL(input.files[0]);
 }
 
+// CRUD
 function save(e, k, mid) {
     e.preventDefault();
     const id = document.getElementById(k+'_id').value;
@@ -223,21 +264,21 @@ function edit(k, id, mid) {
     openM(mid);
 }
 
-function del(k, id) { if(confirm('Supprimer ?')) { db[k] = db[k].filter(x=>x.id!==id); localStorage.setItem(k+'_301', JSON.stringify(db[k])); refresh(); } }
+function del(k, id) { if(confirm('Supprimer cet élément ?')) { db[k] = db[k].filter(x=>x.id!==id); localStorage.setItem(k+'_301', JSON.stringify(db[k])); refresh(); } }
 
+// UI
 function showPage(id) {
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     document.getElementById('page-'+id).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    document.getElementById('title-header').textContent = id.toUpperCase();
 }
 
 function openM(id) { document.getElementById(id).classList.add('open'); }
 function closeM(id) { 
     document.getElementById(id).classList.remove('open'); 
-    const formId = id === 'm-v' ? 'f-v' : 'f-d';
-    document.getElementById(formId).reset();
-    const hiddenId = id === 'm-v' ? 'v_id' : 'd_id';
-    document.getElementById(hiddenId).value = '';
+    const form = document.querySelector(`#${id} form`);
+    if(form) form.reset();
 }
 
 let chart;
@@ -245,12 +286,12 @@ function refresh() {
     document.getElementById('s-v').textContent = db.v.length;
     document.getElementById('s-p').textContent = db.v.filter(x=>x.state==='En panne').length;
     
-    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td><img src="${x.img||''}" class="img-thumb"></td><td>${x.brand} ${x.model}</td><td>${x.plate}</td><td style="font-weight:bold">${x.year || 'N/A'}</td><td>${x.km} km</td><td>${x.state}</td><td><i class="fas fa-edit" onclick="edit('v',${x.id},'m-v')"></i> <i class="fas fa-trash" onclick="del('v',${x.id})" style="margin-left:10px"></i></td></tr>`).join('');
+    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td><img src="${x.img||''}" class="img-thumb"></td><td>${x.brand} ${x.model}</td><td>${x.plate}</td><td>${x.year}</td><td>${x.km} km</td><td>${x.state}</td><td><i class="fas fa-edit" onclick="edit('v',${x.id},'m-v')"></i> <i class="fas fa-trash" onclick="del('v',${x.id})" style="margin-left:10px"></i></td></tr>`).join('');
     document.getElementById('t-d').innerHTML = db.d.map(x=>`<tr><td><img src="${x.img||''}" class="img-thumb" style="border-radius:50%"></td><td>${x.name}</td><td>${x.mat}</td><td>${x.lic}</td><td><i class="fas fa-edit" onclick="edit('d',${x.id},'m-d')"></i> <i class="fas fa-trash" onclick="del('d',${x.id})" style="margin-left:10px"></i></td></tr>`).join('');
 
     const ctx = document.getElementById('chartV').getContext('2d');
     if(chart) chart.destroy();
-    chart = new Chart(ctx, { type:'bar', data: { labels:['En Service', 'En Panne'], datasets:[{label:'Statut Parc', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#28a745','#dc3545']}] }, options:{animation:false}});
+    chart = new Chart(ctx, { type:'bar', data: { labels:['En Service', 'Indisponible'], datasets:[{label:'État de la Flotte', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#28a745','#dc3545']}] }, options:{animation:false}});
 }
 </script>
 </body>
