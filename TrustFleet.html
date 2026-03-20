@@ -2,257 +2,1021 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>RH Manager - Système de Gestion Unité Centrale</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RH Manager v15.0 - Système de Gestion Intégré</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
     <style>
-        :root { --army: #2d3e2d; --gold: #c5a059; --bg: #f4f7f6; --white: #ffffff; --accent: #27ae60; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Écran de Connexion */
-        #login-screen { position: fixed; inset: 0; background: var(--army); z-index: 2000; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: white; padding: 40px; border-radius: 15px; text-align: center; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        :root {
+            --army: #2d3e2d;
+            --gold: #c5a059;
+            --bg: #f4f7f6;
+            --white: #ffffff;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --info: #3498db;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+        }
 
-        /* Sidebar */
-        .sidebar { width: 280px; background: var(--army); color: white; display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.3); z-index: 100; }
-        .sidebar-header { padding: 20px; text-align: center; border-bottom: 2px solid var(--gold); }
-        .nav-group { flex: 1; overflow-y: auto; padding-top: 10px; }
-        .nav-item { padding: 15px 25px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
-        .nav-item:hover, .nav-item.active { background: var(--gold); color: var(--army); font-weight: bold; }
+        * { box-sizing: border-box; }
 
-        /* Main Content */
-        .main { flex: 1; display: flex; flex-direction: column; height: 100vh; position: relative; }
-        .top-bar { background: var(--white); padding: 15px 25px; display: flex; align-items: center; gap: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .content-area { flex: 1; padding: 30px; overflow-y: auto; }
-        
-        .section-card { display: none; background: var(--white); border-radius: 12px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-top: 6px solid var(--army); animation: fadeIn 0.3s ease; margin-bottom: 20px; }
-        .section-card.active { display: block; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
+            margin: 0;
+            background: var(--bg);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-        /* Photo & Details */
-        .profile-header { display: flex; gap: 30px; margin-bottom: 30px; align-items: flex-start; }
-        .photo-box { width: 160px; height: 200px; border: 3px solid var(--gold); background: #eee; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .photo-box img { width: 100%; height: 100%; object-fit: cover; }
-        .photo-hint { position: absolute; bottom: 0; background: rgba(0,0,0,0.6); color: white; width: 100%; font-size: 10px; text-align: center; padding: 5px; opacity: 0; transition: 0.3s; }
-        .photo-box:hover .photo-hint { opacity: 1; }
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: var(--army);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.3);
+            z-index: 100;
+            overflow-y: auto;
+        }
 
-        /* Form Layout */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-        label { display: block; font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 6px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
-        input:disabled, select:disabled, textarea:disabled { background: #f9f9f9; color: #111; border-color: transparent; font-weight: 600; }
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--gold);
+            background: rgba(0,0,0,0.2);
+        }
 
-        /* Buttons */
-        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-army { background: var(--army); color: white; }
-        .btn-gold { background: var(--gold); color: var(--army); }
-        .btn-save { background: var(--accent); color: white; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .sidebar-header h2 {
+            color: var(--gold);
+            margin: 0 0 8px 0;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.8rem;
+            margin: 3px 0;
+            opacity: 0.8;
+        }
+
+        .nav-group {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 10px;
+        }
+
+        .nav-section-title {
+            padding: 10px 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: bold;
+            opacity: 0.8;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            user-select: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(197, 160, 89, 0.2);
+            border-left-color: var(--gold);
+        }
+
+        .nav-item.active {
+            background: var(--gold);
+            color: var(--army);
+            font-weight: bold;
+            border-left-color: var(--army);
+        }
+
+        .sidebar-footer {
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-footer button {
+            width: 100%;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+        }
+
+        .top-bar-left {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background: var(--bg);
+        }
+
+        .section-card {
+            display: none;
+            background: var(--white);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border-top: 6px solid var(--army);
+            animation: fadeIn 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .section-card.active {
+            display: block;
+        }
+
+        .section-card h3 {
+            margin-top: 0;
+            color: var(--army);
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+        }
+
+        /* PROFILE HEADER */
+        .profile-header {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .photo-box {
+            width: 150px;
+            height: 180px;
+            border: 3px solid var(--gold);
+            background: #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .photo-box:hover {
+            transform: scale(1.02);
+        }
+
+        .photo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-hint {
+            position: absolute;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            width: 100%;
+            font-size: 10px;
+            text-align: center;
+            padding: 6px 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .photo-box:hover .photo-hint {
+            opacity: 1;
+        }
+
+        /* FORMS */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .grid-compact {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: bold;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 5px rgba(197, 160, 89, 0.3);
+        }
+
+        input:disabled, select:disabled, textarea:disabled {
+            background: #f5f5f5;
+            color: #333;
+            border-color: #e0e0e0;
+            font-weight: 600;
+            cursor: not-allowed;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-army {
+            background: var(--army);
+            color: white;
+        }
+
+        .btn-army:hover:not(:disabled) {
+            background: #1a2b1a;
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: var(--army);
+        }
+
+        .btn-gold:hover:not(:disabled) {
+            background: #b8944e;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 12px;
+        }
+
+        /* LOGIN SCREEN */
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, var(--army) 0%, #1a2b1a 100%);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            background: var(--white);
+            padding: 50px;
+            border-radius: 15px;
+            width: 350px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .login-container h1 {
+            color: var(--army);
+            margin: 0 0 5px 0;
+            font-size: 1.8rem;
+        }
+
+        .login-container p {
+            font-size: 0.85rem;
+            color: #666;
+            margin: 0 0 30px 0;
+        }
+
+        .login-container input {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .login-container button {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* ALERTS */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* TABLES */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .table thead {
+            background: var(--army);
+            color: white;
+        }
+
+        .table th, .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .table tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--gold);
+        }
+
+        .stat-card h4 {
+            margin: 0 0 10px 0;
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--army);
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; max-height: 60px; }
+            .nav-group { display: none; }
+            .grid { grid-template-columns: 1fr; }
+            .profile-header { flex-direction: column; }
+        }
 
         @media print {
-            .sidebar, .top-bar, .btn, .photo-hint { display: none !important; }
-            .main { padding: 0; }
-            .section-card { display: block !important; box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
+            .sidebar, .top-bar, .btn { display: none !important; }
+            .section-card { box-shadow: none; border: 1px solid #ddd; }
         }
     </style>
 </head>
-<body>
+<body class="is-visitor">
 
+<!-- LOGIN MODAL -->
 <div id="login-screen">
-    <div class="login-box">
-        <h1 style="color:var(--army); margin-bottom:5px;">RH Manager</h1>
-        <p style="font-size: 0.8rem; color:#666;">Système Unité Centrale</p>
-        <input type="text" id="log-id" placeholder="Identifiant (Matricule ou Admin)" style="margin: 20px 0 10px; text-align:center;">
-        <input type="password" id="log-pass" placeholder="Code d'accès" style="text-align:center; margin-bottom:20px;">
-        <button onclick="access()" class="btn btn-gold" style="width:100%">CONNEXION</button>
+    <div class="login-container">
+        <h1>RH Manager</h1>
+        <p>Portail Sécurisé BA 301</p>
+        <input type="text" id="log-id" placeholder="Identifiant" autocomplete="username">
+        <input type="password" id="log-pass" placeholder="Code" autocomplete="current-password">
+        <button onclick="access()" class="btn btn-gold">CONNEXION</button>
+        <button onclick="accessGuest()" class="btn btn-info" style="margin-top:10px;">ACCÈS VISITEUR</button>
     </div>
 </div>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
     <div class="sidebar-header">
-        <h2 id="ui-unit" style="color:var(--gold); margin:0; font-size:1.3rem;">UNITÉ</h2>
-        <div id="ui-user" style="font-size:0.9rem; margin-top:5px; opacity:0.8;">Chargement...</div>
+        <h2 id="ui-unit">BA 301</h2>
+        <p id="ui-user">Bienvenue</p>
+        <p id="ui-role" style="font-size: 0.75rem; color: var(--gold);">-</p>
     </div>
+
     <div class="nav-group">
-        <div class="nav-item active" onclick="nav('sec-ident')">👤 IDENTITÉ & DIPLÔMES</div>
-        <div class="nav-item" onclick="nav('sec-carriere')">🎖 CARRIÈRE MILITAIRE</div>
-        <div class="nav-item" onclick="nav('sec-perf')">📈 PERFORMANCES</div>
-        <div class="nav-item" onclick="nav('sec-act')">📅 ACTIVITÉS & COMPTAGE</div>
-        <div class="nav-item" onclick="nav('sec-med')">🩺 SUIVI MÉDICAL</div>
-        <div id="nav-admin-only" class="nav-item" style="color:var(--gold); display:none;" onclick="nav('sec-admin')">⚙️ PARAMÈTRES ADMIN</div>
+        <div class="nav-section">
+            <div class="nav-section-title">📋 Gestion du Personnel</div>
+            <div class="nav-item active" onclick="nav('sec-dashboard')">📊 Tableau de Bord</div>
+            <div class="nav-item" onclick="nav('sec-ident')">👤 Identité & Profil</div>
+            <div class="nav-item" onclick="nav('sec-carriere')">🎖 Carrière</div>
+            <div class="nav-item" onclick="nav('sec-med')">🩺 Médical</div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">📊 Évaluations</div>
+            <div class="nav-item" onclick="nav('sec-perf')">📈 Performance</div>
+            <div class="nav-item" onclick="nav('sec-eval')">⭐ Évaluation Générale</div>
+            <div class="nav-item" onclick="nav('sec-act')">📅 Activités</div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">🛠 Outils</div>
+            <div class="nav-item" onclick="nav('sec-search')">🔍 Recherche Avancée</div>
+            <div id="nav-admin-only" class="nav-item" style="display:none;">⚙️ Paramètres</div>
+        </div>
     </div>
-    <div style="padding:20px;">
-        <button id="btn-print-pdf" onclick="exportToPDF()" class="btn btn-gold" style="width:100%; margin-bottom:10px;">🖨 EXPORTER PDF</button>
-        <button onclick="location.reload()" class="btn" style="width:100%; background:rgba(255,255,255,0.1); color:white;">DÉCONNEXION</button>
+
+    <div class="sidebar-footer">
+        <button onclick="window.print()" class="btn btn-gold" title="Imprimer en PDF">🖨 IMPRIMER</button>
+        <button onclick="exportJSON()" class="btn btn-info btn-small" style="margin-top:10px;">📥 EXPORTER</button>
+        <button onclick="location.reload()" class="btn" style="background:rgba(255,255,255,0.1); color:white; margin-top:10px;">🚪 DÉCONNEXION</button>
     </div>
 </div>
 
+<!-- MAIN CONTENT -->
 <div class="main">
     <div class="top-bar">
-        <div style="flex:1; display:flex; gap:10px;">
-            <select id="p-select" onchange="loadP(this.value)" style="max-width:300px; display:none;"></select>
-            <button id="btn-new" onclick="createNew()" class="btn" style="display:none; background:#3498db; color:white;">+ NOUVEAU PROFIL</button>
+        <div class="top-bar-left">
+            <select id="p-select" onchange="loadP(this.value)" style="max-width:350px; display:none;">
+            </select>
+            <button id="btn-new" onclick="createNew()" class="btn btn-info" style="display:none;">➕ NOUVEAU</button>
+            <input type="text" id="search-input" placeholder="🔍 Rechercher par nom..." style="max-width:250px; display:none;" onkeyup="filterPersonnel()">
         </div>
-        <button id="btn-edit" onclick="toggleEdit()" class="btn btn-army" style="display:none;">MODIFIER LE DOSSIER</button>
+        <div class="top-bar-right">
+            <button id="btn-edit" onclick="toggleEdit()" class="btn btn-army" style="display:none;">✏️ MODIFIER</button>
+            <button id="btn-delete" onclick="deletePerson()" class="btn btn-danger btn-small" style="display:none;">🗑️ SUPPRIMER</button>
+        </div>
     </div>
 
     <div class="content-area">
-        <div id="sec-ident" class="section-card active">
-            <h3>Identité & Niveau d'Instruction</h3>
+        <!-- DASHBOARD -->
+        <div id="sec-dashboard" class="section-card active">
+            <h3>📊 Tableau de Bord Général</h3>
+            <div id="dashboard-stats" class="stats-grid"></div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+                <div style="background:white; padding:20px; border-radius:8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h4 style="margin-top:0; color:var(--army);">Distribution par Grade</h4>
+                    <canvas id="chart-grades"></canvas>
+                </div>
+                <div style="background:white; padding:20px; border-radius:8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h4 style="margin-top:0; color:var(--army);">Top Performers</h4>
+                    <table class="table" style="margin-top:10px;">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Morale</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top-performers"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- IDENTITÉ -->
+        <div id="sec-ident" class="section-card">
+            <h3>👤 Identité & Profil</h3>
+            <div id="alerts-ident"></div>
             <div class="profile-header">
                 <div class="photo-box" onclick="triggerPhoto()">
-                    <img id="display-photo" src="https://via.placeholder.com/160x200?text=PHOTO">
+                    <img id="display-photo" src="">
                     <div class="photo-hint">CLIQUER POUR CHANGER</div>
-                    <input type="file" id="photo-input" style="display:none" onchange="updatePhoto(this)">
+                    <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="updatePhoto(this)">
                 </div>
                 <div class="grid" style="flex:1">
-                    <div><label>Nom</label><input type="text" data-v="nom" disabled></div>
-                    <div><label>Prénom</label><input type="text" data-v="prenom" disabled></div>
-                    <div><label>Matricule</label><input type="text" id="cur-mat" disabled></div>
-                    <div><label>Diplôme Civil</label><input type="text" data-v="dipCiv" disabled></div>
-                    <div><label>Diplôme Militaire</label><input type="text" data-v="dipMil" disabled></div>
+                    <div class="form-group">
+                        <label>Nom</label>
+                        <input type="text" data-v="nom" placeholder="Nom de famille">
+                    </div>
+                    <div class="form-group">
+                        <label>Prénom</label>
+                        <input type="text" data-v="prenom" placeholder="Prénom(s)">
+                    </div>
+                    <div class="form-group">
+                        <label>Matricule</label>
+                        <input type="text" id="cur-mat" placeholder="ex: OFF/001">
+                    </div>
+                    <div class="form-group">
+                        <label>Grade</label>
+                        <input type="text" data-v="grade" placeholder="CNE, LCL, SGT...">
+                    </div>
+                    <div class="form-group">
+                        <label>Spécialité</label>
+                        <input type="text" data-v="spec" placeholder="Pilote, Mécanicien...">
+                    </div>
                 </div>
             </div>
             <div class="grid">
-                <div><label>Date de Naissance</label><input type="date" data-v="dnais" disabled></div>
-                <div><label>Lieu</label><input type="text" data-v="lnais" disabled></div>
-                <div><label>Région d'Origine</label><input type="text" data-v="reg" disabled></div>
-                <div><label>Situation Familiale</label><select data-v="sit" disabled><option>MARIÉ</option><option>CÉLIBATAIRE</option></select></div>
+                <div class="form-group">
+                    <label>Date de Naissance</label>
+                    <input type="date" data-v="dnais">
+                </div>
+                <div class="form-group">
+                    <label>Lieu de Naissance</label>
+                    <input type="text" data-v="lnais" placeholder="Ville/Pays">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" data-v="email" placeholder="nom@base.mil">
+                </div>
+                <div class="form-group">
+                    <label>Téléphone</label>
+                    <input type="tel" data-v="phone" placeholder="+33 ...">
+                </div>
+                <div class="form-group">
+                    <label>Diplôme Civil</label>
+                    <input type="text" data-v="dipCiv" placeholder="BAC, Licence, Master...">
+                </div>
+                <div class="form-group">
+                    <label>Diplôme Militaire</label>
+                    <input type="text" data-v="dipMil" placeholder="CIA, CAT2...">
+                </div>
             </div>
         </div>
 
+        <!-- CARRIÈRE -->
         <div id="sec-carriere" class="section-card">
-            <h3>Carrière & Service</h3>
+            <h3>🎖️ Carrière Militaire</h3>
             <div class="grid">
-                <div><label>Grade Actuel</label><input type="text" data-v="grade" disabled></div>
-                <div><label>Spécialité</label><input type="text" data-v="spec" disabled></div>
-                <div><label>Date d'Incorporation</label><input type="date" data-v="dinc" disabled></div>
-                <div><label>Unité d'Origine</label><input type="text" data-v="uori" disabled></div>
-                <div><label>Position</label>
-                    <select data-v="pos" disabled><option>PRÉSENT</option><option>MISSION</option><option>STAGE</option><option>PERMISSION</option></select>
+                <div class="form-group">
+                    <label>Date d'Incorporation</label>
+                    <input type="date" data-v="dinc">
+                </div>
+                <div class="form-group">
+                    <label>Unité d'Origine</label>
+                    <input type="text" data-v="uori" placeholder="BA 701, BA 123...">
+                </div>
+                <div class="form-group">
+                    <label>Position Actuelle</label>
+                    <select data-v="pos">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="PRÉSENT">PRÉSENT</option>
+                        <option value="MISSION">MISSION</option>
+                        <option value="STAGE">STAGE</option>
+                        <option value="PERMISSION">PERMISSION</option>
+                        <option value="DÉTACHÉ">DÉTACHÉ</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Années de Service</label>
+                    <input type="number" data-v="ansServ" min="0" placeholder="0">
                 </div>
             </div>
         </div>
 
+        <!-- PERFORMANCE -->
         <div id="sec-perf" class="section-card">
-            <h3>Évaluation des Performances</h3>
-            <div style="display:flex; gap:40px; flex-wrap: wrap; align-items:center;">
-                <div class="grid" style="flex:1; min-width:300px;">
-                    <div><label>Tir (/20)</label><input type="number" data-v="nTir" oninput="liveUpdate()" disabled></div>
-                    <div><label>Physique (/20)</label><input type="number" data-v="nPhy" oninput="liveUpdate()" disabled></div>
-                    <div><label>Intellect (/20)</label><input type="number" data-v="nInt" oninput="liveUpdate()" disabled></div>
-                    <div><label>Moral (/20)</label><input type="number" data-v="nMor" oninput="liveUpdate()" disabled></div>
+            <h3>📈 Évaluation de Performance</h3>
+            <div style="display:flex; gap:40px; flex-wrap:wrap;">
+                <div class="grid-compact">
+                    <div class="form-group">
+                        <label>Valeur Physique (/20)</label>
+                        <input type="number" data-v="nPhy" min="0" max="20" oninput="liveUpdate()" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Valeur Morale (/20)</label>
+                        <input type="number" data-v="nMor" min="0" max="20" oninput="liveUpdate()" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Intellect (/20)</label>
+                        <input type="number" data-v="nInt" min="0" max="20" oninput="liveUpdate()" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Comme Tireur (/20)</label>
+                        <input type="number" data-v="nTir" min="0" max="20" oninput="liveUpdate()" placeholder="0">
+                    </div>
                 </div>
-                <div style="width:300px; height:300px;"><canvas id="radar"></canvas></div>
+                <div style="width:300px; height:300px;">
+                    <canvas id="radar"></canvas>
+                </div>
             </div>
         </div>
 
-        <div id="sec-act" class="section-card">
-            <h3>Suivi des Activités (Compteurs Jours)</h3>
-            <div class="grid">
-                <div><label>Cumul Missions</label><input type="number" data-v="cMis" oninput="updateTotal()" disabled></div>
-                <div><label>Cumul Stages</label><input type="number" data-v="cSta" oninput="updateTotal()" disabled></div>
-                <div><label>Cumul Permissions</label><input type="number" data-v="cPer" oninput="updateTotal()" disabled></div>
-                <div style="background:#eef; padding:10px; border-radius:8px;">
-                    <label>Total Absent Base</label>
-                    <input type="text" id="total-days" style="font-weight:bold; color:var(--army)" disabled>
-                </div>
-            </div>
-        </div>
-
+        <!-- MÉDICAL -->
         <div id="sec-med" class="section-card">
-            <h3>Données Médico-Physiologiques</h3>
+            <h3>🩺 Suivi Médical</h3>
             <div class="grid">
-                <div><label>Groupe Sanguin</label><input type="text" data-v="gs" disabled></div>
-                <div><label>Poids (kg)</label><input type="number" data-v="poids" disabled></div>
-                <div><label>Taille (m)</label><input type="number" step="0.01" data-v="taille" disabled></div>
-                <div><label>Aptitude SIGYCOP</label><input type="text" data-v="sgp" disabled></div>
-                <div style="grid-column: span 2;"><label>Allergies & Contre-indications</label><textarea data-v="all" disabled></textarea></div>
+                <div class="form-group">
+                    <label>Groupe Sanguin</label>
+                    <select data-v="gs">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Poids (kg)</label>
+                    <input type="number" data-v="poids" min="0" step="0.1" placeholder="70">
+                </div>
+                <div class="form-group">
+                    <label>Taille (m)</label>
+                    <input type="number" data-v="taille" min="0" step="0.01" placeholder="1.75">
+                </div>
+                <div class="form-group">
+                    <label>IMC Calculé</label>
+                    <input type="text" id="imc-calc" disabled style="font-weight:bold;">
+                </div>
+                <div class="form-group">
+                    <label>Aptitude SGPDIC</label>
+                    <select data-v="sgp">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="A1">A1</option>
+                        <option value="A2">A2</option>
+                        <option value="A3">A3</option>
+                        <option value="B">B</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tension Artérielle</label>
+                    <input type="text" data-v="tension" placeholder="120/80">
+                </div>
+            </div>
+            <div class="form-group" style="margin-top:20px;">
+                <label>Allergies / Notes Médicales</label>
+                <textarea data-v="all" placeholder="Allergies, pathologies, restrictions..."></textarea>
             </div>
         </div>
 
-        <div id="sec-admin" class="section-card">
-            <h3>Paramètres Système</h3>
+        <!-- ACTIVITÉS -->
+        <div id="sec-act" class="section-card">
+            <h3>📅 Récapitulatif Activités</h3>
             <div class="grid">
-                <div><label>Nom de l'Unité Centrale</label><input type="text" id="set-unit"></div>
-                <div><label>Identifiant Admin</label><input type="text" id="set-id"></div>
-                <div><label>Code Secret Admin</label><input type="password" id="set-pass"></div>
+                <div class="form-group">
+                    <label>Jours Présents</label>
+                    <input type="number" data-v="cPres" min="0" placeholder="0" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Jours Absents</label>
+                    <input type="number" data-v="cAbs" min="0" placeholder="0" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Jours Permission</label>
+                    <input type="number" data-v="cPer" min="0" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Jours Mission</label>
+                    <input type="number" data-v="cMis" min="0" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Jours Malade</label>
+                    <input type="number" data-v="cMal" min="0" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Jours Stage</label>
+                    <input type="number" data-v="cSta" min="0" placeholder="0">
+                </div>
             </div>
-            <button onclick="saveSets()" class="btn btn-save" style="margin-top:20px;">APPLIQUER LA CONFIGURATION</button>
+        </div>
+
+        <!-- ÉVALUATION GÉNÉRALE -->
+        <div id="sec-eval" class="section-card">
+            <h3>⭐ Évaluation Générale</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Morale Moyenne</h4>
+                    <div class="value" id="eval-morale">-</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Performance Globale</h4>
+                    <div class="value" id="eval-perf">-</div>
+                </div>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Critère</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="eval-table"></tbody>
+            </table>
+        </div>
+
+        <!-- RECHERCHE -->
+        <div id="sec-search" class="section-card">
+            <h3>🔍 Recherche Avancée</h3>
+            <div class="grid">
+                <div class="form-group">
+                    <label>Nom ou Prénom</label>
+                    <input type="text" id="search-name" placeholder="Entrer un nom" onkeyup="advancedSearch()">
+                </div>
+                <div class="form-group">
+                    <label>Grade</label>
+                    <input type="text" id="search-grade" placeholder="CNE, SGT..." onkeyup="advancedSearch()">
+                </div>
+                <div class="form-group">
+                    <label>Position</label>
+                    <select id="search-pos" onchange="advancedSearch()">
+                        <option value="">Toutes</option>
+                        <option value="PRÉSENT">PRÉSENT</option>
+                        <option value="MISSION">MISSION</option>
+                        <option value="STAGE">STAGE</option>
+                    </select>
+                </div>
+            </div>
+            <table class="table" id="search-results" style="display:none; margin-top:20px;">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Grade</th>
+                        <th>Position</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="search-tbody"></tbody>
+            </table>
         </div>
     </div>
 </div>
 
 <script>
-    // --- Initialisation des Données ---
-    let configs = JSON.parse(localStorage.getItem('rh_config')) || { unit: "AIR BASE 301", admin: "ADMIN", pass: "301" };
-    let roster = JSON.parse(localStorage.getItem('rh_roster')) || [
-        { id: "OFF/001", nom: "EMAN", prenom: "Armand Brice", grade: "CNE", dipCiv:"Licence", dipMil:"CIA", nTir:18, nPhy:17, nInt:18, nMor:19, cMis:15, cSta:5, cPer:10, photo:"" }
+    // ===== DATA INITIALIZATION =====
+    const personnelData = [
+        { id: "OFF/001", nom: "BALOGOG", prenom: "PATRICK", grade: "CNE", dipCiv: "L3/SIGL", dipMil: "SCU", nTir: 17, nPhy: 11.71, nInt: 0, nMor: 20.47, nTir: 17, cMis: 5, cSta: 0, cPer: 7, cPres: 14, cAbs: 0, cMal: 0, pos: "STAGE", email: "balogog@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 85, taille: 1.75, gs: "", tension: "", dinc: "2012-03-01", dnais: "1989-06-27", lnais: "YAOUNDE" },
+        { id: "OFF/002", nom: "EMAN", prenom: "ARMAND BRICE", grade: "CNE", dipCiv: "BAC A4", dipMil: "SCU", nTir: 18, nPhy: 0, nInt: 0, nMor: 20.6, cMis: 2, cSta: 0, cPer: 0, cPres: 44, cAbs: 0, cMal: 0, pos: "PRESENT", email: "eman@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 82, taille: 1.73, gs: "O+", tension: "121/84", dinc: "2012-03-02", dnais: "1991-06-07", lnais: "EBOLOWA" },
+        { id: "OFF/003", nom: "EBOK", prenom: "JEAN TOURAINE", grade: "CAL", dipCiv: "BAC D", dipMil: "CAT1", nTir: 20, nPhy: 0, nInt: 0, nMor: 21.07, cMis: 0, cSta: 0, cPer: 0, cPres: 41, cAbs: 0, cMal: 0, pos: "PRESENT", email: "ebok@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 0, taille: 0, gs: "", tension: "", dinc: "2015-03-06", dnais: "1995-09-08", lnais: "BERTOUA" }
     ];
 
-    let isAdmin = false, myChart = null, isEditing = false;
+    let configs = JSON.parse(localStorage.getItem('rh_config')) || { 
+        unit: "AIR BASE 301", 
+        admin: "ADMIN", 
+        pass: "301"
+    };
+    
+    let roster = JSON.parse(localStorage.getItem('rh_roster')) || personnelData;
+    let isAdmin = false;
+    let myChart = null;
+    let isEditing = false;
+    let currentPerson = null;
 
-    // --- Sécurité et Accès ---
+    // ===== AUTHENTICATION =====
     function access() {
-        const i = document.getElementById('log-id').value;
-        const p = document.getElementById('log-pass').value;
-
-        if(i === configs.admin && p === configs.pass) {
+        const id = document.getElementById('log-id').value.trim();
+        const pass = document.getElementById('log-pass').value.trim();
+        
+        if (!id || !pass) {
+            alert('Veuillez remplir tous les champs');
+            return;
+        }
+        
+        if (id === configs.admin && pass === configs.pass) {
             isAdmin = true;
+            document.body.className = "is-admin";
             document.getElementById('nav-admin-only').style.display = "flex";
             document.getElementById('p-select').style.display = "block";
             document.getElementById('btn-new').style.display = "block";
+            document.getElementById('btn-delete').style.display = "block";
             document.getElementById('btn-edit').style.display = "block";
+            document.getElementById('search-input').style.display = "block";
+            document.getElementById('ui-role').innerText = "ADMINISTRATEUR";
             fillSel();
             loadP(roster[0].id);
         } else {
-            const user = roster.find(x => x.id === i);
-            if(user) { 
-                isAdmin = false;
-                loadP(user.id); 
-            } else { 
-                alert("Identifiants incorrects"); 
-                return; 
+            const user = roster.find(x => x.id === id);
+            if (user) {
+                loadP(user.id);
+                document.getElementById('ui-role').innerText = "CONSULTATION";
+            } else {
+                alert('Identifiant ou code incorrect');
+                return;
             }
         }
         document.getElementById('login-screen').style.display = "none";
         applyConfigs();
+        initializeDashboard();
     }
 
-    function applyConfigs() {
-        document.getElementById('ui-unit').innerText = configs.unit;
-        document.getElementById('set-unit').value = configs.unit;
-        document.getElementById('set-id').value = configs.admin;
-        document.getElementById('set-pass').value = configs.pass;
+    function accessGuest() {
+        if (roster.length > 0) {
+            loadP(roster[0].id);
+            document.getElementById('login-screen').style.display = "none";
+            applyConfigs();
+            initializeDashboard();
+            document.getElementById('ui-role').innerText = "VISITEUR";
+        }
     }
 
-    function saveSets() {
-        configs.unit = document.getElementById('set-unit').value;
-        configs.admin = document.getElementById('set-id').value;
-        configs.pass = document.getElementById('set-pass').value;
-        localStorage.setItem('rh_config', JSON.stringify(configs));
-        applyConfigs();
-        alert("Configuration mise à jour.");
+    // ===== DASHBOARD =====
+    function initializeDashboard() {
+        const stats = document.getElementById('dashboard-stats');
+        const totalPersonnel = roster.length;
+        const presentCount = roster.filter(p => p.pos === 'PRESENT').length;
+        const missionCount = roster.filter(p => p.pos === 'MISSION').length;
+        const avgMorale = (roster.reduce((sum, p) => sum + (p.nMor || 0), 0) / roster.length).toFixed(2);
+
+        stats.innerHTML = `
+            <div class="stat-card">
+                <h4>Total Personnel</h4>
+                <div class="value">${totalPersonnel}</div>
+            </div>
+            <div class="stat-card">
+                <h4>Présents</h4>
+                <div class="value">${presentCount}</div>
+            </div>
+            <div class="stat-card">
+                <h4>En Mission</h4>
+                <div class="value">${missionCount}</div>
+            </div>
+            <div class="stat-card">
+                <h4>Morale Moyenne</h4>
+                <div class="value">${avgMorale}/20</div>
+            </div>
+        `;
+
+        drawGradesChart();
+        drawTopPerformers();
     }
 
-    // --- Gestion de l'affichage ---
+    function drawGradesChart() {
+        const ctx = document.getElementById('chart-grades');
+        if (!ctx) return;
+
+        const grades = {};
+        roster.forEach(p => {
+            grades[p.grade || 'ND'] = (grades[p.grade || 'ND'] || 0) + 1;
+        });
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(grades),
+                datasets: [{
+                    data: Object.values(grades),
+                    backgroundColor: ['#c5a059', '#2d3e2d', '#3498db', '#27ae60', '#e74c3c'],
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
+
+    function drawTopPerformers() {
+        const tbody = document.getElementById('top-performers');
+        if (!tbody) return;
+
+        const sorted = [...roster].sort((a, b) => (b.nMor || 0) - (a.nMor || 0)).slice(0, 5);
+        tbody.innerHTML = sorted.map(p => `
+            <tr>
+                <td>${p.nom} ${p.prenom}</td>
+                <td><strong>${(p.nMor || 0).toFixed(1)}</strong>/20</td>
+            </tr>
+        `).join('');
+    }
+
+    // ===== PERSONNEL MANAGEMENT =====
     function fillSel() {
-        const s = document.getElementById('p-select');
-        s.innerHTML = roster.map(x => `<option value="${x.id}">${x.grade} ${x.nom}</option>`).join('');
+        const sel = document.getElementById('p-select');
+        if (roster.length === 0) {
+            sel.innerHTML = '<option value="">-- Aucun dossier --</option>';
+            return;
+        }
+        sel.innerHTML = roster.map(x => `<option value="${x.id}">${x.grade || 'SLD'} ${x.nom || 'INCONNU'}</option>`).join('');
     }
 
     function loadP(id) {
         const p = roster.find(x => x.id === id);
-        if(!p) return;
+        if (!p) return;
+        
+        currentPerson = p;
+        document.getElementById('p-select').value = id;
         document.getElementById('cur-mat').value = p.id;
-        document.getElementById('ui-user').innerText = p.grade + " " + p.nom;
+        document.getElementById('ui-user').innerText = (p.grade || 'SLD') + " " + (p.nom || 'INCONNU');
+        
         document.querySelectorAll('[data-v]').forEach(el => {
-            const key = el.getAttribute('data-v');
-            el.value = p[key] || "";
+            const val = p[el.getAttribute('data-v')] || "";
+            el.value = val;
         });
-        document.getElementById('display-photo').src = p.photo || "https://via.placeholder.com/160x200?text=SANS+PHOTO";
-        updateTotal();
+        
+        document.getElementById('display-photo').src = p.photo || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='180' viewBox='0 0 150 180'%3E%3Crect fill='%23ddd' width='150' height='180'/%3E%3Ctext x='75' y='90' text-anchor='middle' dy='.3em' font-family='Arial' font-size='12' fill='%23999'%3EPHOTO%3C/text%3E%3C/svg%3E";
+        
+        calculateIMC();
         drawRadar(p);
+        updateEvaluation(p);
+        isEditing = false;
+        updateEditMode();
     }
 
     function nav(id) {
@@ -262,149 +1026,226 @@
         event.currentTarget.classList.add('active');
     }
 
-    // --- Édition et Sauvegarde ---
     function toggleEdit() {
+        if (!isAdmin) {
+            alert('Accès administrateur requis');
+            return;
+        }
+        
         isEditing = !isEditing;
-        document.querySelectorAll('[data-v], #cur-mat').forEach(el => el.disabled = !isEditing);
-        const b = document.getElementById('btn-edit');
-        if(isEditing) {
-            b.innerText = "💾 SAUVEGARDER LE DOSSIER";
-            b.style.background = "var(--accent)";
+        updateEditMode();
+    }
+
+    function updateEditMode() {
+        const disabled = !isEditing;
+        document.querySelectorAll('[data-v], #cur-mat').forEach(el => {
+            el.disabled = disabled;
+        });
+        
+        const btn = document.getElementById('btn-edit');
+        if (isEditing) {
+            btn.innerText = "💾 SAUVEGARDER";
+            btn.style.background = "var(--success)";
         } else {
-            b.innerText = "MODIFIER LE DOSSIER";
-            b.style.background = "var(--army)";
+            btn.innerText = "✏️ MODIFIER";
+            btn.style.background = "var(--army)";
             saveRoster();
         }
     }
 
     function saveRoster() {
-        const mat = document.getElementById('cur-mat').value;
+        const mat = document.getElementById('cur-mat').value.trim();
+        if (!mat) return;
+        
         let p = roster.find(x => x.id === mat);
-        if(!p) { p = { id: mat }; roster.push(p); }
+        if (!p) {
+            p = { id: mat };
+            roster.push(p);
+        }
         
         document.querySelectorAll('[data-v]').forEach(el => {
             const k = el.getAttribute('data-v');
-            p[k] = isNaN(el.value) || el.value === "" ? el.value : parseFloat(el.value);
+            const val = el.value.trim();
+            p[k] = (el.type === 'number' && val !== "") ? parseFloat(val) : val;
         });
-        p.photo = document.getElementById('display-photo').src;
         
         localStorage.setItem('rh_roster', JSON.stringify(roster));
         fillSel();
         drawRadar(p);
-        alert("Dossier enregistré avec succès.");
     }
 
     function createNew() {
+        if (!isAdmin) return;
         isEditing = true;
-        document.querySelectorAll('[data-v], #cur-mat').forEach(el => { el.value = ""; el.disabled = false; });
-        document.getElementById('display-photo').src = "";
+        currentPerson = null;
+        document.querySelectorAll('[data-v], #cur-mat').forEach(el => {
+            el.value = "";
+            el.disabled = false;
+        });
         document.getElementById('btn-edit').innerText = "💾 SAUVEGARDER";
-        document.getElementById('btn-edit').style.display = "block";
         nav('sec-ident');
+        updateEditMode();
     }
 
-    // --- Photo ---
-    function triggerPhoto() { if(isEditing) document.getElementById('photo-input').click(); }
+    function deletePerson() {
+        if (!isAdmin) return;
+        if (!confirm('Êtes-vous sûr ? Cette action est irréversible.')) return;
+        
+        const mat = document.getElementById('cur-mat').value;
+        roster = roster.filter(x => x.id !== mat);
+        localStorage.setItem('rh_roster', JSON.stringify(roster));
+        fillSel();
+        
+        if (roster.length > 0) {
+            loadP(roster[0].id);
+        }
+    }
+
+    function filterPersonnel() {
+        const term = document.getElementById('search-input').value.toLowerCase();
+        const filtered = roster.filter(p => 
+            p.nom.toLowerCase().includes(term) || 
+            p.prenom.toLowerCase().includes(term)
+        );
+        fillSel();
+    }
+
+    // ===== PHOTO HANDLING =====
+    function triggerPhoto() {
+        if (isEditing) document.getElementById('photo-input').click();
+    }
+
     function updatePhoto(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-            reader.onload = e => document.getElementById('display-photo').src = e.target.result;
+            reader.onload = e => {
+                document.getElementById('display-photo').src = e.target.result;
+                if (currentPerson) {
+                    currentPerson.photo = e.target.result;
+                }
+            };
             reader.readAsDataURL(input.files[0]);
         }
     }
 
-    // --- Graphique Radar ---
+    // ===== CALCULATIONS =====
+    function calculateIMC() {
+        const poids = parseFloat(document.querySelector('[data-v="poids"]').value) || 0;
+        const taille = parseFloat(document.querySelector('[data-v="taille"]').value) || 0;
+        
+        if (poids > 0 && taille > 0) {
+            const imc = (poids / (taille * taille)).toFixed(1);
+            document.getElementById('imc-calc').value = imc + " kg/m²";
+        } else {
+            document.getElementById('imc-calc').value = "-";
+        }
+    }
+
     function drawRadar(p) {
-        const ctx = document.getElementById('radar').getContext('2d');
-        if(myChart) myChart.destroy();
-        myChart = new Chart(ctx, {
+        const ctx = document.getElementById('radar');
+        if (!ctx) return;
+        
+        if (myChart) myChart.destroy();
+        
+        myChart = new Chart(ctx.getContext('2d'), {
             type: 'radar',
             data: {
-                labels: ['Tir', 'Physique', 'Intellect', 'Moral'],
-                datasets: [{ 
-                    label: 'Performances',
-                    data: [p.nTir||0, p.nPhy||0, p.nInt||0, p.nMor||0], 
-                    backgroundColor: 'rgba(197,160,89,0.3)', 
-                    borderColor: '#c5a059',
-                    borderWidth: 2
+                labels: ['Physique', 'Moral', 'Intellect', 'Tireur'],
+                datasets: [{
+                    data: [p.nPhy || 0, p.nMor || 0, p.nInt || 0, p.nTir || 0],
+                    backgroundColor: 'rgba(197,160,89,0.3)',
+                    borderColor: 'rgba(197,160,89,1)',
+                    pointBackgroundColor: 'rgba(197,160,89,1)',
+                    borderWidth: 2,
+                    pointRadius: 5
                 }]
             },
-            options: { 
-                scales: { r: { min: 0, max: 20, ticks: { display: false } } },
-                plugins: { legend: { display: false } }
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { r: { min: 0, max: 20 } },
+                responsive: true,
+                maintainAspectRatio: false
             }
         });
     }
 
     function liveUpdate() {
-        if(myChart) {
+        if (myChart) {
             myChart.data.datasets[0].data = [
-                document.querySelector('[data-v="nTir"]').value || 0,
-                document.querySelector('[data-v="nPhy"]').value || 0,
-                document.querySelector('[data-v="nInt"]').value || 0,
-                document.querySelector('[data-v="nMor"]').value || 0
+                parseFloat(document.querySelector('[data-v="nPhy"]').value) || 0,
+                parseFloat(document.querySelector('[data-v="nMor"]').value) || 0,
+                parseFloat(document.querySelector('[data-v="nInt"]').value) || 0,
+                parseFloat(document.querySelector('[data-v="nTir"]').value) || 0
             ];
             myChart.update();
         }
     }
 
-    function updateTotal() {
-        const m = parseFloat(document.querySelector('[data-v="cMis"]').value) || 0;
-        const s = parseFloat(document.querySelector('[data-v="cSta"]').value) || 0;
-        const p = parseFloat(document.querySelector('[data-v="cPer"]').value) || 0;
-        document.getElementById('total-days').value = (m + s + p) + " Jours";
+    function updateEvaluation(p) {
+        const morale = (p.nMor || 0).toFixed(1);
+        const perf = (((p.nPhy || 0) + (p.nMor || 0) + (p.nInt || 0) + (p.nTir || 0)) / 4).toFixed(1);
+        
+        document.getElementById('eval-morale').innerText = morale + "/20";
+        document.getElementById('eval-perf').innerText = perf + "/20";
+        
+        const tbody = document.getElementById('eval-table');
+        tbody.innerHTML = `
+            <tr><td>Valeur Physique</td><td>${(p.nPhy || 0).toFixed(1)}/20</td></tr>
+            <tr><td>Valeur Morale</td><td>${(p.nMor || 0).toFixed(1)}/20</td></tr>
+            <tr><td>Intellect</td><td>${(p.nInt || 0).toFixed(1)}/20</td></tr>
+            <tr><td>Comme Tireur</td><td>${(p.nTir || 0).toFixed(1)}/20</td></tr>
+        `;
     }
 
-    // --- Export PDF Professionnel ---
-    function exportToPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const mat = document.getElementById('cur-mat').value;
-        const p = roster.find(x => x.id === mat);
+    function advancedSearch() {
+        const name = document.getElementById('search-name').value.toLowerCase();
+        const grade = document.getElementById('search-grade').value.toLowerCase();
+        const pos = document.getElementById('search-pos').value;
 
-        // En-tête Unité (Centré)
-        doc.setFontSize(18);
-        doc.setFont("helvetica", "bold");
-        const title = configs.unit.toUpperCase();
-        doc.text(title, doc.internal.pageSize.getWidth() / 2, 20, { align: "center" });
+        const results = roster.filter(p => 
+            (p.nom.toLowerCase().includes(name) || p.prenom.toLowerCase().includes(name)) &&
+            p.grade.toLowerCase().includes(grade) &&
+            (!pos || p.pos === pos)
+        );
 
-        doc.setFontSize(12);
-        doc.text("FICHE INDIVIDUELLE DU PERSONNEL", doc.internal.pageSize.getWidth() / 2, 30, { align: "center" });
-        doc.line(20, 35, 190, 35);
+        const tbody = document.getElementById('search-tbody');
+        tbody.innerHTML = results.map(p => `
+            <tr>
+                <td>${p.nom} ${p.prenom}</td>
+                <td>${p.grade}</td>
+                <td>${p.pos}</td>
+                <td><button onclick="loadP('${p.id}')" class="btn btn-info btn-small">Voir</button></td>
+            </tr>
+        `).join('');
 
-        // Identité
-        doc.setFontSize(11);
-        doc.text(`MATRICULE : ${p.id}`, 20, 50);
-        doc.text(`GRADE : ${p.grade || 'N/A'}`, 20, 60);
-        doc.text(`NOM : ${p.nom || 'N/A'}`, 20, 70);
-        doc.text(`PRENOM : ${p.prenom || 'N/A'}`, 20, 80);
-        doc.text(`POSITION : ${p.pos || 'N/A'}`, 20, 90);
-
-        // Diplômes
-        doc.text("DIPLÔMES :", 20, 110);
-        doc.setFont("helvetica", "normal");
-        doc.text(`- Civil : ${p.dipCiv || 'Non renseigné'}`, 30, 120);
-        doc.text(`- Militaire : ${p.dipMil || 'Non renseigné'}`, 30, 130);
-
-        // Performances
-        doc.setFont("helvetica", "bold");
-        doc.text("PERFORMANCES :", 20, 150);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Tir: ${p.nTir||0}/20 | Physique: ${p.nPhy||0}/20 | Intellect: ${p.nInt||0}/20 | Moral: ${p.nMor||0}/20`, 30, 160);
-
-        // Médical
-        doc.setFont("helvetica", "bold");
-        doc.text("DONNÉES MÉDICALES :", 20, 180);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Groupe: ${p.gs || 'N/A'} | Poids: ${p.poids||0}kg | Taille: ${p.taille||0}m`, 30, 190);
-        doc.text(`Aptitude SIGYCOP: ${p.sgp || 'N/A'}`, 30, 200);
-
-        // Bas de page
-        doc.setFontSize(9);
-        doc.text(`Document généré par RH Manager le ${new Date().toLocaleDateString()}`, 20, 280);
-
-        doc.save(`Fiche_${p.nom || 'Personnel'}_${p.id}.pdf`);
+        if (results.length > 0) {
+            document.getElementById('search-results').style.display = 'table';
+        }
     }
+
+    // ===== EXPORT =====
+    function exportJSON() {
+        const data = {
+            configs: configs,
+            roster: roster,
+            exported: new Date().toISOString()
+        };
+        
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `RH_Manager_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+    }
+
+    // ===== INITIALIZATION =====
+    document.querySelector('[data-v="poids"]')?.addEventListener('input', calculateIMC);
+    document.querySelector('[data-v="taille"]')?.addEventListener('input', calculateIMC);
+    
+    console.log('RH Manager v15.0 initialisé');
+    console.log(`${roster.length} personnel(s) chargé(s)`);
 </script>
 </body>
 </html>
