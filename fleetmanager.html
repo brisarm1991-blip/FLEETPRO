@@ -1,99 +1,106 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TrustFleet Pro</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-:root {
-    --primary: #1e293b; --accent: #3b82f6; --bg: #f8fafc;
-    --card-bg: #ffffff; --text-main: #334155; --text-muted: #64748b;
-    --border: #e2e8f0; --shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustFleet Pro - Gestion de Flotte</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1e293b; --accent: #3b82f6; --bg: #f8fafc;
+            --card-bg: #ffffff; --text-main: #334155; --text-muted: #64748b;
+            --border: #e2e8f0; --shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
 
-* { box-sizing: border-box; }
-body { 
-    font-family: 'Inter', sans-serif; margin: 0; display: flex; 
-    background-color: var(--bg); color: var(--text-main); -webkit-font-smoothing: antialiased;
-}
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { 
+            font-family: 'Inter', sans-serif; margin: 0; display: flex; 
+            background-color: var(--bg); color: var(--text-main); 
+        }
 
-/* SIDEBAR ÉPURÉE */
-.sidebar { 
-    width: 240px; background: var(--primary); color: white; 
-    height: 100vh; position: fixed; display: flex; flex-direction: column;
-}
-.sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.sidebar-header h3 { margin: 0; font-size: 1.1rem; font-weight: 500; color: var(--accent); letter-spacing: 0.5px; }
+        /* SIDEBAR */
+        .sidebar { 
+            width: 240px; background: var(--primary); color: white; 
+            height: 100vh; position: fixed; display: flex; flex-direction: column;
+        }
+        .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .sidebar-header h3 { margin: 0; font-size: 1.1rem; font-weight: 500; color: var(--accent); letter-spacing: 0.5px; }
 
-.nav-item { 
-    padding: 12px 24px; cursor: pointer; display: flex; align-items: center; gap: 12px; 
-    color: #94a3b8; font-size: 0.85rem; transition: 0.2s;
-}
-.nav-item i { width: 18px; font-size: 1rem; }
-.nav-item:hover { color: white; background: rgba(255,255,255,0.02); }
-.nav-item.active { color: white; background: var(--accent); font-weight: 500; }
+        .nav-item { 
+            padding: 12px 24px; cursor: pointer; display: flex; align-items: center; gap: 12px; 
+            color: #94a3b8; font-size: 0.85rem; transition: 0.2s;
+        }
+        .nav-item i { width: 18px; font-size: 1rem; }
+        .nav-item:hover { color: white; background: rgba(255,255,255,0.02); }
+        .nav-item.active { color: white; background: var(--accent); font-weight: 500; }
 
-/* CONTENU PRINCIPAL */
-.main { margin-left: 240px; flex: 1; display: none; }
-.header { 
-    background: white; padding: 15px 30px; display: flex; justify-content: space-between; 
-    align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10;
-}
-.header h2 { margin: 0; font-size: 1rem; font-weight: 600; text-transform: uppercase; color: var(--primary); }
+        /* CONTENU */
+        .main { margin-left: 240px; flex: 1; display: none; }
+        .header { 
+            background: white; padding: 15px 30px; display: flex; justify-content: space-between; 
+            align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10;
+        }
+        .header h2 { margin: 0; font-size: 1rem; font-weight: 600; text-transform: uppercase; color: var(--primary); }
 
-.content { padding: 25px; }
-.page { display: none; animation: fadeIn 0.3s ease; }
-.page.active { display: block; }
+        .content { padding: 25px; }
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
 
-/* CARTES STATS FINES */
-.card-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
-.stat { 
-    background: white; padding: 20px; border-radius: 8px; box-shadow: var(--shadow);
-    display: flex; flex-direction: column; border: 1px solid var(--border);
-}
-.stat-title { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 5px; }
-.stat-value { font-size: 1.5rem; font-weight: 600; color: var(--primary); margin: 0; }
+        /* STATS */
+        .card-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
+        .stat { 
+            background: white; padding: 20px; border-radius: 8px; box-shadow: var(--shadow);
+            display: flex; flex-direction: column; border: 1px solid var(--border);
+        }
+        .stat-title { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 5px; }
+        .stat-value { font-size: 1.5rem; font-weight: 600; color: var(--primary); margin: 0; }
 
-/* TABLEAUX ÉPURÉS */
-.table-responsive { background: white; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
-table { width: 100%; border-collapse: collapse; }
-th { background: #f1f5f9; padding: 12px 20px; text-align: left; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
-td { padding: 12px 20px; border-bottom: 1px solid var(--border); font-size: 0.85rem; color: var(--text-main); }
-tr:last-child td { border-bottom: none; }
+        /* TABLEAUX */
+        .table-responsive { background: white; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f1f5f9; padding: 12px 20px; text-align: left; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+        td { padding: 12px 20px; border-bottom: 1px solid var(--border); font-size: 0.85rem; color: var(--text-main); vertical-align: middle; }
 
-/* BOUTONS ET MODALES */
-.btn { 
-    padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; 
-    font-size: 0.8rem; font-weight: 500; display: inline-flex; align-items: center; gap: 8px;
-}
-.btn-add { background: var(--accent); color: white; }
-.btn-primary { background: var(--primary); color: white; }
+        /* BOUTONS & MODALES */
+        .btn { 
+            padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; 
+            font-size: 0.8rem; font-weight: 500; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-add { background: var(--accent); color: white; }
+        .btn-primary { background: var(--primary); color: white; }
 
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-.modal { background: white; padding: 30px; border-radius: 12px; width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-.modal input, .modal select { width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 0.9rem; }
+        .modal-overlay { 
+            display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); 
+            z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(2px); 
+        }
+        .modal { background: white; padding: 30px; border-radius: 12px; width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .modal h3 { margin-top: 0; font-size: 1.1rem; color: var(--primary); margin-bottom: 20px; }
+        .modal input, .modal select { 
+            width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid var(--border); 
+            border-radius: 6px; font-family: inherit; font-size: 0.9rem; 
+        }
 
-.img-prev { width: 35px; height: 35px; border-radius: 4px; object-fit: cover; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .img-prev { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; background: #eee; }
+        #lock-screen { 
+            position: fixed; inset: 0; background: var(--primary); z-index: 9999; 
+            display: flex; align-items: center; justify-content: center; color: white; flex-direction: column; 
+        }
 
-#lock-screen { position: fixed; inset: 0; background: var(--primary); z-index: 9999; display: flex; align-items: center; justify-content: center; color: white; flex-direction: column; }
-</style>
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
 </head>
 <body onload="checkInit()">
 
 <div id="lock-screen">
     <h2 style="font-weight: 300; letter-spacing: 2px;">TRUSTFLEET <span style="color:var(--accent); font-weight: 600;">PRO</span></h2>
-    <input type="password" id="pass" placeholder="Code d'accès" style="padding:10px; border-radius:6px; border:none; margin: 20px 0; text-align: center;">
-    <button class="btn btn-add" onclick="login()">SE CONNECTER</button>
+    <input type="password" id="pass" placeholder="Code (301)" style="padding:12px; border-radius:6px; border:none; margin: 20px 0; text-align: center; width: 200px;">
+    <button class="btn btn-add" style="padding: 10px 30px;" onclick="login()">SE CONNECTER</button>
 </div>
 
 <div class="sidebar">
-    <div class="sidebar-header">
-        <h3 id="side-title">UNITÉ AUTO</h3>
-    </div>
+    <div class="sidebar-header"><h3 id="side-title">UNITÉ AUTO</h3></div>
     <div class="nav-container">
         <div class="nav-item active" onclick="showPage('dashboard')"><i class="fas fa-th-large"></i> ACCUEIL</div>
         <div class="nav-item" onclick="showPage('vehicles')"><i class="fas fa-car-side"></i> VÉHICULES</div>
@@ -141,7 +148,12 @@ tr:last-child td { border-bottom: none; }
                 <h3 style="font-size: 0.9rem; font-weight:600;">CONSOMMATION</h3>
                 <button class="btn btn-add" onclick="openM('m-f')">+ PLEIN</button>
             </div>
-            <div class="table-responsive"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Litres</th><th>KM</th><th>Coût</th><th>Action</th></tr></thead><tbody id="t-f"></tbody></table></div>
+            <div class="table-responsive">
+                <table>
+                    <thead><tr><th>Date</th><th>Véhicule</th><th>Litres</th><th>KM</th><th>Coût (FCFA)</th><th>Action</th></tr></thead>
+                    <tbody id="t-f"></tbody>
+                </table>
+            </div>
         </div>
 
         <div id="page-maint" class="page">
@@ -149,7 +161,12 @@ tr:last-child td { border-bottom: none; }
                 <h3 style="font-size: 0.9rem; font-weight:600;">MAINTENANCE</h3>
                 <button class="btn btn-add" onclick="openM('m-m')">+ TRAVAUX</button>
             </div>
-            <div class="table-responsive"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Nature</th><th>Prochain KM</th><th>Action</th></tr></thead><tbody id="t-m"></tbody></table></div>
+            <div class="table-responsive">
+                <table>
+                    <thead><tr><th>Date</th><th>Véhicule</th><th>Nature</th><th>Prochain KM</th><th>Action</th></tr></thead>
+                    <tbody id="t-m"></tbody>
+                </table>
+            </div>
         </div>
 
         <div id="page-drivers" class="page">
@@ -157,13 +174,18 @@ tr:last-child td { border-bottom: none; }
                 <h3 style="font-size: 0.9rem; font-weight:600;">CHAUFFEURS</h3>
                 <button class="btn btn-add" onclick="openM('m-d')">+ CHAUFFEUR</button>
             </div>
-            <div class="table-responsive"><table><thead><tr><th>Photo</th><th>Nom</th><th>Matricule</th><th>Statut</th><th>Action</th></tr></thead><tbody id="t-d"></tbody></table></div>
+            <div class="table-responsive">
+                <table>
+                    <thead><tr><th>Photo</th><th>Nom</th><th>Matricule</th><th>Statut</th><th>Action</th></tr></thead>
+                    <tbody id="t-d"></tbody>
+                </table>
+            </div>
         </div>
 
         <div id="page-settings" class="page">
             <h3 style="font-size: 0.9rem;">CONFIGURATION</h3>
             <div style="background:white; padding:25px; border-radius:8px; border:1px solid var(--border); max-width:400px;">
-                <label style="font-size:0.8rem; font-weight:600;">NOM DE L'UNITÉ</label>
+                <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:10px;">NOM DE L'UNITÉ</label>
                 <input type="text" id="set-unit-name">
                 <button class="btn btn-add" onclick="saveSettings()" style="width:100%; justify-content:center;">ENREGISTRER</button>
             </div>
@@ -171,42 +193,63 @@ tr:last-child td { border-bottom: none; }
     </div>
 </div>
 
-<div id="m-v" class="modal-overlay"><div class="modal"><h3>Nouveau Véhicule</h3><form onsubmit="save(event,'v','m-v')">
-    <input type="text" id="v1" placeholder="Modèle (ex: Hilux)" required>
-    <input type="text" id="v2" placeholder="Immatriculation" required>
-    <input type="number" id="v3" placeholder="KM Actuel" required>
+<div id="m-v" class="modal-overlay"><div class="modal"><h3>Nouveau Véhicule</h3>
+    <input type="text" id="v1" placeholder="Modèle">
+    <input type="text" id="v2" placeholder="Plaque d'immatr.">
+    <input type="number" id="v3" placeholder="Kilométrage">
     <select id="v4"><option>En service</option><option>En panne</option></select>
     <input type="file" onchange="encodeImg(this,'v_img')" accept="image/*"><input type="hidden" id="v_img">
-    <button type="submit" class="btn btn-add">SAUVEGARDER</button><button type="button" onclick="closeM('m-v')" style="margin-left:10px; background:none; border:none; cursor:pointer;">Annuler</button>
-</form></div></div>
+    <div style="display:flex; gap:10px; margin-top:10px;">
+        <button class="btn btn-add" onclick="handleSave('v')">SAUVEGARDER</button>
+        <button class="btn" onclick="closeM('m-v')">ANNULER</button>
+    </div>
+</div></div>
 
-<div id="m-f" class="modal-overlay"><div class="modal"><h3>Plein Carburant</h3><form onsubmit="save(event,'f','m-f')">
-    <input type="date" id="f1" required><select id="f2"></select>
-    <input type="number" id="f3" placeholder="Litres" required><input type="number" id="f4" placeholder="KM Compteur" required>
-    <button type="submit" class="btn btn-add">VALIDER</button><button type="button" onclick="closeM('m-f')">Fermer</button>
-</form></div></div>
+<div id="m-f" class="modal-overlay"><div class="modal"><h3>Saisir un Plein</h3>
+    <input type="date" id="f1">
+    <select id="f2"></select>
+    <input type="number" id="f3" placeholder="Nombre de Litres">
+    <input type="number" id="f4" placeholder="Kilométrage actuel">
+    <div style="display:flex; gap:10px;">
+        <button class="btn btn-add" onclick="handleSave('f')">VALIDER</button>
+        <button class="btn" onclick="closeM('m-f')">ANNULER</button>
+    </div>
+</div></div>
 
-<div id="m-m" class="modal-overlay"><div class="modal"><h3>Entretien</h3><form onsubmit="save(event,'m','m-m')">
-    <input type="date" id="m1" required><select id="m2"></select>
-    <input type="text" id="m3" placeholder="Nature des travaux" required><input type="number" id="m4" placeholder="Prochain KM" required>
-    <button type="submit" class="btn btn-add">VALIDER</button><button type="button" onclick="closeM('m-m')">Fermer</button>
-</form></div></div>
+<div id="m-m" class="modal-overlay"><div class="modal"><h3>Enregistrer Entretien</h3>
+    <input type="date" id="m1">
+    <select id="m2"></select>
+    <input type="text" id="m3" placeholder="Travaux effectués">
+    <input type="number" id="m4" placeholder="Prochain entretien (KM)">
+    <div style="display:flex; gap:10px;">
+        <button class="btn btn-add" onclick="handleSave('m')">ENREGISTRER</button>
+        <button class="btn" onclick="closeM('m-m')">ANNULER</button>
+    </div>
+</div></div>
 
-<div id="m-d" class="modal-overlay"><div class="modal"><h3>Fiche Chauffeur</h3><form onsubmit="save(event,'d','m-d')">
-    <input type="text" id="d1" placeholder="Grade & Nom" required><input type="text" id="d2" placeholder="Matricule" required>
+<div id="m-d" class="modal-overlay"><div class="modal"><h3>Nouveau Chauffeur</h3>
+    <input type="text" id="d1" placeholder="Grade & Nom">
+    <input type="text" id="d2" placeholder="Matricule">
     <select id="d3"><option>Disponible</option><option>En mission</option><option>Repos</option></select>
     <input type="file" onchange="encodeImg(this,'d_img')" accept="image/*"><input type="hidden" id="d_img">
-    <button type="submit" class="btn btn-add">VALIDER</button><button type="button" onclick="closeM('m-d')">Fermer</button>
-</form></div></div>
+    <div style="display:flex; gap:10px;">
+        <button class="btn btn-add" onclick="handleSave('d')">VALIDER</button>
+        <button class="btn" onclick="closeM('m-d')">ANNULER</button>
+    </div>
+</div></div>
 
 <script>
 let config = JSON.parse(localStorage.getItem('trust_config')) || { pass: '301', unit: 'BA 301' };
-let db = { v: JSON.parse(localStorage.getItem('v_301')) || [], d: JSON.parse(localStorage.getItem('d_301')) || [], f: JSON.parse(localStorage.getItem('f_301')) || [], m: JSON.parse(localStorage.getItem('m_301')) || [] };
+let db = { 
+    v: JSON.parse(localStorage.getItem('v_301')) || [], 
+    d: JSON.parse(localStorage.getItem('d_301')) || [], 
+    f: JSON.parse(localStorage.getItem('f_301')) || [], 
+    m: JSON.parse(localStorage.getItem('m_301')) || [] 
+};
 let chart;
 
 function checkInit() {
     document.getElementById('side-title').innerText = config.unit;
-    document.getElementById('title-header').innerText = "FLOTTE - " + config.unit;
     document.getElementById('set-unit-name').value = config.unit;
 }
 
@@ -215,12 +258,13 @@ function login() {
         document.getElementById('lock-screen').style.display='none'; 
         document.getElementById('app').style.display='block'; 
         refresh(); 
-    } else alert('Code incorrect'); 
+    } else { alert('Code incorrect'); }
 }
 
 function saveSettings() {
     config.unit = document.getElementById('set-unit-name').value;
     localStorage.setItem('trust_config', JSON.stringify(config));
+    alert('Paramètres enregistrés');
     location.reload();
 }
 
@@ -230,16 +274,43 @@ function encodeImg(input, hid) {
     if(input.files[0]) reader.readAsDataURL(input.files[0]);
 }
 
-function save(e, k, mid) {
-    e.preventDefault();
-    let o = { id: Date.now() };
-    if(k==='v') o = {...o, name:document.getElementById('v1').value, plate:document.getElementById('v2').value, km:document.getElementById('v3').value, state:document.getElementById('v4').value, img:document.getElementById('v_img').value};
-    if(k==='f') o = {...o, date:document.getElementById('f1').value, car:document.getElementById('f2').value, lit:document.getElementById('f3').value, km:document.getElementById('f4').value};
-    if(k==='m') o = {...o, date:document.getElementById('m1').value, car:document.getElementById('m2').value, work:document.getElementById('m3').value, next:document.getElementById('m4').value};
-    if(k==='d') o = {...o, name:document.getElementById('d1').value, mat:document.getElementById('d2').value, state:document.getElementById('d3').value, img:document.getElementById('d_img').value};
-    db[k].push(o);
-    localStorage.setItem(k+'_301', JSON.stringify(db[k]));
-    closeM(mid); refresh();
+// FONCTION DE SAUVEGARDE CORRIGÉE
+function handleSave(type) {
+    let item = { id: Date.now() };
+
+    if(type === 'v') {
+        const n = document.getElementById('v1').value;
+        const p = document.getElementById('v2').value;
+        if(!n || !p) return alert("Veuillez remplir le modèle et la plaque.");
+        item = {...item, name: n, plate: p, km: document.getElementById('v3').value, state: document.getElementById('v4').value, img: document.getElementById('v_img').value};
+        db.v.push(item);
+        localStorage.setItem('v_301', JSON.stringify(db.v));
+        closeM('m-v');
+    }
+    else if(type === 'f') {
+        item = {...item, date: document.getElementById('f1').value, car: document.getElementById('f2').value, lit: document.getElementById('f3').value, km: document.getElementById('f4').value};
+        if(!item.car || !item.lit) return alert("Données manquantes");
+        db.f.push(item);
+        localStorage.setItem('f_301', JSON.stringify(db.f));
+        closeM('m-f');
+    }
+    else if(type === 'm') {
+        item = {...item, date: document.getElementById('m1').value, car: document.getElementById('m2').value, work: document.getElementById('m3').value, next: document.getElementById('m4').value};
+        db.m.push(item);
+        localStorage.setItem('m_301', JSON.stringify(db.m));
+        closeM('m-m');
+    }
+    else if(type === 'd') {
+        item = {...item, name: document.getElementById('d1').value, mat: document.getElementById('d2').value, state: document.getElementById('d3').value, img: document.getElementById('d_img').value};
+        db.d.push(item);
+        localStorage.setItem('d_301', JSON.stringify(db.d));
+        closeM('m-d');
+    }
+
+    refresh();
+    alert('Enregistré avec succès');
+    // Réinitialisation des inputs
+    document.querySelectorAll('.modal input').forEach(i => i.value = "");
 }
 
 function refresh() {
@@ -248,19 +319,26 @@ function refresh() {
     document.getElementById('s-d').textContent = db.d.length;
     document.getElementById('s-f').textContent = db.f.reduce((a,b)=>a+parseFloat(b.lit||0), 0).toFixed(1);
 
-    const vOpt = db.v.map(x=>`<option>${x.plate}</option>`).join('');
+    const vOpt = db.v.map(x=>`<option value="${x.plate}">${x.plate}</option>`).join('');
     document.getElementById('f2').innerHTML = vOpt; document.getElementById('m2').innerHTML = vOpt;
 
-    const placeholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E";
+    const noImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E";
 
-    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td><img src="${x.img||placeholder}" class="img-prev"></td><td>${x.name}</td><td style="font-weight:600">${x.plate}</td><td>${x.km}</td><td>${x.state}</td><td><i class="fas fa-trash" style="color:#cbd5e1;cursor:pointer" onclick="del('v',${x.id})"></i></td></tr>`).join('');
-    document.getElementById('t-f').innerHTML = db.f.map(x=>`<tr><td>${x.date}</td><td>${x.car}</td><td>${x.lit}L</td><td>${x.km}</td><td>${x.lit*650}</td><td><i class="fas fa-trash" onclick="del('f',${x.id})"></i></td></tr>`).join('');
-    document.getElementById('t-m').innerHTML = db.m.map(x=>`<tr><td>${x.date}</td><td>${x.car}</td><td>${x.work}</td><td>${x.next}</td><td><i class="fas fa-trash" onclick="del('m',${x.id})"></i></td></tr>`).join('');
-    document.getElementById('t-d').innerHTML = db.d.map(x=>`<tr><td><img src="${x.img||placeholder}" class="img-prev" style="border-radius:50%"></td><td>${x.name}</td><td>${x.mat}</td><td>${x.state}</td><td><i class="fas fa-trash" onclick="del('d',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td><img src="${x.img||noImg}" class="img-prev"></td><td>${x.name}</td><td><b>${x.plate}</b></td><td>${parseInt(x.km||0).toLocaleString()}</td><td>${x.state}</td><td><i class="fas fa-trash" style="color:#cbd5e1;cursor:pointer" onclick="del('v',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('t-f').innerHTML = db.f.map(x=>`<tr><td>${x.date}</td><td>${x.car}</td><td>${x.lit}L</td><td>${x.km}</td><td>${(x.lit*650).toLocaleString()}</td><td><i class="fas fa-trash" style="color:#cbd5e1;cursor:pointer" onclick="del('f',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('t-m').innerHTML = db.m.map(x=>`<tr><td>${x.date}</td><td>${x.car}</td><td>${x.work}</td><td>${x.next}</td><td><i class="fas fa-trash" style="color:#cbd5e1;cursor:pointer" onclick="del('m',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('t-d').innerHTML = db.d.map(x=>`<tr><td><img src="${x.img||noImg}" class="img-prev" style="border-radius:50%"></td><td>${x.name}</td><td>${x.mat}</td><td>${x.state}</td><td><i class="fas fa-trash" style="color:#cbd5e1;cursor:pointer" onclick="del('d',${x.id})"></i></td></tr>`).join('');
 
     const ctx = document.getElementById('chartV').getContext('2d');
     if(chart) chart.destroy();
-    chart = new Chart(ctx, { type:'bar', data: { labels:['OPÉRATIONNELS', 'PANNE'], datasets:[{label:'Parc', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#3b82f6','#ef4444']}] }, options:{animation:false, scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+    chart = new Chart(ctx, { 
+        type:'bar', 
+        data: { 
+            labels:['OPÉRATIONNELS', 'PANNE'], 
+            datasets:[{label:'Véhicules', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#3b82f6','#ef4444']}] 
+        }, 
+        options:{animation:false, scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}
+    });
 }
 
 function showPage(pId) {
@@ -268,10 +346,12 @@ function showPage(pId) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('page-' + pId).classList.add('active');
     document.querySelector(`.nav-item[onclick*="${pId}"]`).classList.add('active');
+    document.getElementById('title-header').innerText = pId === 'dashboard' ? "TABLEAU DE BORD" : pId.toUpperCase();
 }
-function del(k, id) { if(confirm('Supprimer ?')) { db[k] = db[k].filter(x=>x.id!==id); localStorage.setItem(k+'_301', JSON.stringify(db[k])); refresh(); } }
-function openM(id) { document.getElementById(id).classList.add('open'); }
-function closeM(id) { document.getElementById(id).classList.remove('open'); }
+
+function del(k, id) { if(confirm('Supprimer cet enregistrement ?')) { db[k] = db[k].filter(x=>x.id!==id); localStorage.setItem(k+'_301', JSON.stringify(db[k])); refresh(); } }
+function openM(id) { document.getElementById(id).style.display = 'flex'; }
+function closeM(id) { document.getElementById(id).style.display = 'none'; }
 </script>
 </body>
 </html>
