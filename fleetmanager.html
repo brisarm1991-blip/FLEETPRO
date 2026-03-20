@@ -3,204 +3,161 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title id="tab-title">Gestion de Flotte</title>
+<title>Gestion de Flotte BA 301</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
+/* STYLE INITIAL ÉPURÉ */
 :root {
-  --primary: #0a192f; /* Bleu nuit militaire */
-  --accent: #d4af37;  /* Or/Bronze */
-  --bg: #f4f7f6;
-  --white: #ffffff;
-  --text: #333;
-  --danger: #b22222;
-  --success: #2e7d32;
+    --primary: #1a2d4a; --accent: #ff6b35; --bg: #f8f9fa; --text: #333;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh;}
+body { font-family: sans-serif; margin: 0; display: flex; background: var(--bg); color: var(--text); }
 
-/* BARRE LATÉRALE */
-.sidebar{width:260px; background:var(--primary); color:white; position:fixed; height:100vh; overflow-y:auto; transition: 0.3s;}
-.sidebar-header{padding:30px 20px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.1);}
-.sidebar-header h3{font-size:1.2rem; letter-spacing:1px; color:var(--accent); text-transform:uppercase;}
-.nav-section{padding:20px 0;}
-.nav-item{padding:15px 25px; cursor:pointer; display:flex; align-items:center; gap:15px; transition:0.3s; color:rgba(255,255,255,0.7); font-weight:500; font-size:0.9rem;}
-.nav-item:hover, .nav-item.active{background:rgba(212,175,55,0.1); color:var(--accent); border-left:5px solid var(--accent);}
+/* SIDEBAR INITIALE */
+.sidebar { width: 250px; background: var(--primary); color: white; height: 100vh; position: fixed; }
+.sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.nav-item { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 10px; }
+.nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); border-left: 4px solid var(--accent); }
 
-/* CONTENU PRINCIPAL */
-.main{margin-left:260px; flex:1; display:none;}
-.header{background:var(--white); padding:0 40px; height:80px; display:flex; align-items:center; justify-content:space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position:sticky; top:0; z-index:10;}
-.header h2{font-weight:700; color:var(--primary); letter-spacing:1px;}
-.content{padding:30px;}
-.page{display:none; animation: fadeIn 0.4s ease;}
-.page.active{display:block;}
+/* CONTENU */
+.main { margin-left: 250px; flex: 1; display: none; }
+.header { background: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+.content { padding: 20px; }
+.page { display: none; }
+.page.active { display: block; }
 
-/* CARTES & STATS */
-.stats-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:20px; margin-bottom:30px;}
-.card{background:var(--white); padding:25px; border-radius:12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #eef2f3;}
-.card h4{font-size:0.8rem; color:#888; text-transform:uppercase; margin-bottom:10px;}
-.card h2{font-size:1.8rem; color:var(--primary);}
+/* TABLEAUX & CARTES */
+.card-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+.stat { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
+th { background: #eee; padding: 12px; text-align: left; font-size: 13px; }
+td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
 
-/* TABLEAUX */
-.table-container{background:var(--white); border-radius:12px; overflow:hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05);}
-table{width:100%; border-collapse:collapse;}
-th{background:#f8f9fa; padding:15px; text-align:left; font-size:0.75rem; color:#666; text-transform:uppercase; border-bottom:1px solid #eee;}
-td{padding:15px; border-bottom:1px solid #f9f9f9; font-size:0.9rem;}
-.img-circle{width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid #eee;}
-.img-rect{width:60px; height:40px; border-radius:4px; object-fit:cover;}
+.btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; background: var(--primary); color: white; }
+.btn-add { background: var(--accent); }
 
-/* BOUTONS */
-.btn{padding:12px 24px; border:none; border-radius:6px; cursor:pointer; font-weight:600; display:inline-flex; align-items:center; gap:10px; transition:0.2s;}
-.btn-primary{background:var(--primary); color:white;}
-.btn-accent{background:var(--accent); color:var(--primary);}
-.btn-primary:hover{opacity:0.9;}
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: white; padding: 25px; border-radius: 8px; width: 400px; }
+.modal input, .modal select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; }
 
-/* MODALES */
-.modal-overlay{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(4px);}
-.modal-overlay.open{display:flex;}
-.modal{background:white; border-radius:15px; width:90%; max-width:550px; padding:30px; position:relative;}
-.modal input, .modal select{width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;}
-
-@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+.img-prev { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; }
 
 @media print {
-  .sidebar, .btn, .modal-overlay, .fa-trash { display: none !important; }
-  .main { margin-left: 0 !important; display: block !important; }
-  .header { border-bottom: 2px solid #333; justify-content: center; }
-  #title-header { text-decoration: underline; font-size: 24pt; }
+    .sidebar, .btn, .modal-overlay, .fa-trash { display: none !important; }
+    .main { margin-left: 0 !important; display: block !important; }
+    .header { text-align: center; border-bottom: 2px solid #000; }
 }
 </style>
 </head>
-<body onload="applyConfig()">
+<body onload="checkInit()">
 
-<div id="lock-screen">
-  <div class="lock-box">
-    <i class="fas fa-shield-halved fa-4x" style="color:var(--primary); margin-bottom:20px;"></i>
-    <h2 id="lock-title">ACCÈS SÉCURISÉ</h2>
-    <input type="password" id="pass" placeholder="Entrez le code">
-    <button class="btn btn-primary" style="width:100%; justify-content:center" onclick="login()">SE CONNECTER</button>
-  </div>
+<div id="lock-screen" style="position:fixed; inset:0; background:var(--primary); z-index:9999; display:flex; align-items:center; justify-content:center; color:white; flex-direction:column;">
+    <h2>GESTION DE FLOTTE</h2>
+    <input type="password" id="pass" placeholder="Code (301)" style="padding:10px; margin:10px; text-align:center;">
+    <button class="btn" onclick="login()">CONNEXION</button>
 </div>
 
-<nav class="sidebar">
-  <div class="sidebar-header">
-    <i class="fas fa-plane-up fa-2x" style="color:var(--accent); margin-bottom:10px;"></i>
-    <h3 id="side-title">UNITÉ AUTO</h3>
-  </div>
-  <div class="nav-section">
-    <div class="nav-item active" onclick="showPage('dashboard')"><i class="fas fa-house"></i> ACCUEIL</div>
-    <div class="nav-item" onclick="showPage('vehicles')"><i class="fas fa-truck-pickup"></i> VÉHICULES</div>
+<div class="sidebar">
+    <div class="sidebar-header"><h3 id="side-title">BA 301</h3></div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><i class="fas fa-home"></i> ACCUEIL</div>
+    <div class="nav-item" onclick="showPage('vehicles')"><i class="fas fa-car"></i> VÉHICULES</div>
     <div class="nav-item" onclick="showPage('fuel')"><i class="fas fa-gas-pump"></i> CARBURANT</div>
-    <div class="nav-item" onclick="showPage('maint')"><i class="fas fa-screwdriver-wrench"></i> ENTRETIEN TECHNIQUE</div>
-    <div class="nav-item" onclick="showPage('drivers')"><i class="fas fa-user-tie"></i> CHAUFFEURS</div>
-    <div class="nav-item" onclick="showPage('settings')" style="margin-top:30px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;"><i class="fas fa-gears"></i> PARAMÈTRES</div>
-  </div>
-</nav>
+    <div class="nav-item" onclick="showPage('maint')"><i class="fas fa-tools"></i> ENTRETIEN TECHNIQUE</div>
+    <div class="nav-item" onclick="showPage('drivers')"><i class="fas fa-user"></i> CHAUFFEURS</div>
+    <div class="nav-item" onclick="showPage('settings')" style="margin-top:20px;"><i class="fas fa-cog"></i> PARAMÈTRES</div>
+</div>
 
 <div class="main" id="app">
-  <header class="header">
-    <h2 id="title-header">GESTION DE FLOTTE</h2>
-    <button class="btn btn-accent" onclick="window.print()"><i class="fas fa-file-export"></i> EXPORTER PDF</button>
-  </header>
-
-  <div class="content">
-    
-    <div id="page-dashboard" class="page active">
-      <div class="stats-grid">
-        <div class="card"><h4>Véhicules</h4><h2 id="s-v">0</h2></div>
-        <div class="card" style="border-bottom: 4px solid var(--danger)"><h4>Hors Service</h4><h2 id="s-p">0</h2></div>
-        <div class="card"><h4>Carburant (L)</h4><h2 id="s-f">0</h2></div>
-        <div class="card"><h4>Chauffeurs</h4><h2 id="s-d">0</h2></div>
-      </div>
-      <div class="card">
-        <canvas id="chartV" height="100"></canvas>
-      </div>
+    <div class="header">
+        <h2 id="title-header">GESTION DE FLOTTE</h2>
+        <button class="btn" onclick="window.print()">EXPORTER PDF</button>
     </div>
 
-    <div id="page-vehicles" class="page">
-      <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3>PARC AUTOMOBILE</h3><button class="btn btn-primary" onclick="openM('m-v')">+ NOUVEAU VÉHICULE</button></div>
-      <div class="table-container"><table><thead><tr><th>Visuel</th><th>Désignation</th><th>Immatriculation</th><th>KM Actuel</th><th>Statut</th><th>Action</th></tr></thead><tbody id="t-v"></tbody></table></div>
-    </div>
+    <div class="content">
+        <div id="page-dashboard" class="page active">
+            <div class="card-stats">
+                <div class="stat">VÉHICULES<br><h2 id="s-v">0</h2></div>
+                <div class="stat">PANNE<br><h2 id="s-p" style="color:red">0</h2></div>
+                <div class="stat">LITRES<br><h2 id="s-f">0</h2></div>
+                <div class="stat">EFFECTIF<br><h2 id="s-d">0</h2></div>
+            </div>
+            <canvas id="chartV" height="100"></canvas>
+        </div>
 
-    <div id="page-fuel" class="page">
-      <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3>SUIVI CARBURANT</h3><button class="btn btn-primary" onclick="openM('m-f')">+ SAISIR PLEIN</button></div>
-      <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Quantité</th><th>KM Saisi</th><th>Coût Est.</th><th>Action</th></tr></thead><tbody id="t-f"></tbody></table></div>
-    </div>
+        <div id="page-vehicles" class="page">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><h3>LISTE DES VÉHICULES</h3><button class="btn btn-add" onclick="openM('m-v')">+ NOUVEAU</button></div>
+            <table><thead><tr><th>PHOTO</th><th>MODÈLE</th><th>IMMATRICULATION</th><th>KM</th><th>ÉTAT</th><th>SUPPR</th></tr></thead><tbody id="t-v"></tbody></table>
+        </div>
 
-    <div id="page-maint" class="page">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3>ENTRETIEN TECHNIQUE</h3><button class="btn btn-primary" onclick="openM('m-m')">+ AJOUTER TRAVAUX</button></div>
-        <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Type de Travaux</th><th>Échéance (KM)</th><th>Action</th></tr></thead><tbody id="t-m"></tbody></table></div>
-    </div>
+        <div id="page-fuel" class="page">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><h3>SUIVI CARBURANT</h3><button class="btn btn-add" onclick="openM('m-f')">+ PLEIN</button></div>
+            <table><thead><tr><th>DATE</th><th>VÉHICULE</th><th>LITRES</th><th>KM</th><th>COÛT</th><th>SUPPR</th></tr></thead><tbody id="t-f"></tbody></table>
+        </div>
 
-    <div id="page-drivers" class="page">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3>GESTION DES CHAUFFEURS</h3><button class="btn btn-primary" onclick="openM('m-d')">+ NOUVEAU CHAUFFEUR</button></div>
-        <div class="table-container"><table><thead><tr><th>Photo</th><th>Grade & Nom</th><th>Matricule</th><th>Disponibilité</th><th>Action</th></tr></thead><tbody id="t-d"></tbody></table></div>
-    </div>
+        <div id="page-maint" class="page">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><h3>ENTRETIEN TECHNIQUE</h3><button class="btn btn-add" onclick="openM('m-m')">+ AJOUTER</button></div>
+            <table><thead><tr><th>DATE</th><th>VÉHICULE</th><th>TRAVAUX</th><th>PROCHAIN (KM)</th><th>SUPPR</th></tr></thead><tbody id="t-m"></tbody></table>
+        </div>
 
-    <div id="page-settings" class="page">
-        <h3>CONFIGURER L'UNITÉ</h3><br>
-        <div class="card" style="max-width:500px">
-            <label>Nom Officiel (ex: BASE AÉRIENNE 301)</label>
-            <input type="text" id="set-unit-name">
-            <label>Code de sécurité</label>
-            <input type="password" id="set-new-pass" placeholder="Modifier le code">
-            <button class="btn btn-accent" onclick="saveSettings()" style="width:100%; justify-content:center; margin-top:10px">VALIDER LES CHANGEMENTS</button>
+        <div id="page-drivers" class="page">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><h3>LISTE DES CHAUFFEURS</h3><button class="btn btn-add" onclick="openM('m-d')">+ NOUVEAU</button></div>
+            <table><thead><tr><th>PHOTO</th><th>NOM</th><th>MATRICULE</th><th>STATUT</th><th>SUPPR</th></tr></thead><tbody id="t-d"></tbody></table>
+        </div>
+
+        <div id="page-settings" class="page">
+            <h3>PARAMÈTRES</h3>
+            <div style="background:white; padding:20px; border-radius:8px; max-width:400px;">
+                <label>Nom de l'Unité</label>
+                <input type="text" id="set-unit-name">
+                <button class="btn" onclick="saveSettings()">ENREGISTRER</button>
+            </div>
         </div>
     </div>
-
-  </div>
 </div>
 
 <div id="m-v" class="modal-overlay"><div class="modal"><h3>Fiche Véhicule</h3><form onsubmit="save(event,'v','m-v')">
-  <input type="text" id="v1" placeholder="Marque & Modèle" required>
-  <input type="text" id="v2" placeholder="N° Immatriculation" required>
-  <input type="number" id="v3" placeholder="Compteur KM actuel" required>
-  <select id="v4"><option>En service</option><option>En panne</option></select>
-  <input type="file" onchange="encodeImg(this,'v_img')"><input type="hidden" id="v_img">
-  <br><br><button type="submit" class="btn btn-primary">ENREGISTRER</button> <button type="button" onclick="closeM('m-v')">FERMER</button>
+    <input type="text" id="v1" placeholder="Marque/Modèle" required>
+    <input type="text" id="v2" placeholder="Immatriculation" required>
+    <input type="number" id="v3" placeholder="KM Actuel" required>
+    <select id="v4"><option>En service</option><option>En panne</option></select>
+    <input type="file" onchange="encodeImg(this,'v_img')"><input type="hidden" id="v_img">
+    <button type="submit" class="btn">ENREGISTRER</button><button type="button" onclick="closeM('m-v')">FERMER</button>
 </form></div></div>
 
 <div id="m-f" class="modal-overlay"><div class="modal"><h3>Saisie Carburant</h3><form onsubmit="save(event,'f','m-f')">
     <input type="date" id="f1" required>
     <select id="f2"></select>
-    <input type="number" id="f3" placeholder="Nombre de Litres" required>
-    <input type="number" id="f4" placeholder="KM au moment du plein" required>
-    <button type="submit" class="btn btn-primary">VALIDER</button> <button type="button" onclick="closeM('m-f')">ANNULER</button>
+    <input type="number" id="f3" placeholder="Litres" required>
+    <input type="number" id="f4" placeholder="Kilométrage" required>
+    <button type="submit" class="btn">VALIDER</button><button type="button" onclick="closeM('m-f')">FERMER</button>
 </form></div></div>
 
-<div id="m-m" class="modal-overlay"><div class="modal"><h3>Entretien Technique</h3><form onsubmit="save(event,'m','m-m')">
-    <input type="date" id="m1" required>
-    <select id="m2"></select>
-    <input type="text" id="m3" placeholder="Description (ex: Vidange, Freins)" required>
-    <input type="number" id="m4" placeholder="Prochain entretien à (KM)" required>
-    <button type="submit" class="btn btn-primary">ENREGISTRER</button> <button type="button" onclick="closeM('m-m')">FERMER</button>
+<div id="m-m" class="modal-overlay"><div class="modal"><h3>Entretien</h3><form onsubmit="save(event,'m','m-m')">
+    <input type="date" id="m1" required><select id="m2"></select>
+    <input type="text" id="m3" placeholder="Nature des travaux" required>
+    <input type="number" id="m4" placeholder="Prochain KM" required>
+    <button type="submit" class="btn">ENREGISTRER</button><button type="button" onclick="closeM('m-m')">FERMER</button>
 </form></div></div>
 
-<div id="m-d" class="modal-overlay"><div class="modal"><h3>Fiche Chauffeur</h3><form onsubmit="save(event,'d','m-d')">
-    <input type="text" id="d1" placeholder="Grade et Nom" required>
+<div id="m-d" class="modal-overlay"><div class="modal"><h3>Chauffeur</h3><form onsubmit="save(event,'d','m-d')">
+    <input type="text" id="d1" placeholder="Nom et Grade" required>
     <input type="text" id="d2" placeholder="Matricule" required>
-    <select id="d3"><option>Disponible</option><option>En mission</option><option>Repos</option></select>
+    <select id="d3"><option>Disponible</option><option>Mission</option><option>Repos</option></select>
     <input type="file" onchange="encodeImg(this,'d_img')"><input type="hidden" id="d_img">
-    <br><br><button type="submit" class="btn btn-primary">ENREGISTRER</button> <button type="button" onclick="closeM('m-d')">ANNULER</button>
+    <button type="submit" class="btn">ENREGISTRER</button><button type="button" onclick="closeM('m-d')">FERMER</button>
 </form></div></div>
 
 <script>
-let config = JSON.parse(localStorage.getItem('trust_config')) || { pass: '301', unit: 'UNITÉ AUTOMOBILE' };
-let db = {
-    v: JSON.parse(localStorage.getItem('v_301')) || [],
-    d: JSON.parse(localStorage.getItem('d_301')) || [],
-    f: JSON.parse(localStorage.getItem('f_301')) || [],
-    m: JSON.parse(localStorage.getItem('m_301')) || []
-};
+let config = JSON.parse(localStorage.getItem('trust_config')) || { pass: '301', unit: 'BA 301' };
+let db = { v: JSON.parse(localStorage.getItem('v_301')) || [], d: JSON.parse(localStorage.getItem('d_301')) || [], f: JSON.parse(localStorage.getItem('f_301')) || [], m: JSON.parse(localStorage.getItem('m_301')) || [] };
 let chart;
 
-function applyConfig() {
-    const name = config.unit || 'UNITÉ AUTOMOBILE';
-    document.title = name;
-    document.getElementById('side-title').innerText = name;
-    document.getElementById('lock-title').innerText = name;
-    document.getElementById('title-header').innerText = name.toUpperCase();
-    document.getElementById('set-unit-name').value = name;
+function checkInit() {
+    document.getElementById('side-title').innerText = config.unit;
+    document.getElementById('title-header').innerText = config.unit.toUpperCase();
+    document.getElementById('set-unit-name').value = config.unit;
 }
 
 function login() { 
@@ -208,30 +165,18 @@ function login() {
         document.getElementById('lock-screen').style.display='none'; 
         document.getElementById('app').style.display='block'; 
         refresh(); 
-    } else alert('Code invalide'); 
+    } else alert('Erreur'); 
 }
 
 function saveSettings() {
     config.unit = document.getElementById('set-unit-name').value;
-    const p = document.getElementById('set-new-pass').value;
-    if(p.trim()) config.pass = p;
     localStorage.setItem('trust_config', JSON.stringify(config));
-    applyConfig();
-    alert('Configuration mise à jour !');
+    location.reload();
 }
 
 function encodeImg(input, hid) {
     const reader = new FileReader();
-    reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 150; canvas.height = 120;
-            canvas.getContext('2d').drawImage(img, 0, 0, 150, 120);
-            document.getElementById(hid).value = canvas.toDataURL('image/jpeg', 0.7);
-        };
-        img.src = e.target.result;
-    };
+    reader.onload = (e) => { document.getElementById(hid).value = e.target.result; };
     if(input.files[0]) reader.readAsDataURL(input.files[0]);
 }
 
@@ -242,7 +187,6 @@ function save(e, k, mid) {
     if(k==='f') o = {...o, date:document.getElementById('f1').value, car:document.getElementById('f2').value, lit:document.getElementById('f3').value, km:document.getElementById('f4').value};
     if(k==='m') o = {...o, date:document.getElementById('m1').value, car:document.getElementById('m2').value, work:document.getElementById('m3').value, next:document.getElementById('m4').value};
     if(k==='d') o = {...o, name:document.getElementById('d1').value, mat:document.getElementById('d2').value, state:document.getElementById('d3').value, img:document.getElementById('d_img').value};
-    
     db[k].push(o);
     localStorage.setItem(k+'_301', JSON.stringify(db[k]));
     closeM(mid); refresh();
@@ -254,18 +198,17 @@ function refresh() {
     document.getElementById('s-d').textContent = db.d.length;
     document.getElementById('s-f').textContent = db.f.reduce((a,b)=>a+parseFloat(b.lit||0), 0);
 
-    const vOpt = db.v.map(x=>`<option>${x.plate} (${x.name})</option>`).join('');
-    document.getElementById('f2').innerHTML = vOpt;
-    document.getElementById('m2').innerHTML = vOpt;
+    const vOpt = db.v.map(x=>`<option>${x.plate}</option>`).join('');
+    document.getElementById('f2').innerHTML = vOpt; document.getElementById('m2').innerHTML = vOpt;
 
-    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td><img src="${x.img||''}" class="img-rect" onerror="this.src='https://via.placeholder.com/60x40'"></td><td>${x.name}</td><td>${x.plate}</td><td>${x.km}</td><td>${x.state}</td><td><i class="fas fa-trash" style="color:var(--danger); cursor:pointer" onclick="del('v',${x.id})"></i></td></tr>`).join('');
-    document.getElementById('t-f').innerHTML = db.f.map(x=>`<tr><td>${x.date}</td><td>${x.car}</td><td>${x.lit} L</td><td>${x.km}</td><td>${(x.lit*650).toLocaleString()}</td><td><i class="fas fa-trash" style="color:var(--danger); cursor:pointer" onclick="del('f',${x.id})"></i></td></tr>`).join('');
-    document.getElementById('t-m').innerHTML = db.m.map(x=>`<tr><td>${x.date}</td><td>${x.car}</td><td>${x.work}</td><td>${x.next} KM</td><td><i class="fas fa-trash" style="color:var(--danger); cursor:pointer" onclick="del('m',${x.id})"></i></td></tr>`).join('');
-    document.getElementById('t-d').innerHTML = db.d.map(x=>`<tr><td><img src="${x.img||''}" class="img-circle" onerror="this.src='https://via.placeholder.com/45'"></td><td>${x.name}</td><td>${x.mat}</td><td>${x.state}</td><td><i class="fas fa-trash" style="color:var(--danger); cursor:pointer" onclick="del('d',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td><img src="${x.img}" class="img-prev"></td><td>${x.name}</td><td>${x.plate}</td><td>${x.km}</td><td>${x.state}</td><td><i class="fas fa-trash" onclick="del('v',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('t-f').innerHTML = db.f.map(x=>`<tr><td>${x.date}</td><td>${x.car}</td><td>${x.lit}L</td><td>${x.km}</td><td>${x.lit*650}</td><td><i class="fas fa-trash" onclick="del('f',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('t-m').innerHTML = db.m.map(x=>`<tr><td>${x.date}</td><td>${x.car}</td><td>${x.work}</td><td>${x.next}</td><td><i class="fas fa-trash" onclick="del('m',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('t-d').innerHTML = db.d.map(x=>`<tr><td><img src="${x.img}" class="img-prev" style="border-radius:50%"></td><td>${x.name}</td><td>${x.mat}</td><td>${x.state}</td><td><i class="fas fa-trash" onclick="del('d',${x.id})"></i></td></tr>`).join('');
 
     const ctx = document.getElementById('chartV').getContext('2d');
     if(chart) chart.destroy();
-    chart = new Chart(ctx, { type:'bar', data: { labels:['OPÉRATIONNELS', 'HORS SERVICE'], datasets:[{label:'Disponibilité Parc', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#2e7d32','#b22222']}] }, options:{animation:false, responsive:true}});
+    chart = new Chart(ctx, { type:'bar', data: { labels:['OK', 'PANNE'], datasets:[{label:'Parc', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['green','red']}] }, options:{animation:false}});
 }
 
 function showPage(pId) {
@@ -274,10 +217,9 @@ function showPage(pId) {
     document.getElementById('page-' + pId).classList.add('active');
     document.querySelector(`.nav-item[onclick*="${pId}"]`).classList.add('active');
 }
-function del(k, id) { if(confirm('Supprimer définitivement cet élément ?')) { db[k] = db[k].filter(x=>x.id!==id); localStorage.setItem(k+'_301', JSON.stringify(db[k])); refresh(); } }
+function del(k, id) { if(confirm('Supprimer ?')) { db[k] = db[k].filter(x=>x.id!==id); localStorage.setItem(k+'_301', JSON.stringify(db[k])); refresh(); } }
 function openM(id) { document.getElementById(id).classList.add('open'); }
 function closeM(id) { document.getElementById(id).classList.remove('open'); }
-applyConfig();
 </script>
 </body>
 </html>
