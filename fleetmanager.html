@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TrustFleet - Gestion de Parc</title>
+<title>TrustFleet - Gestion de Parc Automobile</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -91,11 +91,12 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
   <header class="header">
     <h2 id="title-header">Dashboard</h2>
     <div class="header-btns">
-        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> PDF</button>
+        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> EXPORT PDF</button>
     </div>
   </header>
 
   <div class="content">
+    
     <div id="page-dashboard" class="page active">
       <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:15px; margin-bottom:20px;">
         <div class="card"><h4>Flotte</h4><h2 id="s-v">0</h2></div>
@@ -113,7 +114,7 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Photo</th><th>Modèle</th><th>Immat.</th><th>Année Dotation</th><th>KM</th><th>État</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Photo</th><th>Marque & Modèle</th><th>Immat.</th><th style="color:var(--accent)">Année Dotation</th><th>KM</th><th>État</th><th>Actions</th></tr></thead>
           <tbody id="t-v"></tbody>
         </table>
       </div>
@@ -121,7 +122,7 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 
     <div id="page-drivers" class="page">
         <div style="display:flex; justify-content:space-between; margin-bottom:15px">
-          <h3>Chauffeurs</h3>
+          <h3>Personnel Chauffeurs</h3>
           <button class="btn btn-primary" onclick="openM('m-d')">Nouveau</button>
         </div>
         <div class="table-wrap">
@@ -133,24 +134,27 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
     </div>
 
     <div id="page-settings" class="page">
-        <h3>Paramètres Généraux</h3><br>
+        <h3>Paramètres de l'Application</h3><br>
         <div class="card" style="max-width:500px">
             <div class="form-group">
-                <label>Nom de l'Unité / Application</label>
-                <input type="text" id="set-unit-name" placeholder="Ex: CI BA301">
+                <label>Nom de l'Unité (Affiché dans TrustFleet)</label>
+                <input type="text" id="set-unit-name">
             </div>
             <div class="form-group">
-                <label>Nouveau Code d'Accès</label>
-                <input type="password" id="set-new-pass" placeholder="Laisser vide pour ne pas changer">
+                <label>Changer le Code d'Accès</label>
+                <input type="password" id="set-new-pass" placeholder="Nouveau code">
             </div>
             <br>
-            <button class="btn btn-accent" onclick="saveSettings()">Enregistrer les Paramètres</button>
+            <div style="display:flex; gap:10px">
+                <button class="btn btn-accent" onclick="saveSettings()">Enregistrer les modifications</button>
+                <button class="btn btn-secondary" onclick="showPage('dashboard')">Annuler</button>
+            </div>
         </div>
     </div>
 
-    <div id="page-maint" class="page"><h3>Maintenance</h3><div id="t-m"></div></div>
-    <div id="page-fuel" class="page"><h3>Carburant</h3><div id="t-f"></div></div>
-    <div id="page-interviews" class="page"><h3>Entretiens</h3><div id="t-i"></div></div>
+    <div id="page-maint" class="page"><h3>Maintenance Technique</h3><p>Section en attente de données.</p></div>
+    <div id="page-fuel" class="page"><h3>Suivi Carburant</h3><p>Section en attente de données.</p></div>
+    <div id="page-interviews" class="page"><h3>Entretiens Personnel</h3><p>Section en attente de données.</p></div>
 
   </div>
 </div>
@@ -189,35 +193,44 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 </form></div></div>
 
 <script>
-// INITIALISATION DES PARAMETRES
 let config = JSON.parse(localStorage.getItem('trust_config')) || { pass: '301', unit: 'TrustFleet' };
 let db = {
     v: JSON.parse(localStorage.getItem('v_301')) || [],
     d: JSON.parse(localStorage.getItem('d_301')) || []
 };
 
-// SÉCURITÉ
 function login() { 
     if(document.getElementById('pass').value === config.pass) { 
         document.getElementById('lock-screen').style.display='none'; 
         document.getElementById('app').style.display='block'; 
         document.getElementById('set-unit-name').value = config.unit;
         refresh(); 
-    } else alert('Code d\'accès erroné'); 
+    } else alert('Code d\'accès incorrect'); 
 }
 
-// PARAMETRES
 function saveSettings() {
-    const newName = document.getElementById('set-unit-name').value;
+    config.unit = document.getElementById('set-unit-name').value;
     const newPass = document.getElementById('set-new-pass').value;
-    if(newName) config.unit = newName;
     if(newPass) config.pass = newPass;
     localStorage.setItem('trust_config', JSON.stringify(config));
-    alert('Paramètres enregistrés. Le nouveau code sera effectif au prochain accès.');
+    alert('Modifications enregistrées !');
     location.reload();
 }
 
-// GESTION PHOTOS
+function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    document.getElementById('page-' + pageId).classList.add('active');
+    document.getElementById('title-header').textContent = pageId.toUpperCase();
+    
+    // Ajout de la classe active sur le bon bouton du menu
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        if(item.getAttribute('onclick').includes(pageId)) item.classList.add('active');
+    });
+}
+
 function up(input, hid) {
     const r = new FileReader();
     r.onload = (e) => {
@@ -233,7 +246,6 @@ function up(input, hid) {
     if(input.files[0]) r.readAsDataURL(input.files[0]);
 }
 
-// CRUD
 function save(e, k, mid) {
     e.preventDefault();
     const id = document.getElementById(k+'_id').value;
@@ -243,7 +255,6 @@ function save(e, k, mid) {
     if(k==='d') o = {...o, name:document.getElementById('d1').value, mat:document.getElementById('d2').value, lic:document.getElementById('d3').value, img:document.getElementById('d_img').value || (id ? db.d.find(x=>x.id==id).img : '')};
 
     if(id) { db[k] = db[k].map(x => x.id == id ? o : x); } else { db[k].push(o); }
-
     localStorage.setItem(k+'_301', JSON.stringify(db[k]));
     closeM(mid);
     refresh();
@@ -266,32 +277,27 @@ function edit(k, id, mid) {
 
 function del(k, id) { if(confirm('Supprimer cet élément ?')) { db[k] = db[k].filter(x=>x.id!==id); localStorage.setItem(k+'_301', JSON.stringify(db[k])); refresh(); } }
 
-// UI
-function showPage(id) {
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.getElementById('page-'+id).classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-    document.getElementById('title-header').textContent = id.toUpperCase();
-}
-
 function openM(id) { document.getElementById(id).classList.add('open'); }
 function closeM(id) { 
     document.getElementById(id).classList.remove('open'); 
-    const form = document.querySelector(`#${id} form`);
-    if(form) form.reset();
+    const formId = id === 'm-v' ? 'f-v' : 'f-d';
+    document.getElementById(formId).reset();
+    const hideId = id === 'm-v' ? 'v_id' : 'd_id';
+    document.getElementById(hideId).value = '';
 }
 
 let chart;
 function refresh() {
     document.getElementById('s-v').textContent = db.v.length;
     document.getElementById('s-p').textContent = db.v.filter(x=>x.state==='En panne').length;
+    document.getElementById('s-d').textContent = db.d.length;
     
-    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td><img src="${x.img||''}" class="img-thumb"></td><td>${x.brand} ${x.model}</td><td>${x.plate}</td><td>${x.year}</td><td>${x.km} km</td><td>${x.state}</td><td><i class="fas fa-edit" onclick="edit('v',${x.id},'m-v')"></i> <i class="fas fa-trash" onclick="del('v',${x.id})" style="margin-left:10px"></i></td></tr>`).join('');
+    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td><img src="${x.img||''}" class="img-thumb"></td><td>${x.brand} ${x.model}</td><td>${x.plate}</td><td style="font-weight:bold">${x.year}</td><td>${x.km} km</td><td>${x.state}</td><td><i class="fas fa-edit" onclick="edit('v',${x.id},'m-v')"></i> <i class="fas fa-trash" onclick="del('v',${x.id})" style="margin-left:10px"></i></td></tr>`).join('');
     document.getElementById('t-d').innerHTML = db.d.map(x=>`<tr><td><img src="${x.img||''}" class="img-thumb" style="border-radius:50%"></td><td>${x.name}</td><td>${x.mat}</td><td>${x.lic}</td><td><i class="fas fa-edit" onclick="edit('d',${x.id},'m-d')"></i> <i class="fas fa-trash" onclick="del('d',${x.id})" style="margin-left:10px"></i></td></tr>`).join('');
 
     const ctx = document.getElementById('chartV').getContext('2d');
     if(chart) chart.destroy();
-    chart = new Chart(ctx, { type:'bar', data: { labels:['En Service', 'Indisponible'], datasets:[{label:'État de la Flotte', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#28a745','#dc3545']}] }, options:{animation:false}});
+    chart = new Chart(ctx, { type:'bar', data: { labels:['En Service', 'Indisponible'], datasets:[{label:'État du Parc', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#28a745','#dc3545']}] }, options:{animation:false}});
 }
 </script>
 </body>
