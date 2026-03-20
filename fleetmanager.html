@@ -117,7 +117,7 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
         <table>
           <thead>
             <tr>
-              <th>Marque</th><th>Châssis</th><th>Dotation</th><th>Plaque</th><th>KM ACTUEL</th><th>Statut</th><th>Actions</th>
+              <th>Marque</th><th>Modèle</th><th>Châssis</th><th>Dotation</th><th>Plaque</th><th>KM ACTUEL</th><th>Statut</th><th>Actions</th>
             </tr>
           </thead>
           <tbody id="list-v"></tbody>
@@ -133,7 +133,7 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
       <div class="table-container">
         <table>
           <thead>
-            <tr><th>Nom</th><th>Grade</th><th>Matricule</th><th>Permis</th><th>Statut</th><th>Actions</th></tr>
+            <tr><th>Nom</th><th>Grade</th><th>Matricule</th><th>Permis</th><th>Position</th><th>Actions</th></tr>
           </thead>
           <tbody id="list-d"></tbody>
         </table>
@@ -221,7 +221,7 @@ function renderAll() {
   const v = load('v');
   document.getElementById('list-v').innerHTML = v.map(i => `
     <tr>
-      <td><b>${i.brand}</b></td><td>${i.chassis}</td><td>${i.year}</td>
+      <td><b>${i.brand}</b></td><td>${i.model || ''}</td><td>${i.chassis}</td><td>${i.year}</td>
       <td><code>${i.plate}</code></td>
       <td style="color:var(--accent); font-weight:bold;">${i.km.toLocaleString()} KM</td>
       <td><span class="badge ${i.status==='Actif'?'bg-actif':'bg-indispo'}">${i.status}</span></td>
@@ -234,7 +234,7 @@ function renderAll() {
   const d = load('d');
   document.getElementById('list-d').innerHTML = d.map(i => `
     <tr><td>${i.name}</td><td>${i.grade}</td><td>${i.mat}</td><td>${i.lic}</td>
-    <td><span class="badge ${i.status==='Actif'?'bg-actif':'bg-indispo'}">${i.status}</span></td>
+    <td><span class="badge ${i.status==='Disponible'?'bg-actif':'bg-indispo'}">${i.status || 'Disponible'}</span></td>
     <td class="action-btns">
       <button class="btn" style="color:var(--info)" onclick="openModal('driver', ${i.id})"><i class="fas fa-edit"></i></button>
       <button class="btn" style="color:var(--danger)" onclick="deleteItem('d', ${i.id})"><i class="fas fa-trash"></i></button>
@@ -261,6 +261,7 @@ function openModal(type, id = null) {
   if(type === 'vehicle') {
     box.innerHTML = `<h3>${id?'Modifier':'Nouveau'} Véhicule</h3>
       <div class="form-group"><label>Marque</label><input type="text" id="v-brand" value="${data?data.brand:''}"></div>
+      <div class="form-group"><label>Modèle</label><input type="text" id="v-model" value="${data?data.model||'':''}"></div>
       <div class="form-group"><label>N° Châssis</label><input type="text" id="v-chassis" value="${data?data.chassis:''}"></div>
       <div class="form-group"><label>Année de Dotation</label><input type="number" id="v-year" value="${data?data.year:''}"></div>
       <div class="form-group"><label>Immatriculation</label><input type="text" id="v-plate" value="${data?data.plate:''}"></div>
@@ -273,6 +274,7 @@ function openModal(type, id = null) {
       <div class="form-group"><label>Grade</label><input type="text" id="d-grade" value="${data?data.grade:''}"></div>
       <div class="form-group"><label>Matricule</label><input type="text" id="d-mat" value="${data?data.mat:''}"></div>
       <div class="form-group"><label>Permis</label><input type="text" id="d-lic" value="${data?data.lic:''}"></div>
+      <div class="form-group"><label>Position</label><select id="d-status"><option ${data?.status==='Disponible'?'selected':''}>Disponible</option><option ${data?.status==='Indisponible'?'selected':''}>Indisponible</option></select></div>
       <button class="btn btn-primary" style="width:100%" onclick="saveEntry('d', ${id})">ENREGISTRER</button>`;
   } else if(type === 'fuel') {
     const v = load('v');
@@ -297,6 +299,7 @@ function saveEntry(key, id = null) {
 
   if(key === 'v') {
     obj.brand = document.getElementById('v-brand').value;
+    obj.model = document.getElementById('v-model').value;
     obj.chassis = document.getElementById('v-chassis').value;
     obj.year = document.getElementById('v-year').value;
     obj.plate = document.getElementById('v-plate').value;
@@ -307,7 +310,7 @@ function saveEntry(key, id = null) {
     obj.grade = document.getElementById('d-grade').value;
     obj.mat = document.getElementById('d-mat').value;
     obj.lic = document.getElementById('d-lic').value;
-    obj.status = "Actif";
+    obj.status = document.getElementById('d-status').value;
   } else if(key === 'f') {
     obj.v_name = document.getElementById('f-v').value;
     obj.litres = document.getElementById('f-l').value;
@@ -333,7 +336,6 @@ function saveEntry(key, id = null) {
 
 function deleteItem(key, id) { if(confirm("Supprimer ?")) { save(key, load(key).filter(x=>x.id!==id)); location.reload(); } }
 
-// --- DASHBOARD ---
 function updateKPIs() {
   const v = load('v');
   const m = load('m');
@@ -373,8 +375,8 @@ function showPage(id, e) {
 
 function exportToCSV() {
   const v = load('v');
-  let csv = "Marque;Chassis;Dotation;Plaque;KM\n";
-  v.forEach(i => csv += `${i.brand};${i.chassis};${i.year};${i.plate};${i.km}\n`);
+  let csv = "Marque;Modele;Chassis;Dotation;Plaque;KM\n";
+  v.forEach(i => csv += `${i.brand};${i.model||''};${i.chassis};${i.year};${i.plate};${i.km}\n`);
   const blob = new Blob([csv], { type: 'text/csv' });
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Rapport_BA301.csv'; a.click();
 }
