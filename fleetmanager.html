@@ -17,7 +17,7 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden;}
 
-/* --- OPTIMISATION PDF (MASQUAGE PARAMÈTRES) --- */
+/* --- OPTIMISATION PDF --- */
 @media print {
   .sidebar, .top-bar, .btn, .action-btns, #modal-overlay, #page-settings, #lock-screen { display: none !important; }
   .main-content { margin-left: 0 !important; width: 100% !important; }
@@ -154,7 +154,7 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
       </div>
       <div class="table-container">
         <table>
-          <thead><tr><th>Date</th><th>Véhicule</th><th>Litres</th><th>KM au Compteur</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Date</th><th>Plaque Véhicule</th><th>Litres</th><th>KM au Compteur</th><th>Actions</th></tr></thead>
           <tbody id="list-f"></tbody>
         </table>
       </div>
@@ -167,7 +167,7 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
       </div>
       <div class="table-container">
         <table>
-          <thead><tr><th>Date</th><th>Véhicule</th><th>Intervention</th><th>Coût (CFA)</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Date</th><th>Plaque Véhicule</th><th>Intervention</th><th>Coût (CFA)</th><th>Actions</th></tr></thead>
           <tbody id="list-m"></tbody>
         </table>
       </div>
@@ -190,14 +190,12 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
 </div>
 
 <script>
-// --- GESTION DES DONNEES ---
 const KEYS = { v:'v_db', d:'d_db', f:'f_db', m:'m_db', cfg:'cfg_db' };
 let config = JSON.parse(localStorage.getItem(KEYS.cfg)) || { user:'admin', pass:'301', unit:'BA 301 - GAROUA' };
 
 function load(k) { return JSON.parse(localStorage.getItem(KEYS[k])) || []; }
 function save(k, data) { localStorage.setItem(KEYS[k], JSON.stringify(data)); }
 
-// --- AUTH ---
 function checkAuth() {
   document.getElementById('lock-unit-title').textContent = config.unit;
   if(sessionStorage.getItem('auth_ok') === 'true') {
@@ -226,12 +224,10 @@ function updateSettings() {
 }
 
 function printWithTitle() {
-    // Mise à jour du titre PDF avant impression
     document.getElementById('pdf-unit-name').textContent = config.unit;
     window.print();
 }
 
-// --- ACTIONS PRINCIPALES ---
 function initApp() {
   renderAll();
   updateKPIs();
@@ -274,12 +270,12 @@ function renderAll() {
     <td class="action-btns"><button class="btn" style="color:var(--danger)" onclick="deleteItem('m', ${i.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
 }
 
-// --- MODALES (AJOUT ET MODIFICATION) ---
 function openModal(type, id = null) {
   const overlay = document.getElementById('modal-overlay');
   const box = document.getElementById('modal-content');
   overlay.style.display = 'flex';
   let data = id ? load(type.charAt(0)).find(x => x.id === id) : null;
+  const vehicles = load('v');
 
   if(type === 'vehicle') {
     box.innerHTML = `<h3>${id?'Modifier':'Nouveau'} Véhicule</h3>
@@ -300,16 +296,14 @@ function openModal(type, id = null) {
       <div class="form-group"><label>Position</label><select id="d-status"><option ${data?.status==='Disponible'?'selected':''}>Disponible</option><option ${data?.status==='Indisponible'?'selected':''}>Indisponible</option></select></div>
       <button class="btn btn-primary" style="width:100%" onclick="saveEntry('d', ${id})">ENREGISTRER</button>`;
   } else if(type === 'fuel') {
-    const v = load('v');
     box.innerHTML = `<h3>Carburant</h3>
-      <div class="form-group"><label>Véhicule</label><select id="f-v">${v.map(x=>`<option value="${x.brand} (${x.plate})">${x.brand}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Plaque Véhicule</label><select id="f-v">${vehicles.map(x=>`<option value="${x.plate}">${x.plate} (${x.brand})</option>`).join('')}</select></div>
       <div class="form-group"><label>Litres</label><input type="number" id="f-l"></div>
       <div class="form-group"><label>KM au moment du plein</label><input type="number" id="f-km"></div>
       <button class="btn btn-primary" style="width:100%" onclick="saveEntry('f')">ENREGISTRER</button>`;
   } else if(type === 'maint') {
-    const v = load('v');
     box.innerHTML = `<h3>Maintenance</h3>
-      <div class="form-group"><label>Véhicule</label><select id="m-v">${v.map(x=>`<option value="${x.brand}">${x.brand}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Plaque Véhicule</label><select id="m-v">${vehicles.map(x=>`<option value="${x.plate}">${x.plate} (${x.brand})</option>`).join('')}</select></div>
       <div class="form-group"><label>Description</label><input type="text" id="m-desc"></div>
       <div class="form-group"><label>Coût (CFA)</label><input type="number" id="m-cost"></div>
       <button class="btn btn-primary" style="width:100%" onclick="saveEntry('m')">ENREGISTRER</button>`;
@@ -319,7 +313,6 @@ function openModal(type, id = null) {
 function saveEntry(key, id = null) {
   let db = load(key);
   let obj = { id: id || Date.now() };
-
   if(key === 'v') {
     obj.brand = document.getElementById('v-brand').value;
     obj.model = document.getElementById('v-model').value;
@@ -345,14 +338,7 @@ function saveEntry(key, id = null) {
     obj.cost = document.getElementById('m-cost').value;
     obj.date = new Date().toLocaleDateString();
   }
-
-  if(id) {
-    const idx = db.findIndex(x => x.id === id);
-    db[idx] = obj;
-  } else {
-    db.push(obj);
-  }
-  
+  if(id) { const idx = db.findIndex(x => x.id === id); db[idx] = obj; } else { db.push(obj); }
   save(key, db);
   location.reload();
 }
@@ -360,11 +346,9 @@ function saveEntry(key, id = null) {
 function deleteItem(key, id) { if(confirm("Supprimer ?")) { save(key, load(key).filter(x=>x.id!==id)); location.reload(); } }
 
 function updateKPIs() {
-  const v = load('v');
-  const m = load('m');
+  const v = load('v'); const m = load('m');
   const totalCost = m.reduce((acc, curr) => acc + parseInt(curr.cost || 0), 0);
   const totalKM = v.reduce((acc, curr) => acc + parseInt(curr.km || 0), 0);
-
   document.getElementById('kpi-container').innerHTML = `
     <div class="kpi-card"><h4>TOTAL VÉHICULES</h4><h2>${v.length}</h2></div>
     <div class="kpi-card" style="border-left-color:var(--success)"><h4>DISTANCE TOTALE</h4><h2>${totalKM.toLocaleString()} KM</h2></div>
@@ -374,14 +358,11 @@ function updateKPIs() {
 }
 
 function initCharts() {
-  const v = load('v');
-  const m = load('m');
-  
+  const v = load('v'); const m = load('m');
   new Chart(document.getElementById('chartKM'), {
     type: 'bar',
     data: { labels: v.map(x=>x.plate), datasets: [{ label: 'Kilomètres', data: v.map(x=>x.km), backgroundColor: '#ff6b35' }] }
   });
-
   new Chart(document.getElementById('chartMaint'), {
     type: 'line',
     data: { labels: m.map(x=>x.date), datasets: [{ label: 'CFA', data: m.map(x=>x.cost), borderColor: '#dc3545', fill: false }] }
