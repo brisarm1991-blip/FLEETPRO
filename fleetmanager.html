@@ -38,6 +38,8 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);di
 table{width:100%; border-collapse:collapse;}
 th{background:#f8f9fa; padding:12px; text-align:left; font-size:.75rem; text-transform:uppercase; border-bottom:2px solid var(--border);}
 td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertical-align:middle;}
+.img-thumb{width:45px; height:45px; border-radius:8px; object-fit:cover; border:1px solid var(--border);}
+
 .btn{padding:10px 18px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:8px;}
 .btn-primary{background:var(--primary); color:white;}
 .btn-accent{background:var(--accent); color:white;}
@@ -48,13 +50,13 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 .modal-overlay.open{display:flex;}
 .modal{background:white; border-radius:12px; width:90%; max-width:600px; padding:25px; max-height:90vh; overflow-y:auto;}
 
-/* 🖨️ RÈGLES D'EXPORT PDF (PRINT) */
+/* 🖨️ RÈGLES D'EXPORT PDF */
 @media print {
   .sidebar, .btn, .header-btns, .modal-overlay, #page-settings, .fa-trash, .fa-edit { display: none !important; }
   .main { margin-left: 0 !important; display: block !important; }
   .page { display: block !important; border:none !important; }
   .header { border-bottom: 2px solid #000; justify-content: center; height: auto; padding: 20px 0; }
-  #title-header { font-size: 26pt !important; color: #000 !important; text-align: center; width: 100%; }
+  #title-header { font-size: 26pt !important; color: #000 !important; text-align: center; width: 100%; visibility: visible !important; }
   .card { box-shadow: none; border: 1px solid #eee; }
 }
 </style>
@@ -63,7 +65,7 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 
 <div id="lock-screen">
   <div class="lock-box">
-    <i class="fas fa-car fa-3x" style="color:var(--primary)"></i>
+    <i class="fas fa-shield-alt fa-3x" style="color:var(--primary)"></i>
     <h2 id="lock-title">TrustFleet</h2>
     <input type="password" id="pass" placeholder="Code d'accès">
     <button class="btn btn-primary" style="width:100%; justify-content:center" onclick="login()">Accéder</button>
@@ -72,7 +74,7 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 
 <nav class="sidebar">
   <div class="sidebar-header">
-    <i class="fas fa-car fa-2x" style="color:var(--accent)"></i>
+    <i class="fas fa-truck-moving fa-2x" style="color:var(--accent)"></i>
     <h3 id="side-title">TrustFleet</h3>
   </div>
   <div class="nav-section">
@@ -87,7 +89,7 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
   <header class="header">
     <h2 id="title-header">TrustFleet</h2>
     <div class="header-btns">
-        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
+        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> EXPORTER PDF</button>
     </div>
   </header>
 
@@ -95,7 +97,7 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
     <div id="page-dashboard" class="page active">
       <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:15px; margin-bottom:20px;">
         <div class="card"><h4>Flotte</h4><h2 id="s-v">0</h2></div>
-        <div class="card" style="color:var(--danger)"><h4>Pannes</h4><h2 id="s-p">0</h2></div>
+        <div class="card" style="color:var(--danger)"><h4>En Panne</h4><h2 id="s-p">0</h2></div>
         <div class="card"><h4>Chauffeurs</h4><h2 id="s-d">0</h2></div>
         <div class="card"><h4>Alertes</h4><h2 id="s-i">0</h2></div>
       </div>
@@ -105,32 +107,43 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
     <div id="page-vehicles" class="page">
       <div style="display:flex; justify-content:space-between; margin-bottom:15px">
         <h3>Registre Automobile</h3>
-        <button class="btn btn-primary" onclick="openM('m-v')">Ajouter</button>
+        <button class="btn btn-primary" onclick="openM('m-v')">Nouveau Véhicule</button>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Véhicule</th><th>Immatriculation</th><th>Année Dotation</th><th>KM</th><th>État</th><th class="btn">Actions</th></tr></thead>
+          <thead><tr><th>Photo</th><th>Marque/Modèle</th><th>Immat.</th><th>Année</th><th>KM</th><th>État</th><th class="btn">Actions</th></tr></thead>
           <tbody id="t-v"></tbody>
         </table>
       </div>
     </div>
 
-    <div id="page-drivers" class="page"><h3>Personnel</h3><div id="t-d"></div></div>
+    <div id="page-drivers" class="page">
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px">
+          <h3>Personnel Chauffeurs</h3>
+          <button class="btn btn-primary" onclick="openM('m-d')">Ajouter Chauffeur</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Photo</th><th>Grade & Nom</th><th>Matricule</th><th>Permis</th><th class="btn">Actions</th></tr></thead>
+            <tbody id="t-d"></tbody>
+          </table>
+        </div>
+    </div>
 
     <div id="page-settings" class="page">
-        <h3>Configuration Générale</h3><br>
+        <h3>Configuration de l'Unité</h3><br>
         <div class="card" style="max-width:500px">
             <div style="margin-bottom:15px">
-                <label style="display:block; margin-bottom:5px; font-weight:bold;">Nom de l'Unité / Structure</label>
+                <label style="font-weight:bold;">Nom de la Structure (affiché sur PDF)</label>
                 <input type="text" id="set-unit-name" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:6px;">
             </div>
             <div style="margin-bottom:15px">
-                <label style="display:block; margin-bottom:5px; font-weight:bold;">Code d'Accès</label>
-                <input type="password" id="set-new-pass" placeholder="Nouveau code (si changement)" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:6px;">
+                <label style="font-weight:bold;">Code d'accès sécurisé</label>
+                <input type="password" id="set-new-pass" placeholder="Laisser vide pour ne pas changer" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:6px;">
             </div>
             <div style="display:flex; gap:10px">
-                <button class="btn btn-accent" onclick="saveSettings()">Appliquer les modifications</button>
-                <button class="btn btn-secondary" onclick="showPage('dashboard')">Annuler</button>
+                <button class="btn btn-accent" onclick="saveSettings()">Mettre à jour l'application</button>
+                <button class="btn btn-secondary" onclick="showPage('dashboard')">Retour</button>
             </div>
         </div>
     </div>
@@ -147,6 +160,7 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
     <input type="number" id="v_year" placeholder="Année Dotation" required style="padding:10px; border-radius:6px; border:1px solid #ccc">
     <input type="number" id="v4" placeholder="Kilométrage" required style="padding:10px; border-radius:6px; border:1px solid #ccc">
     <select id="v5" style="padding:10px; border-radius:6px; border:1px solid #ccc"><option>En service</option><option>En panne</option></select>
+    <div style="grid-column: span 2"><label>Photo du véhicule</label><input type="file" onchange="encodeImg(this,'v_img')" style="width:100%"><input type="hidden" id="v_img"></div>
   </div><br>
   <div style="display:flex; gap:10px; justify-content:flex-end">
     <button type="button" class="btn btn-secondary" onclick="closeM('m-v')">Annuler</button>
@@ -154,20 +168,38 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
   </div>
 </form></div></div>
 
+<div id="m-d" class="modal-overlay"><div class="modal"><h3>Fiche Chauffeur</h3><br>
+<form id="f-d" onsubmit="save(event,'d','m-d')">
+  <input type="hidden" id="d_id">
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+    <input type="text" id="d1" placeholder="Grade & Nom" required style="padding:10px; border-radius:6px; border:1px solid #ccc">
+    <input type="text" id="d2" placeholder="Matricule" required style="padding:10px; border-radius:6px; border:1px solid #ccc">
+    <input type="text" id="d3" placeholder="N° Permis" required style="padding:10px; border-radius:6px; border:1px solid #ccc">
+    <div style="grid-column: span 2"><label>Photo d'identité</label><input type="file" onchange="encodeImg(this,'d_img')" style="width:100%"><input type="hidden" id="d_img"></div>
+  </div><br>
+  <div style="display:flex; gap:10px; justify-content:flex-end">
+    <button type="button" class="btn btn-secondary" onclick="closeM('m-d')">Annuler</button>
+    <button type="submit" class="btn btn-accent">Enregistrer</button>
+  </div>
+</form></div></div>
+
 <script>
-// CONFIGURATION ET BASE DE DONNEES
+// INITIALISATION
 let config = JSON.parse(localStorage.getItem('trust_config')) || { pass: '301', unit: 'TrustFleet' };
-let db = { v: JSON.parse(localStorage.getItem('v_301')) || [] };
+let db = {
+    v: JSON.parse(localStorage.getItem('v_301')) || [],
+    d: JSON.parse(localStorage.getItem('d_301')) || []
+};
 let chart;
 
-// FONCTION POUR APPLIQUER LE NOM PARTOUT (Y COMPRIS ENTÊTE PDF)
+// APPLICATION DU NOM ET PERSISTENCE
 function applyConfig() {
-    const name = config.unit || 'TrustFleet';
-    document.title = name;
-    document.getElementById('side-title').innerText = name;
-    document.getElementById('lock-title').innerText = name;
-    document.getElementById('title-header').innerText = name.toUpperCase();
-    document.getElementById('set-unit-name').value = name;
+    const unitName = config.unit || 'TrustFleet';
+    document.title = unitName;
+    document.getElementById('side-title').innerText = unitName;
+    document.getElementById('lock-title').innerText = unitName;
+    document.getElementById('title-header').innerText = unitName.toUpperCase();
+    document.getElementById('set-unit-name').value = unitName;
 }
 
 function login() { 
@@ -179,13 +211,13 @@ function login() {
 }
 
 function saveSettings() {
-    const n = document.getElementById('set-unit-name').value;
-    const p = document.getElementById('set-new-pass').value;
-    if(n.trim() !== "") config.unit = n;
-    if(p.trim() !== "") config.pass = p;
+    const newName = document.getElementById('set-unit-name').value;
+    const newPass = document.getElementById('set-new-pass').value;
+    if(newName.trim() !== "") config.unit = newName;
+    if(newPass.trim() !== "") config.pass = newPass;
     localStorage.setItem('trust_config', JSON.stringify(config));
     applyConfig();
-    alert('Structure mise à jour !');
+    alert('Modifications enregistrées !');
 }
 
 function showPage(pId) {
@@ -195,13 +227,30 @@ function showPage(pId) {
     document.getElementById('title-header').innerText = config.unit.toUpperCase();
 }
 
-function openM(id) { document.getElementById(id).classList.add('open'); }
-function closeM(id) { document.getElementById(id).classList.remove('open'); }
+// ENCODAGE DES PHOTOS
+function encodeImg(input, hid) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 150; canvas.height = 110;
+            canvas.getContext('2d').drawImage(img, 0, 0, 150, 110);
+            document.getElementById(hid).value = canvas.toDataURL('image/jpeg', 0.6);
+        };
+        img.src = e.target.result;
+    };
+    if(input.files[0]) reader.readAsDataURL(input.files[0]);
+}
 
 function save(e, k, mid) {
     e.preventDefault();
     const id = document.getElementById(k+'_id').value;
-    let o = { id: id ? parseInt(id) : Date.now(), brand:document.getElementById('v1').value, model:document.getElementById('v2').value, plate:document.getElementById('v3').value, year:document.getElementById('v_year').value, km:document.getElementById('v4').value, state:document.getElementById('v5').value };
+    let o = { id: id ? parseInt(id) : Date.now() };
+    
+    if(k==='v') o = {...o, brand:document.getElementById('v1').value, model:document.getElementById('v2').value, plate:document.getElementById('v3').value, year:document.getElementById('v_year').value, km:document.getElementById('v4').value, state:document.getElementById('v5').value, img:document.getElementById('v_img').value};
+    if(k==='d') o = {...o, name:document.getElementById('d1').value, mat:document.getElementById('d2').value, lic:document.getElementById('d3').value, img:document.getElementById('d_img').value};
+
     if(id) { db[k] = db[k].map(x => x.id == id ? o : x); } else { db[k].push(o); }
     localStorage.setItem(k+'_301', JSON.stringify(db[k]));
     closeM(mid); refresh();
@@ -210,14 +259,22 @@ function save(e, k, mid) {
 function refresh() {
     document.getElementById('s-v').textContent = db.v.length;
     document.getElementById('s-p').textContent = db.v.filter(x=>x.state==='En panne').length;
-    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td>${x.brand} ${x.model}</td><td>${x.plate}</td><td>${x.year}</td><td>${x.km} km</td><td>${x.state}</td><td class="btn"><i class="fas fa-trash" onclick="del('v',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('s-d').textContent = db.d.length;
     
+    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td><img src="${x.img||''}" class="img-thumb" onerror="this.src='https://via.placeholder.com/50'"></td><td>${x.brand} ${x.model}</td><td>${x.plate}</td><td>${x.year}</td><td>${x.km} km</td><td>${x.state}</td><td class="btn"><i class="fas fa-trash" onclick="del('v',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('t-d').innerHTML = db.d.map(x=>`<tr><td><img src="${x.img||''}" class="img-thumb" style="border-radius:50%" onerror="this.src='https://via.placeholder.com/50'"></td><td>${x.name}</td><td>${x.mat}</td><td>${x.lic}</td><td class="btn"><i class="fas fa-trash" onclick="del('d',${x.id})"></i></td></tr>`).join('');
+
     const ctx = document.getElementById('chartV').getContext('2d');
     if(chart) chart.destroy();
-    chart = new Chart(ctx, { type:'bar', data: { labels:['En Service', 'En Panne'], datasets:[{label:'Parc', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#28a745','#dc3545']}] }, options:{animation:false, responsive:true}});
+    chart = new Chart(ctx, { type:'bar', data: { labels:['Opérationnels', 'Indisponibles'], datasets:[{label:'État de la flotte', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#28a745','#dc3545']}] }, options:{animation:false, responsive:true}});
 }
 
-function del(k, id) { if(confirm('Supprimer ?')) { db[k] = db[k].filter(x=>x.id!==id); localStorage.setItem(k+'_301', JSON.stringify(db[k])); refresh(); } }
+function openM(id) { document.getElementById(id).classList.add('open'); }
+function closeM(id) { 
+    document.getElementById(id).classList.remove('open'); 
+    document.getElementById('f-v').reset(); document.getElementById('f-d').reset();
+}
+function del(k, id) { if(confirm('Supprimer définitivement ?')) { db[k] = db[k].filter(x=>x.id!==id); localStorage.setItem(k+'_301', JSON.stringify(db[k])); refresh(); } }
 
 applyConfig();
 </script>
