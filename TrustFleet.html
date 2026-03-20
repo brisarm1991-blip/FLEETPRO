@@ -1,47 +1,273 @@
-import pandas as pd
-import numpy as np
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système de Gestion Militaire Intégré - CI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --army-dark: #1b2631;
+            --army-green: #2d5a27;
+            --army-gold: #b8860b;
+            --danger: #c0392b;
+            --light-grey: #ecf0f1;
+        }
 
-# 1. CHARGEMENT DES DONNÉES (Basé sur vos noms de fichiers)
-# On charge les paramètres personnels (Matricule, Diplômes, Spécialité)
-df_perso = pd.read_csv('TABLEAU DE BORD SUIVIE PERSONNELS DU CI.xlsx - PARAMETRES PERSONNELS.csv')
+        body { font-family: 'Segoe UI', Arial; margin: 0; background: var(--light-grey); display: flex; height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--army-dark); color: white; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; background: #151d24; text-align: center; border-bottom: 3px solid var(--army-gold); }
+        .menu { list-style: none; padding: 0; flex: 1; }
+        .menu li { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid #2c3e50; transition: 0.3s; }
+        .menu li:hover, .menu li.active { background: var(--army-green); padding-left: 30px; }
+        .menu i { margin-right: 10px; width: 20px; }
 
-# On charge les données médicales (Poids, Taille, IMC, Tension)
-df_sante = pd.read_csv('TABLEAU DE BORD SUIVIE PERSONNELS DU CI.xlsx - INFORMATIONS MEDICALES.csv')
+        /* Contenu Principal */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        header { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .content-area { padding: 25px; overflow-y: auto; flex: 1; }
 
-# On charge les évaluations (COVAPI, Tir, Morale)
-df_eval = pd.read_csv('TABLEAU DE BORD SUIVIE PERSONNELS DU CI.xlsx - EVALUATION PERSONNEL.csv')
+        /* Tableaux et Data */
+        .data-card { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; padding: 20px; }
+        .section-title { color: var(--army-dark); border-left: 5px solid var(--army-gold); padding-left: 15px; margin-bottom: 20px; text-transform: uppercase; font-weight: bold; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { background: #f8f9fa; color: var(--army-dark); padding: 12px 8px; border-bottom: 2px solid #dee2e6; text-align: left; position: sticky; top: 0; }
+        td { padding: 10px 8px; border-bottom: 1px solid #eee; }
+        tr:hover { background-color: #f1f4f6; }
 
-# 2. NETTOYAGE ET FUSION (Le "Merge")
-# On utilise le NOM comme clé de liaison pour regrouper toutes les informations
-df_complet = pd.merge(df_perso, df_sante[['NOM', 'POIDS Kg', 'TAILLE m', 'TA', 'GLYCEMIE']], on='NOM', how='left')
-df_complet = pd.merge(df_complet, df_eval[['NOM', 'COVAPI', 'VALEUR MORALE', 'NOTE TIR']], on='NOM', how='left')
+        /* Badges & Statuts */
+        .status { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; color: white; }
+        .status-present { background: var(--army-green); }
+        .status-mission { background: #2980b9; }
+        .status-perm { background: #f39c12; }
+        .status-malade { background: var(--danger); }
 
-# 3. CALCULS AUTOMATISÉS (Intelligence du code)
-def calculer_imc(row):
-    try:
-        if row['TAILLE m'] > 0:
-            return round(row['POIDS Kg'] / (row['TAILLE m']**2), 2)
-    except:
-        return np.nan
+        .imc-warning { color: var(--danger); font-weight: bold; }
+        
+        /* Recherche */
+        .search-bar { padding: 10px; width: 300px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
+        
+        .page { display: none; }
+        .page.active { display: block; }
+    </style>
+</head>
+<body>
 
-# Recalcul de l'IMC pour vérifier les données du fichier
-df_complet['IMC_CALCULE'] = df_complet.apply(calculer_imc, axis=1)
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h3>BASE AÉRIENNE 301</h3>
+        <p style="font-size: 0.7rem; color: var(--army-gold);">Gestion du Personnel - CI</p>
+    </div>
+    <ul class="menu">
+        <li class="active" onclick="showPage('page-rh')"><i class="fas fa-user-shield"></i> Administration RH</li>
+        <li onclick="showPage('page-ops')"><i class="fas fa-calendar-check"></i> Présences & Missions</li>
+        <li onclick="showPage('page-eval')"><i class="fas fa-medal"></i> Éval. & Performances</li>
+        <li onclick="showPage('page-sante')"><i class="fas fa-heartbeat"></i> Suivi Médical</li>
+    </ul>
+</div>
 
-# Calcul d'une Moyenne Générale pondérée (Exemple: Physique 30%, Tir 40%, Morale 30%)
-df_complet['SCORE_GLOBAL'] = (
-    df_complet['COVAPI'].fillna(0) * 0.3 + 
-    df_complet['NOTE TIR'].fillna(0) * 0.4 + 
-    df_complet['VALEUR MORALE'].fillna(0) * 0.3
-)
+<div class="main">
+    <header>
+        <input type="text" class="search-bar" placeholder="Rechercher un militaire (Nom, Matricule...)" id="searchInput" onkeyup="filterData()">
+        <div class="user">
+            <span id="date-now"></span> | <strong>CNE EMAN ARMAND BRICE</strong>
+        </div>
+    </header>
 
-# 4. EXEMPLE DE SORTIE : EXTRAIRE LES PROFILS À RISQUE OU D'ÉLITE
-# Liste des personnels ayant un IMC > 25 (Surpoids)
-profils_imc_eleve = df_complet[df_complet['IMC_CALCULE'] > 25][['NOM', 'GRADE', 'IMC_CALCULE']]
+    <div class="content-area">
+        
+        <div id="page-rh" class="page active">
+            <div class="section-title">Fiche d'Identification Administrative</div>
+            <div class="data-card">
+                <table id="tableRH">
+                    <thead>
+                        <tr>
+                            <th>Grade</th>
+                            <th>Nom & Prénoms</th>
+                            <th>Matricule</th>
+                            <th>Né(e) le</th>
+                            <th>Lieu</th>
+                            <th>Spécialité</th>
+                            <th>Diplôme Civ/Mil</th>
+                            <th>Statut Mat.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyRH"></tbody>
+                </table>
+            </div>
+        </div>
 
-# Liste des meilleurs tireurs (Note > 15)
-tireurs_elite = df_complet[df_complet['NOTE TIR'] >= 16][['NOM', 'GRADE', 'NOTE TIR']]
+        <div id="page-ops" class="page">
+            <div class="section-title">Situation Opérationnelle & Positions</div>
+            <div class="data-card">
+                <table id="tableOps">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Position Actuelle</th>
+                            <th>Jan</th><th>Fév</th><th>Mar</th><th>Avr</th>
+                            <th>Détails Mission</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyOps"></tbody>
+                </table>
+            </div>
+        </div>
 
-# 5. EXPORTATION VERS UN NOUVEAU FICHIER CENTRALISÉ
-df_complet.to_excel('BASE_DE_DONNEES_INTEGREE_CI.xlsx', index=False)
+        <div id="page-eval" class="page">
+            <div class="section-title">Tableau des Performances (COVAPI / TIR / RDG)</div>
+            <div class="data-card">
+                <table id="tableEval">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Physique (COVAPI)</th>
+                            <th>Morale (RDG/RDH)</th>
+                            <th>Tir (ISTC)</th>
+                            <th>Topo/CBT</th>
+                            <th>Moyenne Gén.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyEval"></tbody>
+                </table>
+            </div>
+        </div>
 
-print("Analyse terminée. Fichier centralisé généré avec succès.")
+        <div id="page-sante" class="page">
+            <div class="section-title">Aptitude Médicale et Biométrie</div>
+            <div class="data-card">
+                <table id="tableSante">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Poids (kg)</th>
+                            <th>Taille (m)</th>
+                            <th>IMC</th>
+                            <th>Tension (TA)</th>
+                            <th>Glycémie</th>
+                            <th>Alerte IMC</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodySante"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // BASE DE DONNÉES INTÉGRÉE (Données extraites de vos fichiers XLSX)
+    const dbMilitaire = [
+        {
+            grade: 'CNE', nom: 'BALOGOG', prenom: 'PATRICK', mat: '-', dob: '1989-06-27', lieu: 'YAOUNDE',
+            spec: 'LOG', dipCiv: 'L3/SIGL', dipMil: 'SCU', matstat: 'CELIBATAIRE',
+            pos: 'STAGE', m1:'S', m2:'P', m3:'C', m4:'-',
+            eval: { covapi: 11.71, morale: 20.46, tir: 17, topo: 14, cbt: 13 },
+            medical: { poids: 85, taille: 1.75, ta: '0', gly: '0' }
+        },
+        {
+            grade: 'CNE', nom: 'EMAN', prenom: 'ARMAND BRICE', mat: '-', dob: '1991-06-07', lieu: 'EBOLOWA',
+            spec: 'RENS', dipCiv: 'BAC A4', dipMil: 'SCU', matstat: 'MARIE',
+            pos: 'PRESENT', m1:'P', m2:'P', m3:'P', m4:'PERM',
+            eval: { covapi: 16.20, morale: 20.60, tir: 18, topo: 15, cbt: 16 },
+            medical: { poids: 82, taille: 1.73, ta: '121/84', gly: '0.8' }
+        },
+        {
+            grade: 'LT', nom: 'DARBAWA', prenom: 'MADELEINE', mat: '-', dob: '1993-04-12', lieu: 'MAROUA',
+            spec: 'FUSAIR', dipCiv: 'BAC', dipMil: 'CAT1', matstat: 'CELIBATAIRE',
+            pos: 'PRESENT', m1:'ML', m2:'P', m3:'P', m4:'-',
+            eval: { covapi: 12.50, morale: 14.20, tir: 12, topo: 10, cbt: 11 },
+            medical: { poids: 74, taille: 1.65, ta: '113/93', gly: '0' }
+        },
+        {
+            grade: 'CAL', nom: 'EBOK', prenom: 'JEAN TOURAINE', mat: 'A15/26261', dob: '1995-09-08', lieu: 'BERTOUA',
+            spec: 'FUSAIR', dipCiv: 'BAC D', dipMil: 'CAT1', matstat: 'CELIBATAIRE',
+            pos: 'PRESENT', m1:'P', m2:'P', m3:'P', m4:'-',
+            eval: { covapi: 15.00, morale: 21.06, tir: 20, topo: 14, cbt: 15 },
+            medical: { poids: 68, taille: 1.75, ta: '0', gly: '0' }
+        }
+        // ... Ajoutez ici les autres membres de l'effectif (ABA, BELBARA, etc.)
+    ];
+
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.menu li').forEach(l => l.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function renderTables() {
+        const bodies = {
+            rh: document.getElementById('bodyRH'),
+            ops: document.getElementById('bodyOps'),
+            eval: document.getElementById('bodyEval'),
+            sante: document.getElementById('bodySante')
+        };
+
+        dbMilitaire.forEach(m => {
+            // Remplissage RH
+            bodies.rh.innerHTML += `<tr>
+                <td><b>${m.grade}</b></td>
+                <td>${m.nom} ${m.prenom}</td>
+                <td>${m.mat}</td>
+                <td>${m.dob}</td>
+                <td>${m.lieu}</td>
+                <td>${m.spec}</td>
+                <td>${m.dipCiv} / ${m.dipMil}</td>
+                <td>${m.matstat}</td>
+            </tr>`;
+
+            // Remplissage OPS
+            let pClass = m.pos === 'PRESENT' ? 'status-present' : (m.pos === 'MISSION' ? 'status-mission' : 'status-perm');
+            bodies.ops.innerHTML += `<tr>
+                <td>${m.nom}</td>
+                <td><span class="status ${pClass}">${m.pos}</span></td>
+                <td>${m.m1}</td><td>${m.m2}</td><td>${m.m3}</td><td>${m.m4}</td>
+                <td>${m.pos === 'MISSION' ? 'MINUSCA' : '-'}</td>
+            </tr>`;
+
+            // Remplissage EVAL
+            let moy = ((m.eval.covapi + m.eval.morale + m.eval.tir) / 3).toFixed(2);
+            bodies.eval.innerHTML += `<tr>
+                <td>${m.nom}</td>
+                <td>${m.eval.covapi}</td>
+                <td>${m.eval.morale}</td>
+                <td>${m.eval.tir}/20</td>
+                <td>${m.eval.topo}</td>
+                <td><strong style="color:var(--army-green)">${moy}</strong></td>
+            </tr>`;
+
+            // Remplissage SANTE
+            let imc = m.medical.taille > 0 ? (m.medical.poids / (m.medical.taille * m.medical.taille)).toFixed(1) : 'N/A';
+            let alerte = imc > 25 ? '<span class="imc-warning">SURPOIDS</span>' : 'RAS';
+            bodies.sante.innerHTML += `<tr>
+                <td>${m.nom}</td>
+                <td>${m.medical.poids}</td>
+                <td>${m.medical.taille}</td>
+                <td class="${imc > 25 ? 'imc-warning' : ''}">${imc}</td>
+                <td>${m.medical.ta}</td>
+                <td>${m.medical.gly}</td>
+                <td>${alerte}</td>
+            </tr>`;
+        });
+    }
+
+    function filterData() {
+        let input = document.getElementById('searchInput').value.toUpperCase();
+        let rows = document.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            let text = row.innerText.toUpperCase();
+            row.style.display = text.includes(input) ? "" : "none";
+        });
+    }
+
+    document.getElementById('date-now').innerText = new Date().toLocaleDateString('fr-FR');
+    window.onload = renderTables;
+</script>
+
+</body>
+</html>
