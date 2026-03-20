@@ -72,7 +72,7 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
 <div id="lock-screen">
   <div class="lock-box">
     <i class="fas fa-shield-alt fa-3x" style="color:var(--accent); margin-bottom:15px"></i>
-    <h2 id="lock-unit-title">BA 301 - GAROUA</h2>
+    <h2 id="lock-unit-title">UNITE</h2>
     <input type="text" id="login-id" placeholder="Identifiant">
     <input type="password" id="login-pass" placeholder="Mot de passe" onkeypress="if(event.key==='Enter') verifyLogin()">
     <button onclick="verifyLogin()" class="btn btn-primary" style="width:100%; justify-content:center;">S'IDENTIFIER</button>
@@ -123,9 +123,7 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
       <div class="table-container">
         <table>
           <thead>
-            <tr>
-              <th>Marque</th><th>Modèle</th><th>Châssis</th><th>Dotation</th><th>Plaque</th><th>KM ACTUEL</th><th>Statut</th><th>Actions</th>
-            </tr>
+            <tr><th>Marque</th><th>Modèle</th><th>Châssis</th><th>Dotation</th><th>Plaque</th><th>KM ACTUEL</th><th>Statut</th><th>Actions</th></tr>
           </thead>
           <tbody id="list-v"></tbody>
         </table>
@@ -204,6 +202,7 @@ function checkAuth() {
     initApp();
   }
 }
+
 function verifyLogin() {
   const u = document.getElementById('login-id').value.trim().toLowerCase();
   const p = document.getElementById('login-pass').value.trim();
@@ -214,13 +213,14 @@ function verifyLogin() {
 }
 function logout() { sessionStorage.removeItem('auth_ok'); location.reload(); }
 
+// CORRECTION BOUTON ENREGISTRER PARAMETRES
 function updateSettings() {
   config.unit = document.getElementById('set-unit').value || config.unit;
   if(document.getElementById('set-user').value) config.user = document.getElementById('set-user').value.trim();
   if(document.getElementById('set-pass').value) config.pass = document.getElementById('set-pass').value.trim();
   save('cfg', config);
-  alert("Changements enregistrés. L'application va redémarrer.");
-  logout();
+  alert("Changements enregistrés.");
+  location.reload(); 
 }
 
 function printWithTitle() {
@@ -296,12 +296,14 @@ function openModal(type, id = null) {
       <div class="form-group"><label>Position</label><select id="d-status"><option ${data?.status==='Disponible'?'selected':''}>Disponible</option><option ${data?.status==='Indisponible'?'selected':''}>Indisponible</option></select></div>
       <button class="btn btn-primary" style="width:100%" onclick="saveEntry('d', ${id})">ENREGISTRER</button>`;
   } else if(type === 'fuel') {
+    // CORRECTION LISTE PAR IMMATRICULATION
     box.innerHTML = `<h3>Carburant</h3>
       <div class="form-group"><label>Plaque Véhicule</label><select id="f-v">${vehicles.map(x=>`<option value="${x.plate}">${x.plate} (${x.brand})</option>`).join('')}</select></div>
       <div class="form-group"><label>Litres</label><input type="number" id="f-l"></div>
       <div class="form-group"><label>KM au moment du plein</label><input type="number" id="f-km"></div>
       <button class="btn btn-primary" style="width:100%" onclick="saveEntry('f')">ENREGISTRER</button>`;
   } else if(type === 'maint') {
+    // CORRECTION LISTE PAR IMMATRICULATION
     box.innerHTML = `<h3>Maintenance</h3>
       <div class="form-group"><label>Plaque Véhicule</label><select id="m-v">${vehicles.map(x=>`<option value="${x.plate}">${x.plate} (${x.brand})</option>`).join('')}</select></div>
       <div class="form-group"><label>Description</label><input type="text" id="m-desc"></div>
@@ -382,7 +384,7 @@ function exportToCSV() {
   let csv = "Marque;Modele;Chassis;Dotation;Plaque;KM\n";
   v.forEach(i => csv += `${i.brand};${i.model||''};${i.chassis};${i.year};${i.plate};${i.km}\n`);
   const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Rapport_BA301.csv'; a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Rapport_TrustFleet.csv'; a.click();
 }
 
 window.onclick = (e) => { if(e.target == document.getElementById('modal-overlay')) document.getElementById('modal-overlay').style.display = 'none'; }
