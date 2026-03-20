@@ -21,9 +21,11 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg
 @media print {
   .sidebar, .top-bar, .btn, .action-btns, #modal-overlay, #page-settings, #lock-screen { display: none !important; }
   .main-content { margin-left: 0 !important; width: 100% !important; }
-  .page { display: block !important; opacity: 1 !important; padding: 0 !important; }
+  .page { display: block !important; opacity: 1 !important; padding: 20px !important; border:none !important; }
   .table-container { box-shadow: none !important; border: 1px solid #eee !important; page-break-inside: avoid; }
+  #pdf-header { display: block !important; text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
 }
+#pdf-header { display: none; }
 
 .sidebar{width:var(--sidebar-width);background:var(--primary);color:#fff;display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100;}
 .sidebar-header{padding:25px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1);}
@@ -90,11 +92,16 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
 </div>
 
 <div class="main-content" id="app-main" style="display:none">
+  <div id="pdf-header">
+    <h1 id="pdf-unit-name">UNITÉ</h1>
+    <p>Rapport de Gestion de Flotte - TrustFleet Pro</p>
+  </div>
+
   <div class="top-bar">
     <h3 id="current-page-title">Tableau de Bord</h3>
     <div style="display:flex; gap:10px;">
        <button class="btn btn-success" onclick="exportToCSV()"><i class="fas fa-file-excel"></i> EXPORT CSV</button>
-       <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
+       <button class="btn btn-primary" onclick="printWithTitle()"><i class="fas fa-print"></i> PDF</button>
        <button class="btn" style="background:#eee" onclick="logout()"><i class="fas fa-power-off"></i></button>
     </div>
   </div>
@@ -218,6 +225,12 @@ function updateSettings() {
   logout();
 }
 
+function printWithTitle() {
+    // Mise à jour du titre PDF avant impression
+    document.getElementById('pdf-unit-name').textContent = config.unit;
+    window.print();
+}
+
 // --- ACTIONS PRINCIPALES ---
 function initApp() {
   renderAll();
@@ -244,7 +257,7 @@ function renderAll() {
   const d = load('d');
   document.getElementById('list-d').innerHTML = d.map(i => `
     <tr><td>${i.name}</td><td>${i.grade}</td><td>${i.mat}</td><td>${i.lic}</td>
-    <td><span class="badge ${ (i.status==='Disponible' || i.status==='Actif') ?'bg-actif':'bg-indispo'}">${i.status || 'Disponible'}</span></td>
+    <td><span class="badge ${(i.status==='Disponible' || i.status==='Actif') ?'bg-actif':'bg-indispo'}">${i.status || 'Disponible'}</span></td>
     <td class="action-btns">
       <button class="btn" style="color:var(--info)" onclick="openModal('driver', ${i.id})"><i class="fas fa-edit"></i></button>
       <button class="btn" style="color:var(--danger)" onclick="deleteItem('d', ${i.id})"><i class="fas fa-trash"></i></button>
