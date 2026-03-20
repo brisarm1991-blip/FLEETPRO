@@ -17,7 +17,7 @@
         body { font-family: 'Inter', sans-serif; margin: 0; display: flex; background-color: var(--bg); color: var(--text-main); }
 
         /* SIDEBAR */
-        .sidebar { width: 240px; background: var(--primary); color: white; height: 100vh; position: fixed; display: flex; flex-direction: column; z-index: 100; transition: 0.3s; }
+        .sidebar { width: 240px; background: var(--primary); color: white; height: 100vh; position: fixed; display: flex; flex-direction: column; z-index: 100; }
         .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .sidebar-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent); }
         .nav-item { padding: 12px 24px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: #94a3b8; font-size: 0.85rem; }
@@ -28,12 +28,12 @@
         .main { margin-left: 240px; flex: 1; display: none; min-height: 100vh; }
         .header { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
         .content { padding: 25px; }
-        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page { display: none; }
         .page.active { display: block; }
 
         /* CARDS & TABLES */
         .card-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
-        .stat { background: white; padding: 20px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .stat { background: white; padding: 20px; border-radius: 8px; border: 1px solid var(--border); }
         .stat-val { font-size: 1.5rem; font-weight: 600; display: block; margin-top: 5px; }
 
         .table-res { background: white; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
@@ -53,9 +53,7 @@
         #lock-screen { position: fixed; inset: 0; background: var(--primary); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; }
         .img-prev { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; background: #eee; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* CONFIGURATION IMPRESSION PDF : MASQUER SIDEBAR */
+        /* IMPRESSION PDF SANS SIDEBAR */
         @media print {
             .sidebar, .btn, .header button, .nav-item, .sidebar-header { display: none !important; }
             .main { margin-left: 0 !important; width: 100% !important; }
@@ -70,13 +68,13 @@
 <body onload="checkInit()">
 
 <div id="lock-screen">
-    <h2 style="font-weight: 300; letter-spacing: 2px;">TRUSTFLEET <span style="color:var(--accent); font-weight: 600;">PRO</span></h2>
-    <input type="password" id="pass" placeholder="Code d'accès" style="padding:12px; border-radius:6px; border:none; margin: 20px 0; text-align: center; width: 220px;">
-    <button class="btn btn-add" style="padding: 10px 40px;" onclick="login()">CONNEXION</button>
+    <h2>TRUSTFLEET <span style="color:var(--accent)">PRO</span></h2>
+    <input type="password" id="pass" placeholder="Code d'accès" style="padding:12px; border-radius:6px; border:none; margin: 20px 0; text-align: center;">
+    <button class="btn btn-add" onclick="login()">CONNEXION</button>
 </div>
 
 <div class="sidebar">
-    <div class="sidebar-header"><h3 id="side-title">UNITÉ AUTO</h3></div>
+    <div class="sidebar-header"><h3 id="side-title">BA 301</h3></div>
     <div class="nav-item active" onclick="showPage('dashboard')"><i class="fas fa-th-large"></i> ACCUEIL</div>
     <div class="nav-item" onclick="showPage('vehicles')"><i class="fas fa-car-side"></i> VÉHICULES</div>
     <div class="nav-item" onclick="showPage('fuel')"><i class="fas fa-gas-pump"></i> CARBURANT</div>
@@ -97,12 +95,12 @@
     <div class="content">
         <div id="page-dashboard" class="page active">
             <div class="card-stats">
-                <div class="stat"><span style="font-size:0.7rem; color:var(--text-muted)">VÉHICULES</span><span class="stat-val" id="s-v">0</span></div>
-                <div class="stat"><span style="font-size:0.7rem; color:var(--text-muted)">EN PANNE</span><span class="stat-val" id="s-p" style="color:#ef4444">0</span></div>
-                <div class="stat"><span style="font-size:0.7rem; color:var(--text-muted)">CONSO TOTAL (L)</span><span class="stat-val" id="s-f">0</span></div>
-                <div class="stat"><span style="font-size:0.7rem; color:var(--text-muted)">EFFECTIF</span><span class="stat-val" id="s-d">0</span></div>
+                <div class="stat"><span>VÉHICULES</span><span class="stat-val" id="s-v">0</span></div>
+                <div class="stat"><span>EN PANNE</span><span class="stat-val" id="s-p" style="color:red">0</span></div>
+                <div class="stat"><span>CONSO (L)</span><span class="stat-val" id="s-f">0</span></div>
+                <div class="stat"><span>EFFECTIF</span><span class="stat-val" id="s-d">0</span></div>
             </div>
-            <div style="background:white; padding:20px; border-radius:8px; border:1px solid var(--border);"><canvas id="chartV" height="100"></canvas></div>
+            <canvas id="chartV" height="100"></canvas>
         </div>
 
         <div id="page-vehicles" class="page">
@@ -111,70 +109,52 @@
         </div>
 
         <div id="page-fuel" class="page">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><h3>CONSOMMATION CARBURANT</h3><button class="btn btn-add" onclick="openM('m-f')">+ PLEIN</button></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><h3>CONSOMMATION</h3><button class="btn btn-add" onclick="openM('m-f')">+ PLEIN</button></div>
             <div class="table-res"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Litres</th><th>KM Compteur</th><th>Actions</th></tr></thead><tbody id="t-f"></tbody></table></div>
         </div>
 
         <div id="page-maint" class="page">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><h3>HISTORIQUE ENTRETIEN</h3><button class="btn btn-add" onclick="openM('m-m')">+ TRAVAUX</button></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><h3>ENTRETIEN</h3><button class="btn btn-add" onclick="openM('m-m')">+ TRAVAUX</button></div>
             <div class="table-res"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Nature</th><th>Prochain KM</th><th>Actions</th></tr></thead><tbody id="t-m"></tbody></table></div>
         </div>
 
         <div id="page-drivers" class="page">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><h3>EFFECTIF CHAUFFEURS</h3><button class="btn btn-add" onclick="openM('m-d')">+ NOUVEAU</button></div>
-            <div class="table-res"><table><thead><tr><th>Photo</th><th>Nom & Grade</th><th>Matricule</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="t-d"></tbody></table></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><h3>CHAUFFEURS</h3><button class="btn btn-add" onclick="openM('m-d')">+ NOUVEAU</button></div>
+            <div class="table-res"><table><thead><tr><th>Photo</th><th>Nom</th><th>Matricule</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="t-d"></tbody></table></div>
         </div>
 
         <div id="page-settings" class="page">
-            <h3>CONFIGURATION SYSTÈME</h3>
-            <div style="background:white; padding:25px; border-radius:8px; border:1px solid var(--border); max-width:450px;">
-                <label style="font-size:0.8rem; font-weight:600;">NOM DE L'UNITÉ</label>
-                <input type="text" id="set-unit-name">
-                <label style="font-size:0.8rem; font-weight:600;">MODIFIER CODE D'ACCÈS</label>
-                <input type="password" id="set-pass" placeholder="Nouveau code">
-                <button class="btn btn-add" onclick="saveSettings()" style="width:100%; justify-content:center; margin-top:10px;">ENREGISTRER</button>
-                <hr style="margin:20px 0; border:0; border-top:1px solid var(--border);">
-                <button class="btn btn-sec" onclick="exportData()" style="width:100%; justify-content:center;">EXPORTER TOUTES LES DONNÉES (.JSON)</button>
+            <h3>PARAMÈTRES</h3>
+            <div style="background:white; padding:25px; border-radius:8px; border:1px solid var(--border); max-width:400px;">
+                <label>NOM DE L'UNITÉ</label><input type="text" id="set-unit-name">
+                <label>NOUVEAU CODE D'ACCÈS</label><input type="password" id="set-pass">
+                <button class="btn btn-add" onclick="saveSettings()" style="width:100%; justify-content:center;">ENREGISTRER</button>
             </div>
         </div>
     </div>
 </div>
 
-<div id="m-v" class="modal-overlay"><div class="modal"><h3>Fiche Véhicule</h3>
-    <input type="text" id="v1" placeholder="Modèle">
-    <input type="text" id="v2" placeholder="Plaque d'immatr.">
-    <input type="number" id="v3" placeholder="Kilométrage actuel">
+<div id="m-v" class="modal-overlay"><div class="modal"><h3>Véhicule</h3>
+    <input type="text" id="v1" placeholder="Modèle"><input type="text" id="v2" placeholder="Plaque"><input type="number" id="v3" placeholder="KM actuel">
     <select id="v4"><option>En service</option><option>En panne</option></select>
     <input type="file" onchange="encodeImg(this,'v_img')"><input type="hidden" id="v_img">
-    <button class="btn btn-add" onclick="handleSave('v')">VALIDER</button>
-    <button class="btn" onclick="closeM('m-v')">ANNULER</button>
+    <button class="btn btn-add" onclick="handleSave('v')">VALIDER</button><button onclick="closeM('m-v')">ANNULER</button>
 </div></div>
 
-<div id="m-f" class="modal-overlay"><div class="modal"><h3>Plein Carburant</h3>
-    <input type="date" id="f1">
-    <select id="f2"></select>
-    <input type="number" id="f3" placeholder="Litres">
-    <input type="number" id="f4" placeholder="KM Compteur">
-    <button class="btn btn-add" onclick="handleSave('f')">ENREGISTRER</button>
-    <button class="btn" onclick="closeM('m-f')">ANNULER</button>
+<div id="m-f" class="modal-overlay"><div class="modal"><h3>Carburant</h3>
+    <input type="date" id="f1"><select id="f2"></select><input type="number" id="f3" placeholder="Litres"><input type="number" id="f4" placeholder="KM">
+    <button class="btn btn-add" onclick="handleSave('f')">VALIDER</button><button onclick="closeM('m-f')">ANNULER</button>
 </div></div>
 
-<div id="m-m" class="modal-overlay"><div class="modal"><h3>Maintenance</h3>
-    <input type="date" id="m1">
-    <select id="m2"></select>
-    <input type="text" id="m3" placeholder="Nature des travaux">
-    <input type="number" id="m4" placeholder="Prochain KM">
-    <button class="btn btn-add" onclick="handleSave('m')">ENREGISTRER</button>
-    <button class="btn" onclick="closeM('m-m')">ANNULER</button>
+<div id="m-m" class="modal-overlay"><div class="modal"><h3>Entretien</h3>
+    <input type="date" id="m1"><select id="m2"></select><input type="text" id="m3" placeholder="Nature"><input type="number" id="m4" placeholder="Prochain KM">
+    <button class="btn btn-add" onclick="handleSave('m')">VALIDER</button><button onclick="closeM('m-m')">ANNULER</button>
 </div></div>
 
-<div id="m-d" class="modal-overlay"><div class="modal"><h3>Nouveau Chauffeur</h3>
-    <input type="text" id="d1" placeholder="Grade & Nom">
-    <input type="text" id="d2" placeholder="Matricule">
-    <select id="d3"><option>Disponible</option><option>Mission</option><option>Repos</option></select>
+<div id="m-d" class="modal-overlay"><div class="modal"><h3>Chauffeur</h3>
+    <input type="text" id="d1" placeholder="Nom"><input type="text" id="d2" placeholder="Matricule"><select id="d3"><option>Disponible</option><option>Mission</option></select>
     <input type="file" onchange="encodeImg(this,'d_img')"><input type="hidden" id="d_img">
-    <button class="btn btn-add" onclick="handleSave('d')">SAUVEGARDER</button>
-    <button class="btn" onclick="closeM('m-d')">ANNULER</button>
+    <button class="btn btn-add" onclick="handleSave('d')">VALIDER</button><button onclick="closeM('m-d')">ANNULER</button>
 </div></div>
 
 <script>
@@ -197,71 +177,63 @@ function login() {
         document.getElementById('lock-screen').style.display='none';
         document.getElementById('app').style.display='block';
         refresh();
-    } else alert('Code incorrect');
-}
-
-function saveSettings() {
-    config.unit = document.getElementById('set-unit-name').value;
-    const newPass = document.getElementById('set-pass').value;
-    if(newPass) config.pass = newPass;
-    localStorage.setItem('trust_config', JSON.stringify(config));
-    alert('Paramètres mis à jour');
-    location.reload();
+    } else alert('Erreur code');
 }
 
 function handleSave(type) {
     let item = { id: Date.now() };
     if(type==='v'){
         item = {...item, name:document.getElementById('v1').value, plate:document.getElementById('v2').value, km:document.getElementById('v3').value, state:document.getElementById('v4').value, img:document.getElementById('v_img').value};
-        if(!item.plate) return alert('Plaque obligatoire');
-        db.v.push(item); localStorage.setItem('v_301', JSON.stringify(db.v)); closeM('m-v');
-    }
-    else if(type==='f'){
+        db.v.push(item); localStorage.setItem('v_301', JSON.stringify(db.v));
+    } else if(type==='f'){
         item = {...item, date:document.getElementById('f1').value, car:document.getElementById('f2').value, lit:document.getElementById('f3').value, km:document.getElementById('f4').value};
-        db.f.push(item); localStorage.setItem('f_301', JSON.stringify(db.f)); closeM('m-f');
-    }
-    else if(type==='m'){
+        db.f.push(item); localStorage.setItem('f_301', JSON.stringify(db.f));
+    } else if(type==='m'){
         item = {...item, date:document.getElementById('m1').value, car:document.getElementById('m2').value, work:document.getElementById('m3').value, next:document.getElementById('m4').value};
-        db.m.push(item); localStorage.setItem('m_301', JSON.stringify(db.m)); closeM('m-m');
-    }
-    else if(type==='d'){
+        db.m.push(item); localStorage.setItem('m_301', JSON.stringify(db.m));
+    } else if(type==='d'){
         item = {...item, name:document.getElementById('d1').value, mat:document.getElementById('d2').value, state:document.getElementById('d3').value, img:document.getElementById('d_img').value};
-        db.d.push(item); localStorage.setItem('d_301', JSON.stringify(db.d)); closeM('m-d');
+        db.d.push(item); localStorage.setItem('d_301', JSON.stringify(db.d));
     }
-    refresh(); alert('Donnée enregistrée avec succès');
+    closeM('m-'+type); refresh();
 }
 
 function refresh() {
-    document.getElementById('s-v').textContent = db.v.length;
-    document.getElementById('s-p').textContent = db.v.filter(x=>x.state==='En panne').length;
-    document.getElementById('s-d').textContent = db.d.length;
-    document.getElementById('s-f').textContent = db.f.reduce((a,b)=>a+parseFloat(b.lit||0),0).toFixed(1);
+    document.getElementById('s-v').innerText = db.v.length;
+    document.getElementById('s-p').innerText = db.v.filter(x=>x.state==='En panne').length;
+    document.getElementById('s-f').innerText = db.f.reduce((a,b)=>a+Number(b.lit||0),0);
+    document.getElementById('s-d').innerText = db.d.length;
 
-    const vOpt = db.v.map(x=>`<option value="${x.plate}">${x.plate}</option>`).join('');
-    document.getElementById('f2').innerHTML = vOpt; document.getElementById('m2').innerHTML = vOpt;
+    const opt = db.v.map(x=>`<option value="${x.plate}">${x.plate}</option>`).join('');
+    document.getElementById('f2').innerHTML = opt; document.getElementById('m2').innerHTML = opt;
 
-    const noImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E";
+    const img = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ccc'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E";
     
-    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td><img src="${x.img||noImg}" class="img-prev"></td><td>${x.name}</td><td><b>${x.plate}</b></td><td style="color:var(--accent);font-weight:600">${parseInt(x.km||0).toLocaleString()} KM</td><td>${x.state}</td><td><i class="fas fa-trash" style="color:#cbd5e1;cursor:pointer" onclick="del('v',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td><img src="${x.img||img}" class="img-prev"></td><td>${x.name}</td><td>${x.plate}</td><td style="color:blue;font-weight:600">${x.km} KM</td><td>${x.state}</td><td><i class="fas fa-trash" onclick="del('v',${x.id})"></i></td></tr>`).join('');
     document.getElementById('t-f').innerHTML = db.f.map(x=>`<tr><td>${x.date}</td><td>${x.car}</td><td>${x.lit} L</td><td>${x.km}</td><td><i class="fas fa-trash" onclick="del('f',${x.id})"></i></td></tr>`).join('');
     document.getElementById('t-m').innerHTML = db.m.map(x=>`<tr><td>${x.date}</td><td>${x.car}</td><td>${x.work}</td><td>${x.next}</td><td><i class="fas fa-trash" onclick="del('m',${x.id})"></i></td></tr>`).join('');
-    document.getElementById('t-d').innerHTML = db.d.map(x=>`<tr><td><img src="${x.img||noImg}" class="img-prev" style="border-radius:50%"></td><td>${x.name}</td><td>${x.mat}</td><td>${x.state}</td><td><i class="fas fa-trash" onclick="del('d',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('t-d').innerHTML = db.d.map(x=>`<tr><td><img src="${x.img||img}" class="img-prev"></td><td>${x.name}</td><td>${x.mat}</td><td>${x.state}</td><td><i class="fas fa-trash" onclick="del('d',${x.id})"></i></td></tr>`).join('');
 
     const ctx = document.getElementById('chartV').getContext('2d');
     if(chart) chart.destroy();
-    chart = new Chart(ctx, { type:'bar', data:{labels:['OPÉRATIONNELS','PANNE'], datasets:[{label:'Véhicules', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#3b82f6','#ef4444']}]}, options:{animation:false}});
+    chart = new Chart(ctx, { type:'bar', data:{labels:['OK','PANNE'], datasets:[{label:'Parc', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#3b82f6','#ef4444']}]}, options:{animation:false}});
+}
+
+function saveSettings() {
+    config.unit = document.getElementById('set-unit-name').value;
+    if(document.getElementById('set-pass').value) config.pass = document.getElementById('set-pass').value;
+    localStorage.setItem('trust_config', JSON.stringify(config));
+    location.reload();
 }
 
 function showPage(pId) {
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
     document.getElementById('page-'+pId).classList.add('active');
-    document.querySelector(`.nav-item[onclick*="${pId}"]`).classList.add('active');
     document.getElementById('title-header').innerText = pId.toUpperCase();
 }
-function exportData(){const s="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(db));const a=document.createElement('a');a.setAttribute("href",s);a.setAttribute("download","donnees_BA301.json");a.click();}
-function encodeImg(input,hid){const r=new FileReader();r.onload=(e)=>document.getElementById(hid).value=e.target.result;if(input.files[0])r.readAsDataURL(input.files[0]);}
-function del(k,id){if(confirm('Supprimer ?')){db[k]=db[k].filter(x=>x.id!==id); localStorage.setItem(k+'_301',JSON.stringify(db[k])); refresh();}}
+function exportData(){const s="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(db));const a=document.createElement('a');a.setAttribute("href",s);a.setAttribute("download","data.json");a.click();}
+function encodeImg(i,h){const r=new FileReader();r.onload=(e)=>document.getElementById(h).value=e.target.result;if(i.files[0])r.readAsDataURL(i.files[0]);}
+function del(k,id){if(confirm('Supprimer?')){db[k]=db[k].filter(x=>x.id!==id);localStorage.setItem(k+'_301',JSON.stringify(db[k]));refresh();}}
 function openM(id){document.getElementById(id).style.display='flex';}
 function closeM(id){document.getElementById(id).style.display='none';}
 </script>
