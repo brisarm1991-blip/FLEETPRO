@@ -2,241 +2,266 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>AGC v3.0 - Système Intégré CI BA 301</title>
+    <title>AGC v4.0 - Gestion Intégrée CI BA 301</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --army: #2d3e2d; --gold: #c5a059; --danger: #e74c3c; --bg: #f8f9fa; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; height: 100vh; }
+        :root { --army: #2d3e2d; --gold: #c5a059; --light: #f4f4f4; --dark: #1a1a1a; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--light); display: flex; height: 100vh; overflow: hidden; }
         
-        /* LOGIN SYSTEM */
-        #auth-screen { position: fixed; inset: 0; background: var(--army); z-index: 1000; display: flex; align-items: center; justify-content: center; color: white; }
-        .auth-card { background: #1a1a1a; padding: 40px; border-radius: 12px; border: 1px solid var(--gold); width: 350px; text-align: center; }
+        /* LOGIN STYLES */
+        #auth-screen { position: fixed; inset: 0; background: var(--army); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .auth-box { background: var(--dark); padding: 40px; border-radius: 15px; border: 1px solid var(--gold); width: 350px; text-align: center; color: white; }
         
-        /* LAYOUT */
-        .sidebar { width: 260px; background: var(--army); color: white; display: flex; flex-direction: column; }
-        .main { flex: 1; padding: 25px; overflow-y: auto; }
-        .nav-link { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .nav-link:hover, .active-nav { background: var(--gold); color: var(--army); font-weight: bold; }
+        /* SIDEBAR */
+        .sidebar { width: 280px; background: var(--army); color: white; display: flex; flex-direction: column; box-shadow: 2px 0 10px rgba(0,0,0,0.2); }
+        .nav-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { background: var(--gold); color: var(--army); font-weight: bold; }
         
-        /* COMPONENTS */
-        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .grid-admin { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
-        th, td { padding: 12px; border: 1px solid #eee; text-align: left; font-size: 0.9rem; }
-        th { background: #f4f4f4; }
+        /* MAIN CONTENT */
+        .content { flex: 1; padding: 25px; overflow-y: auto; }
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.5s; }
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
         
-        .admin-controls { background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin-bottom: 20px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-save { background: var(--army); color: white; }
-        .btn-view { background: var(--gold); color: white; }
+        /* GRID & TABLES */
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f8f8f8; color: var(--army); }
+        
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 5px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-army { background: var(--army); color: white; }
         
         .hidden { display: none; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div id="auth-screen">
-    <div class="auth-card">
-        <h2 style="color:var(--gold)">CONNEXION AGC</h2>
-        <input type="text" id="loginUser" placeholder="Matricule ou 'admin'" style="width:100%; padding:10px; margin-bottom:10px">
-        <input type="password" id="loginPass" placeholder="Code secret" style="width:100%; padding:10px; margin-bottom:20px">
-        <button class="btn btn-save" style="width:100%" onclick="handleLogin()">SE CONNECTER</button>
+    <div class="auth-box">
+        <h2 style="color:var(--gold)">CI BA 301 - AGC</h2>
+        <p>Entrez votre Matricule ou 'admin'</p>
+        <input type="text" id="loginId" placeholder="Identifiant">
+        <input type="password" id="loginPw" placeholder="Code secret" style="margin-top:10px">
+        <button class="btn btn-army" style="width:100%; margin-top:20px;" onclick="authenticate()">SE CONNECTER</button>
     </div>
 </div>
 
 <div class="sidebar">
-    <div style="padding:25px; border-bottom: 2px solid var(--gold)">
-        <div style="font-size:1.2rem; font-weight:bold">CI BA 301</div>
-        <div id="userDisplay" style="font-size:0.8rem; color:var(--gold)">-</div>
+    <div style="padding:30px; border-bottom:1px solid var(--gold); text-align:center">
+        <h3 style="margin:0">UNITÉ CI BA 301</h3>
+        <small id="userRoleLabel">Accès sécurisé</small>
     </div>
-    <div class="nav-link active-nav" onclick="showSec('sec-dash')">🏠 TABLEAU DE BORD</div>
-    <div class="nav-link admin-only" onclick="showSec('sec-admin')">⚙️ PARAMÈTRES ADMIN</div>
-    <div class="nav-link" onclick="logout()" style="margin-top:auto; background:rgba(0,0,0,0.2)">🚪 DÉCONNEXION</div>
+    <div class="nav-item active" onclick="switchSec('sec-perso')">👤 INFOS PERSONNELLES</div>
+    <div class="nav-item" onclick="switchSec('sec-med')">🏥 INFOS MÉDICALES</div>
+    <div class="nav-item" onclick="switchSec('sec-eval')">🎯 ÉVALUATION & TIR</div>
+    <div class="nav-item admin-only hidden" onclick="switchSec('sec-param')">⚙️ PARAMÈTRES (ADMIN)</div>
+    <div class="nav-item" onclick="location.reload()" style="margin-top:auto; background:rgba(0,0,0,0.2)">🚪 DÉCONNEXION</div>
 </div>
 
-<div class="main">
-    
-    <div id="sec-dash" class="section">
-        <div id="admin-selector" class="admin-only card hidden">
-            <h3>Sélectionner un Militaire pour voir sa fiche :</h3>
-            <select id="selectMilitaire" onchange="loadIndividualSheet(this.value)" style="padding:10px; width:300px"></select>
-        </div>
+<div class="content">
+    <div id="admin-selector" class="card admin-only hidden">
+        <label>Sélectionner un militaire :</label>
+        <select id="personnelSelect" onchange="loadData(this.value)"></select>
+    </div>
 
-        <div id="fiche-individuelle" class="card">
-            <div style="display:flex; gap:30px">
-                <div style="flex:1">
-                    <h2 id="f-nom" style="color:var(--army)">-</h2>
-                    <p><strong>Grade :</strong> <span id="f-grade">-</span> | <strong>Matricule :</strong> <span id="f-mat">-</span></p>
-                    <hr>
-                    <div class="grid-admin">
-                        <div><label>Position :</label> <div id="f-pos">-</div></div>
-                        <div><label>IMC :</label> <div id="f-imc">-</div></div>
-                        <div><label>Tension :</label> <div id="f-ta">-</div></div>
-                    </div>
-                </div>
-                <div style="width:350px; height:350px;">
-                    <canvas id="radarChart"></canvas>
-                </div>
+    <div id="sec-perso" class="section active">
+        <div class="card">
+            <h2 style="border-bottom:2px solid var(--gold); padding-bottom:10px">Fiche d'Identification</h2>
+            <div class="grid-3">
+                <div><label>Nom</label><div id="d-nom" class="val">-</div></div>
+                <div><label>Prénom</label><div id="d-prenom" class="val">-</div></div>
+                <div><label>Grade</label><div id="d-grade" class="val">-</div></div>
+                <div><label>Matricule</label><div id="d-mat" class="val">-</div></div>
+                <div><label>Date Naissance</label><div id="d-dn" class="val">-</div></div>
+                <div><label>Lieu Naissance</label><div id="d-ln" class="val">-</div></div>
+                <div><label>Spécialité</label><div id="d-spec" class="val">-</div></div>
+                <div><label>Diplôme Militaire</label><div id="d-dipm" class="val">-</div></div>
+                <div><label>Position</label><div id="d-pos" class="val">-</div></div>
             </div>
         </div>
     </div>
 
-    <div id="sec-admin" class="section hidden">
+    <div id="sec-med" class="section">
         <div class="card">
-            <h3>Insertion / Modification des Données</h3>
-            <div class="grid-admin">
-                <input type="text" id="inNom" placeholder="NOM">
-                <input type="text" id="inPrenom" placeholder="Prénom">
-                <input type="text" id="inGrade" placeholder="Grade">
-                <input type="text" id="inMat" placeholder="Matricule">
-                <input type="number" id="inTir" placeholder="Note Tir /20">
-                <input type="number" id="inSport" placeholder="Note Sport /20">
-                <input type="number" id="inTopo" placeholder="Note Topo /20">
-                <input type="number" id="inCombat" placeholder="Note Combat /20">
-                <input type="number" id="inRdg" placeholder="Note RDG /20">
+            <h2>Données Biométriques</h2>
+            <div class="grid-3">
+                <div><label>Poids (Kg)</label><div id="m-poids">-</div></div>
+                <div><label>Taille (m)</label><div id="m-taille">-</div></div>
+                <div><label>IMC</label><div id="m-imc" style="font-weight:bold">-</div></div>
+                <div><label>Tension (TA)</label><div id="m-ta">-</div></div>
+                <div><label>Glycémie</label><div id="m-gly">-</div></div>
+                <div><label>Pouls</label><div id="m-pouls">-</div></div>
             </div>
-            <button class="btn btn-save" style="margin-top:15px" onclick="saveNewData()">ENREGISTRER LES DONNÉES</button>
-        </div>
-
-        <div class="card">
-            <h3>Liste Globale du Personnel</h3>
-            <table id="tableMain">
-                <thead>
-                    <tr><th>Nom</th><th>Matricule</th><th>Position</th><th>Moyenne</th><th>Actions</th></tr>
-                </thead>
-                <tbody id="tbodyMain"></tbody>
-            </table>
         </div>
     </div>
 
+    <div id="sec-eval" class="section">
+        <div style="display:flex; gap:20px">
+            <div class="card" style="flex:1">
+                <h2>Performances & Notes</h2>
+                <table>
+                    <tr><th>Domaine</th><th>Matière</th><th>Note /20</th></tr>
+                    <tr><td>Physique</td><td>COVAPI / MARCO</td><td id="e-phys">-</td></tr>
+                    <tr><td>Intellectuel</td><td>TOPO / RDG / DIH</td><td id="e-intel">-</td></tr>
+                    <tr><td>Tireur</td><td>ISTC / TIR DYNAMIQUE</td><td id="e-tir">-</td></tr>
+                    <tr style="background:var(--gold); color:var(--army)"><td><b>TOTAL</b></td><td><b>MOYENNE GÉNÉRALE</b></td><td id="e-moy"><b>-</b></td></tr>
+                </table>
+            </div>
+            <div class="card" style="width:400px">
+                <h3>Analyse Forces/Faiblesses</h3>
+                <canvas id="radarChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="sec-param" class="section">
+        <div class="card">
+            <h2>Panneau d'administration</h2>
+            <p>Ajouter ou modifier un personnel avec toutes les informations des sections ci-dessus.</p>
+            <div class="grid-3">
+                <input type="text" id="i-nom" placeholder="NOM">
+                <input type="text" id="i-mat" placeholder="MATRICULE">
+                <input type="text" id="i-grade" placeholder="GRADE">
+                <input type="number" id="i-tir" placeholder="Note TIR">
+                <input type="number" id="i-phys" placeholder="Note SPORT">
+                <input type="number" id="i-poids" placeholder="POIDS">
+                <input type="number" id="i-taille" placeholder="TAILLE (ex: 1.75)">
+            </div>
+            <button class="btn btn-army" onclick="saveData()">ENREGISTRER DANS LA BASE</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    // BASE DE DONNEES INITIALE
-    let db = [
-        { id: "A15/26261", nom: "EBOK", prenom: "JEAN", grade: "CAL", mat: "A15/26261", pos: "PRESENT", tir: 18, sport: 14, topo: 12, combat: 15, rdg: 16, poids: 75, taille: 1.75, ta: "12/8" },
-        { id: "CNE001", nom: "EMAN", prenom: "ARMAND BRICE", grade: "CNE", mat: "CNE001", pos: "PRESENT", tir: 19, sport: 17, topo: 15, combat: 18, rdg: 19, poids: 82, taille: 1.73, ta: "12/8" }
+    // BASE DE DONNEES (Reportée depuis vos fichiers Excel)
+    let baseDonnees = [
+        { mat: "CNE001", nom: "EMAN", prenom: "ARMAND BRICE", grade: "CNE", dn: "1991-06-07", ln: "EBOLOWA", spec: "RENS", dipm: "SCU", pos: "PRESENT", poids: 82, taille: 1.73, ta: "121/84", gly: 0.8, pouls: 75, nPhys: 16.2, nIntel: 15.5, nTir: 18, nRdg: 17 },
+        { mat: "A15/26261", nom: "EBOK", prenom: "JEAN TOURAINE", grade: "CAL", dn: "1995-09-08", ln: "BERTOUA", spec: "FUSAIR", dipm: "CAT1", pos: "PRESENT", poids: 75, taille: 1.78, ta: "120/80", gly: 0.7, pouls: 68, nPhys: 14.5, nIntel: 13, nTir: 19, nRdg: 15 }
     ];
 
-    let currentUser = null;
-    let radarChart = null;
+    let sessionUser = null;
+    let chartObj = null;
 
-    function handleLogin() {
-        const user = document.getElementById('loginUser').value;
-        const pass = document.getElementById('loginPass').value;
+    function authenticate() {
+        const id = document.getElementById('loginId').value;
+        const pw = document.getElementById('loginPw').value;
 
-        if (user === 'admin' && pass === '301') {
-            currentUser = { role: 'admin', nom: 'ADMINISTRATEUR' };
+        if(id === 'admin' && pw === '301') {
+            sessionUser = { role: 'admin', nom: 'ADMINISTRATEUR' };
+            document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
         } else {
-            const found = db.find(u => u.mat === user);
-            if (found && pass === '1234') {
-                currentUser = { role: 'visitor', ...found };
+            const user = baseDonnees.find(u => u.mat === id);
+            if(user && pw === '1234') {
+                sessionUser = { role: 'visitor', ...user };
             } else {
-                alert("Identifiants incorrects (Visiteur: Matricule / 1234)");
+                alert("Échec de connexion (Admin: admin/301 | Visiteur: Matricule/1234)");
                 return;
             }
         }
-        
         document.getElementById('auth-screen').style.display = 'none';
         initApp();
     }
 
     function initApp() {
-        document.getElementById('userDisplay').innerText = currentUser.nom;
+        document.getElementById('userRoleLabel').innerText = "Session : " + sessionUser.nom;
         
-        if (currentUser.role === 'admin') {
-            document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
-            populateSelect();
-            refreshTable();
-            loadIndividualSheet(db[0].mat); // Par défaut sur le premier
+        // Remplir le sélecteur admin
+        const sel = document.getElementById('personnelSelect');
+        sel.innerHTML = baseDonnees.map(p => `<option value="${p.mat}">${p.nom} ${p.prenom}</option>`).join('');
+
+        if(sessionUser.role === 'admin') {
+            loadData(baseDonnees[0].mat);
         } else {
-            document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
-            loadIndividualSheet(currentUser.mat);
+            loadData(sessionUser.mat);
         }
     }
 
-    function populateSelect() {
-        const sel = document.getElementById('selectMilitaire');
-        sel.innerHTML = db.map(p => `<option value="${p.mat}">${p.nom} ${p.prenom}</option>`).join('');
-    }
+    function loadData(mat) {
+        const p = baseDonnees.find(u => u.mat === mat);
+        
+        // Section Perso
+        document.getElementById('d-nom').innerText = p.nom;
+        document.getElementById('d-prenom').innerText = p.prenom;
+        document.getElementById('d-grade').innerText = p.grade;
+        document.getElementById('d-mat').innerText = p.mat;
+        document.getElementById('d-dn').innerText = p.dn;
+        document.getElementById('d-ln').innerText = p.ln;
+        document.getElementById('d-spec').innerText = p.spec;
+        document.getElementById('d-dipm').innerText = p.dipm;
+        document.getElementById('d-pos').innerText = p.pos;
 
-    function loadIndividualSheet(mat) {
-        const p = db.find(u => u.mat === mat);
-        document.getElementById('f-nom').innerText = `${p.nom} ${p.prenom}`;
-        document.getElementById('f-grade').innerText = p.grade;
-        document.getElementById('f-mat').innerText = p.mat;
-        document.getElementById('f-pos').innerText = p.pos;
-        document.getElementById('f-imc').innerText = (p.poids / (p.taille**2)).toFixed(1);
-        document.getElementById('f-ta').innerText = p.ta;
+        // Section Médicale
+        const imc = (p.poids / (p.taille * p.taille)).toFixed(1);
+        document.getElementById('m-poids').innerText = p.poids + " kg";
+        document.getElementById('m-taille').innerText = p.taille + " m";
+        document.getElementById('m-imc').innerText = imc;
+        document.getElementById('m-imc').style.color = (imc > 25) ? 'red' : 'green';
+        document.getElementById('m-ta').innerText = p.ta;
+        document.getElementById('m-gly').innerText = p.gly;
+        document.getElementById('m-pouls').innerText = p.pouls;
+
+        // Section Evaluation
+        document.getElementById('e-phys').innerText = p.nPhys;
+        document.getElementById('e-intel').innerText = p.nIntel;
+        document.getElementById('e-tir').innerText = p.nTir;
+        const moy = ((p.nPhys + p.nIntel + p.nTir + p.nRdg) / 4).toFixed(2);
+        document.getElementById('e-moy').innerText = moy;
 
         updateRadar(p);
     }
 
     function updateRadar(p) {
         const ctx = document.getElementById('radarChart').getContext('2d');
-        if (radarChart) radarChart.destroy();
+        if(chartObj) chartObj.destroy();
         
-        radarChart = new Chart(ctx, {
+        chartObj = new Chart(ctx, {
             type: 'radar',
             data: {
-                labels: ['Tir', 'Sport', 'Topographie', 'Combat', 'Règlements'],
+                labels: ['Physique', 'Intellectuel', 'Tir', 'Règlements', 'Moral'],
                 datasets: [{
-                    label: 'Forces / Faiblesses',
-                    data: [p.tir, p.sport, p.topo, p.combat, p.rdg],
+                    label: 'Profil individuel',
+                    data: [p.nPhys, p.nIntel, p.nTir, p.nRdg, 18],
                     backgroundColor: 'rgba(197, 160, 89, 0.2)',
                     borderColor: '#c5a059',
-                    pointBackgroundColor: '#2d3e2d'
+                    borderWidth: 3
                 }]
             },
-            options: { 
-                scales: { r: { min: 0, max: 20 } },
-                maintainAspectRatio: false 
-            }
+            options: { scales: { r: { min: 0, max: 20 } }, maintainAspectRatio: false }
         });
     }
 
-    function saveNewData() {
-        const n = {
-            id: document.getElementById('inMat').value,
-            nom: document.getElementById('inNom').value.toUpperCase(),
-            prenom: document.getElementById('inPrenom').value.toUpperCase(),
-            grade: document.getElementById('inGrade').value,
-            mat: document.getElementById('inMat').value,
-            pos: "PRESENT",
-            tir: Number(document.getElementById('inTir').value),
-            sport: Number(document.getElementById('inSport').value),
-            topo: Number(document.getElementById('inTopo').value),
-            combat: Number(document.getElementById('inCombat').value),
-            rdg: Number(document.getElementById('inRdg').value),
-            poids: 70, taille: 1.75, ta: "12/7"
+    function switchSec(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function saveData() {
+        const mat = document.getElementById('i-mat').value;
+        const index = baseDonnees.findIndex(u => u.mat === mat);
+        
+        const newData = {
+            mat: mat,
+            nom: document.getElementById('i-nom').value.toUpperCase(),
+            grade: document.getElementById('i-grade').value,
+            nTir: Number(document.getElementById('i-tir').value),
+            nPhys: Number(document.getElementById('i-phys').value),
+            poids: Number(document.getElementById('i-poids').value),
+            taille: Number(document.getElementById('i-taille').value),
+            // Valeurs par défaut pour les autres rubriques
+            prenom: "", dn: "-", ln: "-", spec: "-", dipm: "-", pos: "PRESENT", ta: "12/8", gly: 0.8, pouls: 70, nIntel: 12, nRdg: 12
         };
-        db.push(n);
-        populateSelect();
-        refreshTable();
-        alert("Données enregistrées !");
-    }
 
-    function refreshTable() {
-        const body = document.getElementById('tbodyMain');
-        body.innerHTML = db.map(p => `
-            <tr>
-                <td>${p.nom}</td><td>${p.mat}</td><td>${p.pos}</td>
-                <td><b>${((p.tir+p.sport+p.topo+p.combat+p.rdg)/5).toFixed(2)}</b></td>
-                <td><button class="btn btn-view" onclick="showSec('sec-dash'); loadIndividualSheet('${p.mat}')">Voir Fiche</button></td>
-            </tr>
-        `).join('');
+        if(index > -1) baseDonnees[index] = newData;
+        else baseDonnees.push(newData);
+        
+        initApp();
+        alert("Base de données mise à jour.");
     }
-
-    function showSec(id) {
-        document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active-nav'));
-        event.currentTarget.classList.add('active-nav');
-    }
-
-    function logout() { location.reload(); }
 </script>
-
 </body>
 </html>
