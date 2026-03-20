@@ -17,14 +17,44 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden;}
 
-/* --- OPTIMISATION PDF --- */
+/* --- CONFIGURATION EXPORT PDF --- */
 @media print {
-  .sidebar, .top-bar, .btn, .action-btns, #modal-overlay, #page-settings, #lock-screen { display: none !important; }
-  .main-content { margin-left: 0 !important; width: 100% !important; }
-  .page { display: block !important; opacity: 1 !important; padding: 20px !important; border:none !important; }
-  .table-container { box-shadow: none !important; border: 1px solid #eee !important; page-break-inside: avoid; }
-  #pdf-header { display: block !important; text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+  /* Masquer tout ce qui n'est pas de la donnée */
+  .sidebar, .top-bar, .btn, .action-btns, #modal-overlay, #page-settings, #lock-screen, .sidebar-header { 
+    display: none !important; 
+  }
+  
+  .main-content { margin-left: 0 !important; width: 100% !important; background: white !important; }
+  
+  /* Forcer l'affichage de toutes les pages de données */
+  .page { 
+    display: block !important; 
+    opacity: 1 !important; 
+    padding: 20px !important; 
+    border: none !important;
+    page-break-before: always; /* CHAQUE SECTION COMMENCE SUR UNE NOUVELLE PAGE */
+  }
+
+  /* La première page (Dashboard) n'a pas besoin de saut avant elle */
+  #page-dash { page-break-before: auto; }
+
+  .table-container { 
+    box-shadow: none !important; 
+    border: 1px solid #eee !important; 
+    page-break-inside: avoid; 
+  }
+
+  #pdf-header { 
+    display: block !important; 
+    text-align: center; 
+    margin-bottom: 30px; 
+    border-bottom: 3px solid var(--primary); 
+    padding-bottom: 10px; 
+  }
+
+  canvas { max-width: 100% !important; height: auto !important; }
 }
+
 #pdf-header { display: none; }
 
 .sidebar{width:var(--sidebar-width);background:var(--primary);color:#fff;display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100;}
@@ -72,7 +102,7 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
 <div id="lock-screen">
   <div class="lock-box">
     <i class="fas fa-shield-alt fa-3x" style="color:var(--accent); margin-bottom:15px"></i>
-    <h2 id="lock-unit-title">UNITE</h2>
+    <h2 id="lock-unit-title">CHARGEMENT...</h2>
     <input type="text" id="login-id" placeholder="Identifiant">
     <input type="password" id="login-pass" placeholder="Mot de passe" onkeypress="if(event.key==='Enter') verifyLogin()">
     <button onclick="verifyLogin()" class="btn btn-primary" style="width:100%; justify-content:center;">S'IDENTIFIER</button>
@@ -94,36 +124,38 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
 <div class="main-content" id="app-main" style="display:none">
   <div id="pdf-header">
     <h1 id="pdf-unit-name">UNITÉ</h1>
-    <p>Rapport de Gestion de Flotte - TrustFleet Pro</p>
+    <h2 style="color: #666;">Rapport Global de Gestion de Flotte</h2>
+    <p>Généré le : <span id="pdf-date"></span></p>
   </div>
 
   <div class="top-bar">
     <h3 id="current-page-title">Tableau de Bord</h3>
     <div style="display:flex; gap:10px;">
-       <button class="btn btn-success" onclick="exportToCSV()"><i class="fas fa-file-excel"></i> EXPORT CSV</button>
-       <button class="btn btn-primary" onclick="printWithTitle()"><i class="fas fa-print"></i> PDF</button>
+       <button class="btn btn-success" onclick="exportToCSV()"><i class="fas fa-file-excel"></i> CSV</button>
+       <button class="btn btn-primary" onclick="printReport()"><i class="fas fa-print"></i> EXPORT PDF</button>
        <button class="btn" style="background:#eee" onclick="logout()"><i class="fas fa-power-off"></i></button>
     </div>
   </div>
 
   <div class="content">
     <div id="page-dash" class="page active">
+      <h2 class="print-only" style="display:none; margin-bottom:20px;">1. État de Situation (KPI)</h2>
       <div class="kpi-grid" id="kpi-container"></div>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-        <div class="table-container"><h3>Kilométrage Total par Véhicule</h3><canvas id="chartKM"></canvas></div>
+        <div class="table-container"><h3>Kilométrage par Véhicule</h3><canvas id="chartKM"></canvas></div>
         <div class="table-container"><h3>Dépenses Maintenance (CFA)</h3><canvas id="chartMaint"></canvas></div>
       </div>
     </div>
 
     <div id="page-vehicles" class="page">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3>Parc Automobile</h3>
-        <button class="btn btn-primary" onclick="openModal('vehicle')">+ Ajouter Véhicule</button>
+        <h3>2. Parc Automobile</h3>
+        <button class="btn btn-primary" onclick="openModal('vehicle')">+ Ajouter</button>
       </div>
       <div class="table-container">
         <table>
           <thead>
-            <tr><th>Marque</th><th>Modèle</th><th>Châssis</th><th>Dotation</th><th>Plaque</th><th>KM ACTUEL</th><th>Statut</th><th>Actions</th></tr>
+            <tr><th>Marque</th><th>Modèle</th><th>Châssis</th><th>Dotation</th><th>Plaque</th><th>KM ACTUEL</th><th>Statut</th><th class="action-btns">Actions</th></tr>
           </thead>
           <tbody id="list-v"></tbody>
         </table>
@@ -132,13 +164,13 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
 
     <div id="page-drivers" class="page">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3>Personnel Chauffeur</h3>
-        <button class="btn btn-primary" onclick="openModal('driver')">+ Ajouter Personnel</button>
+        <h3>3. Personnel Chauffeur</h3>
+        <button class="btn btn-primary" onclick="openModal('driver')">+ Ajouter</button>
       </div>
       <div class="table-container">
         <table>
           <thead>
-            <tr><th>Nom</th><th>Grade</th><th>Matricule</th><th>Permis</th><th>Position</th><th>Actions</th></tr>
+            <tr><th>Nom</th><th>Grade</th><th>Matricule</th><th>Permis</th><th>Position</th><th class="action-btns">Actions</th></tr>
           </thead>
           <tbody id="list-d"></tbody>
         </table>
@@ -147,12 +179,12 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
 
     <div id="page-fuel" class="page">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3>Suivi Carburant</h3>
-        <button class="btn btn-primary" onclick="openModal('fuel')">+ Nouveau Plein</button>
+        <h3>4. Suivi Carburant</h3>
+        <button class="btn btn-primary" onclick="openModal('fuel')">+ Nouveau</button>
       </div>
       <div class="table-container">
         <table>
-          <thead><tr><th>Date</th><th>Plaque Véhicule</th><th>Litres</th><th>KM au Compteur</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Date</th><th>Plaque</th><th>Litres</th><th>Kilométrage</th><th class="action-btns">Actions</th></tr></thead>
           <tbody id="list-f"></tbody>
         </table>
       </div>
@@ -160,12 +192,12 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
 
     <div id="page-maint" class="page">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3>Journal de Maintenance</h3>
+        <h3>5. Journal de Maintenance</h3>
         <button class="btn btn-primary" onclick="openModal('maint')">+ Nouvelle Intervention</button>
       </div>
       <div class="table-container">
         <table>
-          <thead><tr><th>Date</th><th>Plaque Véhicule</th><th>Intervention</th><th>Coût (CFA)</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Date</th><th>Plaque</th><th>Intervention</th><th>Coût (CFA)</th><th class="action-btns">Actions</th></tr></thead>
           <tbody id="list-m"></tbody>
         </table>
       </div>
@@ -177,15 +209,13 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
         <div class="form-group"><label>Nom de l'Unité</label><input type="text" id="set-unit"></div>
         <div class="form-group"><label>Identifiant</label><input type="text" id="set-user"></div>
         <div class="form-group"><label>Mot de passe</label><input type="password" id="set-pass"></div>
-        <button class="btn btn-primary" style="width:100%" onclick="updateSettings()">Enregistrer les modifications</button>
+        <button class="btn btn-primary" style="width:100%" onclick="updateSettings()">Enregistrer</button>
       </div>
     </div>
   </div>
 </div>
 
-<div id="modal-overlay">
-  <div class="modal-box" id="modal-content"></div>
-</div>
+<div id="modal-overlay"><div class="modal-box" id="modal-content"></div></div>
 
 <script>
 const KEYS = { v:'v_db', d:'d_db', f:'f_db', m:'m_db', cfg:'cfg_db' };
@@ -211,20 +241,21 @@ function verifyLogin() {
     location.reload();
   } else { alert("Erreur d'identification."); }
 }
+
 function logout() { sessionStorage.removeItem('auth_ok'); location.reload(); }
 
-// CORRECTION BOUTON ENREGISTRER PARAMETRES
 function updateSettings() {
   config.unit = document.getElementById('set-unit').value || config.unit;
   if(document.getElementById('set-user').value) config.user = document.getElementById('set-user').value.trim();
   if(document.getElementById('set-pass').value) config.pass = document.getElementById('set-pass').value.trim();
   save('cfg', config);
-  alert("Changements enregistrés.");
-  location.reload(); 
+  alert("Paramètres mis à jour.");
+  location.reload();
 }
 
-function printWithTitle() {
+function printReport() {
     document.getElementById('pdf-unit-name').textContent = config.unit;
+    document.getElementById('pdf-date').textContent = new Date().toLocaleString('fr-FR');
     window.print();
 }
 
@@ -278,96 +309,69 @@ function openModal(type, id = null) {
   const vehicles = load('v');
 
   if(type === 'vehicle') {
-    box.innerHTML = `<h3>${id?'Modifier':'Nouveau'} Véhicule</h3>
+    box.innerHTML = `<h3>${id?'Modifier':'Nouveau'}</h3>
       <div class="form-group"><label>Marque</label><input type="text" id="v-brand" value="${data?data.brand:''}"></div>
-      <div class="form-group"><label>Modèle</label><input type="text" id="v-model" value="${data?data.model||'':''}"></div>
-      <div class="form-group"><label>N° Châssis</label><input type="text" id="v-chassis" value="${data?data.chassis:''}"></div>
-      <div class="form-group"><label>Année de Dotation</label><input type="number" id="v-year" value="${data?data.year:''}"></div>
       <div class="form-group"><label>Immatriculation</label><input type="text" id="v-plate" value="${data?data.plate:''}"></div>
       <div class="form-group"><label>KM Actuel</label><input type="number" id="v-km" value="${data?data.km:''}"></div>
       <div class="form-group"><label>Statut</label><select id="v-status"><option ${data?.status==='Actif'?'selected':''}>Actif</option><option ${data?.status==='Indisponible'?'selected':''}>Indisponible</option></select></div>
       <button class="btn btn-primary" style="width:100%" onclick="saveEntry('v', ${id})">ENREGISTRER</button>`;
+  } else if(type === 'fuel' || type === 'maint') {
+    const isFuel = type === 'fuel';
+    box.innerHTML = `<h3>${isFuel?'Carburant':'Maintenance'}</h3>
+      <div class="form-group"><label>Véhicule (Plaque)</label><select id="xf-v">${vehicles.map(x=>`<option value="${x.plate}">${x.plate}</option>`).join('')}</select></div>
+      <div class="form-group"><label>${isFuel?'Litres':'Description'}</label><input type="text" id="xf-1"></div>
+      <div class="form-group"><label>${isFuel?'KM':'Coût'}</label><input type="number" id="xf-2"></div>
+      <button class="btn btn-primary" style="width:100%" onclick="saveEntry('${isFuel?'f':'m'}')">ENREGISTRER</button>`;
   } else if(type === 'driver') {
-    box.innerHTML = `<h3>Personnel</h3>
-      <div class="form-group"><label>Nom Complet</label><input type="text" id="d-name" value="${data?data.name:''}"></div>
-      <div class="form-group"><label>Grade</label><input type="text" id="d-grade" value="${data?data.grade:''}"></div>
-      <div class="form-group"><label>Matricule</label><input type="text" id="d-mat" value="${data?data.mat:''}"></div>
-      <div class="form-group"><label>Permis</label><input type="text" id="d-lic" value="${data?data.lic:''}"></div>
-      <div class="form-group"><label>Position</label><select id="d-status"><option ${data?.status==='Disponible'?'selected':''}>Disponible</option><option ${data?.status==='Indisponible'?'selected':''}>Indisponible</option></select></div>
+    box.innerHTML = `<h3>Chauffeur</h3>
+      <div class="form-group"><label>Nom</label><input type="text" id="d-name" value="${data?data.name:''}"></div>
       <button class="btn btn-primary" style="width:100%" onclick="saveEntry('d', ${id})">ENREGISTRER</button>`;
-  } else if(type === 'fuel') {
-    // CORRECTION LISTE PAR IMMATRICULATION
-    box.innerHTML = `<h3>Carburant</h3>
-      <div class="form-group"><label>Plaque Véhicule</label><select id="f-v">${vehicles.map(x=>`<option value="${x.plate}">${x.plate} (${x.brand})</option>`).join('')}</select></div>
-      <div class="form-group"><label>Litres</label><input type="number" id="f-l"></div>
-      <div class="form-group"><label>KM au moment du plein</label><input type="number" id="f-km"></div>
-      <button class="btn btn-primary" style="width:100%" onclick="saveEntry('f')">ENREGISTRER</button>`;
-  } else if(type === 'maint') {
-    // CORRECTION LISTE PAR IMMATRICULATION
-    box.innerHTML = `<h3>Maintenance</h3>
-      <div class="form-group"><label>Plaque Véhicule</label><select id="m-v">${vehicles.map(x=>`<option value="${x.plate}">${x.plate} (${x.brand})</option>`).join('')}</select></div>
-      <div class="form-group"><label>Description</label><input type="text" id="m-desc"></div>
-      <div class="form-group"><label>Coût (CFA)</label><input type="number" id="m-cost"></div>
-      <button class="btn btn-primary" style="width:100%" onclick="saveEntry('m')">ENREGISTRER</button>`;
   }
 }
 
 function saveEntry(key, id = null) {
   let db = load(key);
-  let obj = { id: id || Date.now() };
+  let obj = { id: id || Date.now(), date: new Date().toLocaleDateString() };
   if(key === 'v') {
     obj.brand = document.getElementById('v-brand').value;
-    obj.model = document.getElementById('v-model').value;
-    obj.chassis = document.getElementById('v-chassis').value;
-    obj.year = document.getElementById('v-year').value;
     obj.plate = document.getElementById('v-plate').value;
     obj.km = parseInt(document.getElementById('v-km').value) || 0;
     obj.status = document.getElementById('v-status').value;
+  } else if(key === 'f') {
+    obj.v_name = document.getElementById('xf-v').value;
+    obj.litres = document.getElementById('xf-1').value;
+    obj.km = document.getElementById('xf-2').value;
+  } else if(key === 'm') {
+    obj.v_name = document.getElementById('xf-v').value;
+    obj.desc = document.getElementById('xf-1').value;
+    obj.cost = document.getElementById('xf-2').value;
   } else if(key === 'd') {
     obj.name = document.getElementById('d-name').value;
-    obj.grade = document.getElementById('d-grade').value;
-    obj.mat = document.getElementById('d-mat').value;
-    obj.lic = document.getElementById('d-lic').value;
-    obj.status = document.getElementById('d-status').value;
-  } else if(key === 'f') {
-    obj.v_name = document.getElementById('f-v').value;
-    obj.litres = document.getElementById('f-l').value;
-    obj.km = document.getElementById('f-km').value;
-    obj.date = new Date().toLocaleDateString();
-  } else if(key === 'm') {
-    obj.v_name = document.getElementById('m-v').value;
-    obj.desc = document.getElementById('m-desc').value;
-    obj.cost = document.getElementById('m-cost').value;
-    obj.date = new Date().toLocaleDateString();
   }
   if(id) { const idx = db.findIndex(x => x.id === id); db[idx] = obj; } else { db.push(obj); }
-  save(key, db);
-  location.reload();
+  save(key, db); location.reload();
 }
 
 function deleteItem(key, id) { if(confirm("Supprimer ?")) { save(key, load(key).filter(x=>x.id!==id)); location.reload(); } }
 
 function updateKPIs() {
-  const v = load('v'); const m = load('m');
+  const v = load('v'), m = load('m');
   const totalCost = m.reduce((acc, curr) => acc + parseInt(curr.cost || 0), 0);
   const totalKM = v.reduce((acc, curr) => acc + parseInt(curr.km || 0), 0);
   document.getElementById('kpi-container').innerHTML = `
     <div class="kpi-card"><h4>TOTAL VÉHICULES</h4><h2>${v.length}</h2></div>
     <div class="kpi-card" style="border-left-color:var(--success)"><h4>DISTANCE TOTALE</h4><h2>${totalKM.toLocaleString()} KM</h2></div>
-    <div class="kpi-card" style="border-left-color:var(--danger)"><h4>FRAIS MAINTENANCE</h4><h2>${totalCost.toLocaleString()} CFA</h2></div>
-    <div class="kpi-card" style="border-left-color:var(--info)"><h4>CHAUFFEURS</h4><h2>${load('d').length}</h2></div>
+    <div class="kpi-card" style="border-left-color:var(--danger)"><h4>MAINTENANCE TOTALE</h4><h2>${totalCost.toLocaleString()} CFA</h2></div>
   `;
 }
 
 function initCharts() {
-  const v = load('v'); const m = load('m');
+  const v = load('v'), m = load('m');
   new Chart(document.getElementById('chartKM'), {
-    type: 'bar',
-    data: { labels: v.map(x=>x.plate), datasets: [{ label: 'Kilomètres', data: v.map(x=>x.km), backgroundColor: '#ff6b35' }] }
+    type: 'bar', data: { labels: v.map(x=>x.plate), datasets: [{ label: 'KM', data: v.map(x=>x.km), backgroundColor: '#ff6b35' }] }
   });
   new Chart(document.getElementById('chartMaint'), {
-    type: 'line',
-    data: { labels: m.map(x=>x.date), datasets: [{ label: 'CFA', data: m.map(x=>x.cost), borderColor: '#dc3545', fill: false }] }
+    type: 'line', data: { labels: m.map(x=>x.date), datasets: [{ label: 'CFA', data: m.map(x=>x.cost), borderColor: '#dc3545' }] }
   });
 }
 
@@ -381,8 +385,8 @@ function showPage(id, e) {
 
 function exportToCSV() {
   const v = load('v');
-  let csv = "Marque;Modele;Chassis;Dotation;Plaque;KM\n";
-  v.forEach(i => csv += `${i.brand};${i.model||''};${i.chassis};${i.year};${i.plate};${i.km}\n`);
+  let csv = "Marque;Plaque;KM\n";
+  v.forEach(i => csv += `${i.brand};${i.plate};${i.km}\n`);
   const blob = new Blob([csv], { type: 'text/csv' });
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Rapport_TrustFleet.csv'; a.click();
 }
