@@ -172,7 +172,7 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
         <div class="form-group"><label>Nom de l'Unité</label><input type="text" id="set-unit"></div>
         <div class="form-group"><label>Identifiant</label><input type="text" id="set-user"></div>
         <div class="form-group"><label>Mot de passe</label><input type="password" id="set-pass"></div>
-        <button class="btn btn-primary" style="width:100%" onclick="updateSettings()">Enregistrer</button>
+        <button class="btn btn-primary" style="width:100%" onclick="updateSettings()">Enregistrer les modifications</button>
       </div>
     </div>
   </div>
@@ -209,12 +209,22 @@ function verifyLogin() {
 }
 function logout() { sessionStorage.removeItem('auth_ok'); location.reload(); }
 
+function updateSettings() {
+  config.unit = document.getElementById('set-unit').value || config.unit;
+  if(document.getElementById('set-user').value) config.user = document.getElementById('set-user').value.trim();
+  if(document.getElementById('set-pass').value) config.pass = document.getElementById('set-pass').value.trim();
+  save('cfg', config);
+  alert("Changements enregistrés. L'application va redémarrer.");
+  logout();
+}
+
 // --- ACTIONS PRINCIPALES ---
 function initApp() {
   renderAll();
   updateKPIs();
   initCharts();
   document.getElementById('set-unit').value = config.unit;
+  document.getElementById('set-user').value = config.user;
 }
 
 function renderAll() {
@@ -223,7 +233,7 @@ function renderAll() {
     <tr>
       <td><b>${i.brand}</b></td><td>${i.model || ''}</td><td>${i.chassis}</td><td>${i.year}</td>
       <td><code>${i.plate}</code></td>
-      <td style="color:var(--accent); font-weight:bold;">${i.km.toLocaleString()} KM</td>
+      <td style="color:var(--accent); font-weight:bold;">${(i.km || 0).toLocaleString()} KM</td>
       <td><span class="badge ${i.status==='Actif'?'bg-actif':'bg-indispo'}">${i.status}</span></td>
       <td class="action-btns">
         <button class="btn" style="color:var(--info)" onclick="openModal('vehicle', ${i.id})"><i class="fas fa-edit"></i></button>
@@ -234,7 +244,7 @@ function renderAll() {
   const d = load('d');
   document.getElementById('list-d').innerHTML = d.map(i => `
     <tr><td>${i.name}</td><td>${i.grade}</td><td>${i.mat}</td><td>${i.lic}</td>
-    <td><span class="badge ${i.status==='Disponible'?'bg-actif':'bg-indispo'}">${i.status || 'Disponible'}</span></td>
+    <td><span class="badge ${ (i.status==='Disponible' || i.status==='Actif') ?'bg-actif':'bg-indispo'}">${i.status || 'Disponible'}</span></td>
     <td class="action-btns">
       <button class="btn" style="color:var(--info)" onclick="openModal('driver', ${i.id})"><i class="fas fa-edit"></i></button>
       <button class="btn" style="color:var(--danger)" onclick="deleteItem('d', ${i.id})"><i class="fas fa-trash"></i></button>
