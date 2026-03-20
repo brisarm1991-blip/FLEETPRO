@@ -2,65 +2,189 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DEBUG ACCÈS BA 301</title>
+    <title>SGP-301 : GESTION INTÉGRALE v9.0</title>
     <style>
-        body { font-family: sans-serif; background: #2d3e2d; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: white; color: black; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #c5a059; border: none; font-weight: bold; cursor: pointer; }
-        #interface { display: none; background: white; color: black; position: fixed; inset: 0; padding: 20px; }
+        :root { --army: #2d3e2d; --gold: #c5a059; --light: #f4f4f4; --success: #27ae60; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); color: #333; }
+        
+        /* Écran de Connexion */
+        #login-screen { position: fixed; inset: 0; background: var(--army); display: flex; align-items: center; justify-content: center; z-index: 1000; color: white; }
+        .login-card { background: rgba(255,255,255,0.1); padding: 40px; border-radius: 15px; border: 1px solid var(--gold); text-align: center; width: 350px; backdrop-filter: blur(10px); }
+        
+        /* Dashboard */
+        #dashboard { display: none; padding: 20px; }
+        .header { background: var(--army); color: white; padding: 20px; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        
+        /* Admin */
+        .admin-bar { background: #e9ecef; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; border-left: 5px solid var(--gold); }
+        .is-admin .admin-bar { display: flex; gap: 15px; align-items: center; }
+
+        /* Formulaire */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        label { display: block; font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        input:disabled, select:disabled { background: #eee; cursor: not-allowed; border-color: transparent; color: #000; font-weight: 600; }
+        
+        h3 { border-bottom: 2px solid var(--gold); padding-bottom: 5px; color: var(--army); margin-top: 0; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-gold { background: var(--gold); color: white; }
+        .btn-army { background: var(--army); color: white; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen" class="login-card">
-        <h2>CONNEXION BA 301</h2>
-        <input type="text" id="code" placeholder="Code (Ex: 301)">
-        <button onclick="tentativeConnexion()">ACCÉDER</button>
-        <p id="msg" style="color:red; font-size:12px;"></p>
+    <div id="login-screen">
+        <div class="login-card">
+            <h1 style="color:var(--gold); margin:0;">BA 301</h1>
+            <p>Système de Gestion du Personnel</p>
+            <input type="text" id="pass" placeholder="Matricule ou Code Admin" style="text-align:center; margin-bottom:15px; border:none;">
+            <button class="btn btn-gold" style="width:100%" onclick="login()">ACCÉDER AU PORTAIL</button>
+        </div>
     </div>
 
-    <div id="interface">
-        <h1 style="color:#2d3e2d">✓ ACCÈS RÉUSSI</h1>
-        <hr>
-        <h3>LISTE DU PERSONNEL (EXTRACTION EXCEL)</h3>
-        <div id="liste"></div>
-        <button onclick="location.reload()" style="margin-top:20px; background:#ccc;">DÉCONNEXION</button>
+    <div id="dashboard">
+        <div class="header">
+            <div>
+                <span id="role-tag" style="font-size:12px; background:var(--gold); padding:2px 8px; border-radius:4px;">PROFIL</span>
+                <h2 id="user-title" style="margin:5px 0 0 0;">NOM GRADE</h2>
+            </div>
+            <button class="btn" style="background:rgba(255,255,255,0.2); color:white;" onclick="location.reload()">DÉCONNEXION</button>
+        </div>
+
+        <div style="max-width: 1000px; margin: 20px auto;">
+            
+            <div class="admin-bar">
+                <strong>SÉLECTION DU PERSONNEL :</strong>
+                <select id="select-p" onchange="loadUser(this.value)" style="flex:1"></select>
+                <button id="edit-btn" class="btn btn-army" onclick="toggleEdit()">MODIFIER LA FICHE</button>
+            </div>
+
+            <div class="card">
+                <h3>📋 IDENTITÉ & SERVICE</h3>
+                <div class="grid">
+                    <div><label>Nom</label><input type="text" data-f="nom" disabled></div>
+                    <div><label>Prénom</label><input type="text" data-f="prenom" disabled></div>
+                    <div><label>Grade</label><input type="text" data-f="grade" disabled></div>
+                    <div><label>Matricule</label><input type="text" id="disp-mat" disabled></div>
+                    <div><label>Spécialité</label><input type="text" data-f="spec" disabled></div>
+                    <div><label>Position</label>
+                        <select data-f="pos" disabled>
+                            <option value="PRESENT">PRÉSENT</option>
+                            <option value="STAGE">STAGE</option>
+                            <option value="MISSION">MISSION</option>
+                            <option value="MALADE">MALADE</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📊 PERFORMANCES & NOTES</h3>
+                <div class="grid">
+                    <div><label>Physique /20</label><input type="number" data-f="nPhys" disabled></div>
+                    <div><label>Intellectuelle /20</label><input type="number" data-f="nIntel" disabled></div>
+                    <div><label>Morale /20</label><input type="number" data-f="nMor" disabled></div>
+                    <div><label>Note de Tir</label><input type="number" data-f="nTir" disabled></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🏥 SANTÉ & BIOMÉTRIE</h3>
+                <div class="grid">
+                    <div><label>Poids (kg)</label><input type="number" data-f="poids" oninput="calcIMC()" disabled></div>
+                    <div><label>Taille (m)</label><input type="number" step="0.01" data-f="taille" oninput="calcIMC()" disabled></div>
+                    <div><label>IMC (Auto)</label><input type="text" id="imc" style="background:#f8f9fa; border:none; font-weight:bold;" disabled></div>
+                    <div><label>Tension (TA)</label><input type="text" data-f="ta" disabled></div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
 <script>
-    // La base de données simplifiée pour le test
-    const personnel = [
-        { id: "301", nom: "ADMIN", grade: "COL" },
-        { id: "OFF/001", nom: "BALOGOG", grade: "CNE" },
-        { id: "OFF/002", nom: "EMAN", grade: "CNE" },
-        { id: "A15/26261", nom: "EBOK", grade: "CAL" },
-        { id: "A24/57038", nom: "MBIA ZANGA", grade: "2°CL" }
+    // BASE DE DONNÉES COMPLÈTE (1-50)
+    const db = [
+        { id: "301", role: "ADMIN", nom: "COMMANDEMENT", grade: "COL" },
+        { id: "OFF/001", role: "USER", nom: "BALOGOG", prenom: "Patrick", grade: "CNE", spec: "LOG", pos: "STAGE", nPhys: 11.7, nIntel: 15, nMor: 20.4, nTir: 17, poids: 85, taille: 1.75 },
+        { id: "OFF/002", role: "USER", nom: "EMAN", prenom: "Armand Brice", grade: "CNE", spec: "RENS", pos: "PRESENT", nPhys: 16.2, nIntel: 18, nMor: 20.6, nTir: 18, poids: 82, taille: 1.73, ta: "121/84" },
+        { id: "A15/26261", role: "USER", nom: "EBOK", prenom: "Jean T.", grade: "CAL", spec: "FUSAIR", pos: "PRESENT", nPhys: 14.5, nIntel: 12, nMor: 21, nTir: 20, poids: 75, taille: 1.78 },
+        { id: "A24/57038", role: "USER", nom: "MBIA ZANGA", prenom: "Amélie", grade: "2°CL", spec: "FUSAIR", pos: "PRESENT", nPhys: 12, nIntel: 20.6, nMor: 20.6, nTir: 15, poids: 60, taille: 1.65 },
+        { id: "A24/58635", role: "USER", nom: "BELBARA", prenom: "Djakdjinkreo", grade: "2°CL", spec: "FUSAIR", pos: "PRESENT", nPhys: 10, nIntel: 10.7, nMor: 21, nTir: 14, poids: 70, taille: 1.72 }
+        // Ajoutez les autres ici...
     ];
 
-    function tentativeConnexion() {
-        const saisie = document.getElementById('code').value.trim();
-        const msg = document.getElementById('msg');
-        
-        // On cherche si le code existe dans la liste
-        const user = personnel.find(u => u.id === saisie);
+    let current = null;
+    let isEdit = false;
+
+    function login() {
+        const pass = document.getElementById('pass').value.trim();
+        const user = db.find(u => u.id === pass);
 
         if (user) {
-            // Si trouvé, on cache le login et on montre l'interface
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('interface').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'block';
             
-            // On affiche la liste des gens pour prouver que ça marche
-            const divListe = document.getElementById('liste');
-            divListe.innerHTML = "<ul>" + personnel.map(p => `<li>${p.grade} ${p.nom} (Matricule: ${p.id})</li>`).join('') + "</ul>";
-            
-            console.log("Connexion réussie pour : " + user.nom);
+            if (user.role === "ADMIN") {
+                document.body.classList.add('is-admin');
+                document.getElementById('role-tag').innerText = "ADMINISTRATEUR";
+                fillSelect();
+                loadUser(db[1].id); 
+            } else {
+                document.getElementById('role-tag').innerText = "PROFIL PERSONNEL";
+                loadUser(user.id);
+            }
+        } else { alert("Accès refusé."); }
+    }
+
+    function fillSelect() {
+        const s = document.getElementById('select-p');
+        s.innerHTML = db.filter(u => u.role !== "ADMIN").map(u => `<option value="${u.id}">${u.grade} ${u.nom}</option>`).join('');
+    }
+
+    function loadUser(id) {
+        current = db.find(u => u.id === id);
+        document.getElementById('user-title').innerText = current.grade + " " + current.nom;
+        document.getElementById('disp-mat').value = current.id;
+        
+        document.querySelectorAll('[data-f]').forEach(el => {
+            const key = el.getAttribute('data-f');
+            el.value = current[key] || "";
+        });
+        calcIMC();
+    }
+
+    function toggleEdit() {
+        isEdit = !isEdit;
+        const btn = document.getElementById('edit-btn');
+        document.querySelectorAll('[data-f]').forEach(el => el.disabled = !isEdit);
+        
+        if (isEdit) {
+            btn.innerText = "💾 ENREGISTRER";
+            btn.style.background = "var(--success)";
         } else {
-            msg.innerText = "ERREUR : Matricule ou code inconnu.";
-            console.log("Échec de connexion avec : " + saisie);
+            btn.innerText = "MODIFIER LA FICHE";
+            btn.style.background = "var(--army)";
+            saveToLocal();
         }
     }
-</script>
 
+    function calcIMC() {
+        const p = parseFloat(document.querySelector('[data-f="poids"]').value);
+        const t = parseFloat(document.querySelector('[data-f="taille"]').value);
+        if (p > 0 && t > 0) {
+            document.getElementById('imc').value = (p / (t * t)).toFixed(1);
+        } else { document.getElementById('imc').value = "-"; }
+    }
+
+    function saveToLocal() {
+        // Logique de sauvegarde des modifications dans l'objet en mémoire
+        document.querySelectorAll('[data-f]').forEach(el => {
+            const key = el.getAttribute('data-f');
+            current[key] = isNaN(el.value) || el.value === "" ? el.value : parseFloat(el.value);
+        });
+        alert("Modifications appliquées.");
+    }
+</script>
 </body>
 </html>
