@@ -2,172 +2,193 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTÈME DE GESTION INTÉGRÉ - CI BA 301</title>
+    <title>SGI - CENTRE D'INSTRUCTION BA 301</title>
     <style>
-        :root {
-            --army-green: #3a5a40;
-            --army-dark: #1b2631;
-            --gold: #b8860b;
-            --danger: #e74c3c;
-            --success: #27ae60;
-        }
-
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background-color: #f0f2f5; display: flex; }
-
-        /* Barre Latérale */
-        .sidebar { width: 260px; background: var(--army-dark); height: 100vh; position: fixed; color: white; padding-top: 20px; }
-        .sidebar h2 { text-align: center; color: var(--gold); font-size: 1.2rem; border-bottom: 1px solid #34495e; padding-bottom: 15px; }
-        .menu-item { padding: 15px 25px; cursor: pointer; border-left: 4px solid transparent; transition: 0.3s; }
-        .menu-item:hover, .menu-item.active { background: #2c3e50; border-left-color: var(--gold); }
-
-        /* Contenu Principal */
-        .main { margin-left: 260px; flex: 1; padding: 30px; }
-        .header-bar { background: white; padding: 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        :root { --army: #1b2631; --gold: #b8860b; --light: #f4f7f6; --success: #27ae60; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); display: flex; height: 100vh; overflow: hidden; }
         
-        /* Cartes de Personnel */
-        .grid-personnel { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 5px solid var(--army-green); }
-        .card-header { padding: 15px; background: #f8f9fa; display: flex; align-items: center; gap: 15px; }
-        .photo-placeholder { width: 60px; height: 60px; border-radius: 50%; background: #ddd; border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        
-        .card-body { padding: 15px; font-size: 0.9rem; }
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #eee; padding-bottom: 3px; }
-        .label { color: #7f8c8d; font-weight: bold; }
-        .valeur { color: var(--army-dark); font-weight: bold; }
+        /* Login Overlay */
+        #login-screen { position: fixed; inset: 0; background: var(--army); z-index: 1000; display: flex; align-items: center; justify-content: center; color: white; flex-direction: column; }
+        .login-card { background: #2c3e50; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
+        input, select, button { padding: 12px; margin: 10px 0; border-radius: 5px; border: none; width: 100%; box-sizing: border-box; }
+        button { background: var(--gold); color: white; font-weight: bold; cursor: pointer; }
 
-        /* Indicateurs */
-        .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; text-transform: uppercase; }
-        .badge-present { background: #d4edda; color: #155724; }
-        .badge-mission { background: #fff3cd; color: #856404; }
-        .badge-alerte { background: #f8d7da; color: #721c24; }
+        /* Sidebar */
+        .sidebar { width: 280px; background: var(--army); color: white; display: flex; flex-direction: column; }
+        .nav-item { padding: 15px 25px; cursor: pointer; transition: 0.3s; border-bottom: 1px solid #2c3e50; }
+        .nav-item:hover, .active { background: var(--gold); }
+        .admin-only { border-left: 4px solid #e74c3c; display: none; }
 
-        .section { display: none; }
-        .section.active { display: block; }
+        /* Main Content */
+        .content { flex: 1; padding: 25px; overflow-y: auto; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 0.85rem; }
+        th { background: #eee; }
         
-        input[type="text"] { padding: 10px; width: 300px; border-radius: 20px; border: 1px solid #ddd; outline: none; }
+        /* Forms */
+        .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <h2>UNITÉ CI - BA 301</h2>
-    <div class="menu-item active" onclick="showSection('global')">📋 Personnel Complet</div>
-    <div class="menu-item" onclick="showSection('perf')">🎯 Performance & Tir</div>
-    <div class="menu-item" onclick="showSection('sante')">🏥 Suivi Biométrique</div>
-    <div class="menu-item" onclick="showSection('ops')">🌍 Opérations / Missions</div>
+<div id="login-screen">
+    <div class="login-card">
+        <h2>SGI - BA 301</h2>
+        <p>Veuillez vous identifier</p>
+        <select id="roleSelect">
+            <option value="guest">Profil : Invité (Lecture seule)</option>
+            <option value="admin">Profil : Administrateur (Accès total)</option>
+        </select>
+        <input type="password" id="passInput" placeholder="Mot de passe (si Admin)">
+        <button onclick="login()">SE CONNECTER</button>
+    </div>
 </div>
 
-<div class="main">
-    <div class="header-bar">
-        <input type="text" id="searchInput" placeholder="Rechercher un militaire..." onkeyup="filterCards()">
-        <div id="stats-unite">Effectif total: <span id="count">0</span></div>
+<div class="sidebar">
+    <div style="padding: 20px; text-align: center; border-bottom: 2px solid var(--gold);">
+        <h3>CI BA 301</h3>
+        <span id="userBadge" style="font-size: 0.8rem; opacity: 0.7;"></span>
     </div>
+    <div class="nav-item active" onclick="showTab('tab-rh')">📂 1. PARAMÈTRES PERSO</div>
+    <div class="nav-item" onclick="showTab('tab-med')">🏥 2. SUIVI MÉDICAL</div>
+    <div class="nav-item" onclick="showTab('tab-perf')">🎯 3. ÉVALUATION & TIR</div>
+    <div class="nav-item" onclick="showTab('tab-pres')">📅 4. PRÉSENCES (RÉCAP)</div>
+    <div class="nav-item admin-only" onclick="showTab('tab-add')">➕ AJOUTER PERSONNEL</div>
+</div>
 
-    <div id="global" class="section active">
-        <div class="grid-personnel" id="personnelGrid">
-            </div>
-    </div>
+<div class="content">
+    <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 id="tabTitle">Paramètres du Personnel</h2>
+        <button onclick="location.reload()" style="width: auto; background: #95a5a6;">DÉCONNEXION</button>
+    </header>
 
-    <div id="perf" class="section">
-        <div class="card" style="width: 100%;">
-            <div class="card-body">
-                <h3>Classement Performance (Sport & Tir)</h3>
-                <p>Données consolidées des fichiers EVALUATION et ISTC.</p>
-                <div id="perfContent"></div>
-            </div>
+    <div id="tab-rh" class="tab-content">
+        <div class="card">
+            <input type="text" id="searchBar" placeholder="Rechercher un militaire..." onkeyup="filterTable('tableRH')">
+            <table id="tableRH">
+                <thead><tr><th>Nom</th><th>Prénom</th><th>Grade</th><th>Matricule</th><th>Diplôme Mil.</th><th>Position</th></tr></thead>
+                <tbody id="bodyRH"></tbody>
+            </table>
         </div>
     </div>
 
+    <div id="tab-med" class="tab-content hidden">
+        <div class="card">
+            <table>
+                <thead><tr><th>Nom</th><th>Poids (kg)</th><th>Taille (m)</th><th>IMC</th><th>Tension</th><th>Glycémie</th></tr></thead>
+                <tbody id="bodyMed"></tbody>
+            </table>
+        </div>
     </div>
 
+    <div id="tab-perf" class="tab-content hidden">
+        <div class="card">
+            <table>
+                <thead><tr><th>Nom</th><th>Sport (COVAPI)</th><th>Tir</th><th>Topo</th><th>Combat</th><th>Moy. Gén.</th></tr></thead>
+                <tbody id="bodyPerf"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="tab-add" class="tab-content hidden admin-only">
+        <div class="card">
+            <h3>Enregistrer un nouveau militaire</h3>
+            <form id="addForm">
+                <div class="form-group">
+                    <input type="text" id="newNom" placeholder="Nom" required>
+                    <input type="text" id="newPrenom" placeholder="Prénom" required>
+                    <input type="text" id="newGrade" placeholder="Grade">
+                    <input type="text" id="newMat" placeholder="Matricule">
+                    <input type="text" id="newSpec" placeholder="Spécialité">
+                    <input type="text" id="newDip" placeholder="Diplôme Militaire">
+                </div>
+                <button type="button" onclick="addNewUser()" style="background: var(--success);">ENREGISTRER DANS LA BASE</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
-    // 1. BASE DE DONNÉES CONSOLIDÉE (Synthèse de tous vos fichiers CSV)
-    // Ici, nous intégrons les colonnes exactes de vos fichiers
-    const effectif = [
-        {
-            nom: "EMAN", prenom: "ARMAND BRICE", grade: "CNE", mat: "-", 
-            dn: "1991-06-07", dipM: "SCU", spec: "RENS", pos: "PRESENT",
-            poids: 82, taille: 1.73, ta: "121/84", gly: "0.8",
-            sport: 16.20, tir: 18, topo: 15, combat: 16, moral: 20.6,
-            mission: "RAS", imc: 27.4
-        },
-        {
-            nom: "BALOGOG", prenom: "PATRICK", grade: "CNE", mat: "-", 
-            dn: "1989-06-27", dipM: "SCU", spec: "LOG", pos: "STAGE",
-            poids: 85, taille: 1.75, ta: "0", gly: "0",
-            sport: 11.71, tir: 17, topo: 14, combat: 10, moral: 20.4,
-            mission: "STAGE", imc: 27.7
-        },
-        {
-            nom: "EBOK", prenom: "JEAN TOURAINE", grade: "CAL", mat: "A15/26261", 
-            dn: "1995-09-08", dipM: "CAT1", spec: "FUSAIR", pos: "PRESENT",
-            poids: 68, taille: 1.75, ta: "0", gly: "0",
-            sport: 15.00, tir: 20, topo: 14, combat: 15, moral: 21.1,
-            mission: "RAS", imc: 22.2
-        },
-        {
-            nom: "BELBARA", prenom: "DJAKDJINKREO", grade: "2°CL", mat: "A24/58635", 
-            dn: "2001-05-12", dipM: "FES AIR", spec: "FUSAIR", pos: "PRESENT",
-            poids: 72, taille: 1.70, ta: "110/70", gly: "0.9",
-            sport: 12.5, tir: 15, topo: 11, combat: 12, moral: 21.0,
-            mission: "RAS", imc: 24.9
-        }
-        // Ajoutez ici les autres membres en suivant le même format
+    // 1. BASE DE DONNÉES LOCALE (Chargée avec vos données réelles)
+    let db = [
+        { nom: "BALOGOG", prenom: "PATRICK", grade: "CNE", mat: "-", dip: "SCU", pos: "STAGE", poids: 85, taille: 1.75, imc: 27.7, ta: "-", gly: "-", sport: 11.7, tir: 17, topo: 14, combat: 10 },
+        { nom: "EMAN", prenom: "ARMAND BRICE", grade: "CNE", mat: "-", dip: "SCU", pos: "PRESENT", poids: 82, taille: 1.73, imc: 27.4, ta: "121/84", gly: "0.8", sport: 16.2, tir: 18, topo: 15, combat: 16 },
+        { nom: "EBOK", prenom: "JEAN TOURAINE", grade: "CAL", mat: "A15/26261", dip: "CAT1", pos: "PRESENT", poids: 68, taille: 1.75, imc: 22.2, ta: "-", gly: "-", sport: 15.0, tir: 20, topo: 14, combat: 15 }
     ];
 
-    function renderCards() {
-        const grid = document.getElementById('personnelGrid');
-        grid.innerHTML = '';
-        document.getElementById('count').innerText = effectif.length;
+    // 2. GESTION DES ACCÈS
+    function login() {
+        const role = document.getElementById('roleSelect').value;
+        const pass = document.getElementById('passInput').value;
 
-        effectif.forEach(p => {
-            const badgeClass = p.pos === 'PRESENT' ? 'badge-present' : 'badge-mission';
-            const imcColor = p.imc > 25 ? 'color:red' : 'color:green';
+        if (role === 'admin' && pass !== '1234') {
+            alert("Mot de passe incorrect !");
+            return;
+        }
 
-            grid.innerHTML += `
-                <div class="card" data-name="${p.nom} ${p.prenom}">
-                    <div class="card-header">
-                        <div class="photo-placeholder">${p.nom[0]}${p.prenom[0]}</div>
-                        <div>
-                            <div style="font-weight:bold; font-size:1.1rem">${p.grade} ${p.nom}</div>
-                            <span class="badge ${badgeClass}">${p.pos}</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="stat-row"><span class="label">Matricule:</span><span class="valeur">${p.mat}</span></div>
-                        <div class="stat-row"><span class="label">Spécialité:</span><span class="valeur">${p.spec}</span></div>
-                        <div class="stat-row"><span class="label">Diplôme Mil:</span><span class="valeur">${p.dipM}</span></div>
-                        <hr>
-                        <div class="stat-row"><span class="label">Note Sport:</span><span class="valeur">${p.sport}/20</span></div>
-                        <div class="stat-row"><span class="label">Note Tir:</span><span class="valeur" style="color:blue">${p.tir}/20</span></div>
-                        <div class="stat-row"><span class="label">Moral:</span><span class="valeur">${p.moral}</span></div>
-                        <hr>
-                        <div class="stat-row"><span class="label">Santé (IMC):</span><span class="valeur" style="${imcColor}">${p.imc}</span></div>
-                        <div class="stat-row"><span class="label">Tension (TA):</span><span class="valeur">${p.ta}</span></div>
-                    </div>
-                </div>
-            `;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('userBadge').innerText = role.toUpperCase();
+        
+        if (role === 'admin') {
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+        }
+        renderTables();
+    }
+
+    // 3. AFFICHAGE DES DONNÉES
+    function renderTables() {
+        const bodies = {
+            rh: document.getElementById('bodyRH'),
+            med: document.getElementById('bodyMed'),
+            perf: document.getElementById('bodyPerf')
+        };
+        
+        // On vide les tables
+        Object.values(bodies).forEach(b => b.innerHTML = "");
+
+        db.forEach(p => {
+            bodies.rh.innerHTML += `<tr><td>${p.nom}</td><td>${p.prenom}</td><td>${p.grade}</td><td>${p.mat}</td><td>${p.dip}</td><td>${p.pos}</td></tr>`;
+            bodies.med.innerHTML += `<tr><td>${p.nom}</td><td>${p.poids}</td><td>${p.taille}</td><td>${p.imc}</td><td>${p.ta}</td><td>${p.gly}</td></tr>`;
+            bodies.perf.innerHTML += `<tr><td>${p.nom}</td><td>${p.sport}</td><td>${p.tir}</td><td>${p.topo}</td><td>${p.combat}</td><td>${((p.sport+p.tir+p.topo+p.combat)/4).toFixed(2)}</td></tr>`;
         });
     }
 
-    function showSection(id) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        event.currentTarget.classList.add('active');
+    // 4. AJOUT DE DONNÉES (ADMIN)
+    function addNewUser() {
+        const newUser = {
+            nom: document.getElementById('newNom').value.toUpperCase(),
+            prenom: document.getElementById('newPrenom').value.toUpperCase(),
+            grade: document.getElementById('newGrade').value,
+            mat: document.getElementById('newMat').value,
+            dip: document.getElementById('newDip').value,
+            pos: "PRESENT", poids: 0, taille: 0, imc: 0, ta: "-", gly: "-", sport: 0, tir: 0, topo: 0, combat: 0
+        };
+        db.push(newUser);
+        alert("Militaire ajouté avec succès !");
+        document.getElementById('addForm').reset();
+        renderTables();
+        showTab('tab-rh');
     }
 
-    function filterCards() {
-        let input = document.getElementById('searchInput').value.toUpperCase();
-        let cards = document.querySelectorAll('.card');
-        cards.forEach(card => {
-            let name = card.getAttribute('data-name');
-            card.style.display = name.includes(input) ? "block" : "none";
-        });
+    // 5. NAVIGATION
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+        document.getElementById(tabId).classList.remove('hidden');
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        // Changement de titre dynamique
+        const titles = { 'tab-rh': 'Paramètres du Personnel', 'tab-med': 'Suivi Médical', 'tab-perf': 'Aptitudes et Notes', 'tab-add': 'Administration Système' };
+        document.getElementById('tabTitle').innerText = titles[tabId];
     }
 
-    window.onload = renderCards;
+    function filterTable(tableId) {
+        let input = document.getElementById('searchBar').value.toUpperCase();
+        let rows = document.getElementById(tableId).getElementsByTagName('tr');
+        for (let i = 1; i < rows.length; i++) {
+            rows[i].style.display = rows[i].innerText.toUpperCase().includes(input) ? "" : "none";
+        }
+    }
 </script>
 
 </body>
