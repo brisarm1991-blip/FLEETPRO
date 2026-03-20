@@ -49,14 +49,14 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 .btn-accent{background:var(--accent); color:white;}
 .btn-secondary{background:#6c757d; color:white;}
 
-/* STYLE SPECIFIQUE POUR LE PDF (PRINT) */
+/* 🖨️ RÉGLAGES SPÉCIFIQUES POUR L'EXPORT PDF */
 @media print {
-  .sidebar, .btn, .modal-overlay, #page-settings, .fa-trash, .fa-edit { display: none !important; }
+  .sidebar, .btn, .header-btns, .modal-overlay, #page-settings, .fa-trash, .fa-edit { display: none !important; }
   .main { margin-left: 0 !important; display: block !important; }
-  .page { display: block !important; margin-bottom: 40px; page-break-after: auto; }
-  .header { border-bottom: 2px solid #000; }
-  #title-header { font-size: 24pt; text-transform: uppercase; }
-  .card { box-shadow: none; border: 1px solid #ccc; }
+  .page { display: block !important; border:none !important; }
+  .header { border-bottom: 2px solid #000; justify-content: center; }
+  #title-header { font-size: 26pt !important; color: #000 !important; }
+  .card { box-shadow: none; border: 1px solid #eee; }
 }
 </style>
 </head>
@@ -86,8 +86,10 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 
 <div class="main" id="app">
   <header class="header">
-    <h2 id="title-header">TABLEAU DE BORD</h2>
-    <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> EXPORTER PDF</button>
+    <h2 id="title-header">TrustFleet</h2>
+    <div class="header-btns">
+        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> PDF</button>
+    </div>
   </header>
 
   <div class="content">
@@ -103,28 +105,36 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
     </div>
 
     <div id="page-vehicles" class="page">
-      <h3>Registre des Véhicules</h3><br>
+      <div style="display:flex; justify-content:space-between; margin-bottom:15px">
+        <h3>Registre Automobile</h3>
+        <button class="btn btn-primary" onclick="openM('m-v')">Ajouter</button>
+      </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Véhicule</th><th>Immatriculation</th><th>Dotation</th><th>Kilométrage</th><th>État</th><th class="btn">Actions</th></tr></thead>
+          <thead><tr><th>Véhicule</th><th>Immatriculation</th><th>Année Dotation</th><th>KM</th><th>État</th><th class="btn">Actions</th></tr></thead>
           <tbody id="t-v"></tbody>
         </table>
       </div>
     </div>
 
+    <div id="page-drivers" class="page">
+        <h3>Personnel</h3>
+        <div id="t-d"></div>
+    </div>
+
     <div id="page-settings" class="page">
-        <h3>Configuration de la Structure</h3><br>
+        <h3>Paramètres de la Structure</h3><br>
         <div class="card" style="max-width:500px">
             <div style="margin-bottom:15px">
-                <label style="display:block; margin-bottom:5px; font-weight:bold;">Nom affiché en Entête (PDF & App)</label>
+                <label style="display:block; margin-bottom:5px; font-weight:bold;">Nom de l'Unité (Entête PDF)</label>
                 <input type="text" id="set-unit-name" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:6px;">
             </div>
             <div style="margin-bottom:15px">
                 <label style="display:block; margin-bottom:5px; font-weight:bold;">Code d'Accès</label>
-                <input type="password" id="set-new-pass" placeholder="Nouveau code (optionnel)" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:6px;">
+                <input type="password" id="set-new-pass" placeholder="Laisser vide pour ne pas changer" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:6px;">
             </div>
             <div style="display:flex; gap:10px">
-                <button class="btn btn-accent" onclick="saveSettings()">Valider les changements</button>
+                <button class="btn btn-accent" onclick="saveSettings()">Valider et Appliquer</button>
                 <button class="btn btn-secondary" onclick="showPage('dashboard')">Annuler</button>
             </div>
         </div>
@@ -133,7 +143,7 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
   </div>
 </div>
 
-<div id="m-v" class="modal-overlay"><div class="modal"><h3>Nouveau Véhicule</h3><br>
+<div id="m-v" class="modal-overlay"><div class="modal"><h3>Fiche Véhicule</h3><br>
 <form id="f-v" onsubmit="save(event,'v','m-v')">
   <input type="hidden" id="v_id">
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
@@ -151,17 +161,18 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 </form></div></div>
 
 <script>
+// INITIALISATION
 let config = JSON.parse(localStorage.getItem('trust_config')) || { pass: '301', unit: 'TrustFleet' };
-let db = { v: JSON.parse(localStorage.getItem('v_301')) || [], d: [] };
+let db = { v: JSON.parse(localStorage.getItem('v_301')) || [] };
 
-// APPLIQUE LE NOM PARTOUT ET DANS L'ENTÊTE PDF
+// APPLICATION DU NOM PARTOUT
 function applyConfig() {
-    document.title = config.unit;
-    document.getElementById('lock-title').innerText = config.unit;
-    document.getElementById('side-title').innerText = config.unit;
-    // C'est ici que l'entête se met à jour pour le PDF
-    document.getElementById('title-header').innerText = config.unit.toUpperCase();
-    document.getElementById('set-unit-name').value = config.unit;
+    const unitName = config.unit || 'TrustFleet';
+    document.title = unitName;
+    document.getElementById('side-title').innerText = unitName;
+    document.getElementById('lock-title').innerText = unitName;
+    document.getElementById('title-header').innerText = unitName.toUpperCase();
+    document.getElementById('set-unit-name').value = unitName;
 }
 
 function login() { 
@@ -173,13 +184,14 @@ function login() {
 }
 
 function saveSettings() {
-    const val = document.getElementById('set-unit-name').value;
-    if(val.trim() !== "") config.unit = val;
-    const ps = document.getElementById('set-new-pass').value;
-    if(ps.trim() !== "") config.pass = ps;
+    const newName = document.getElementById('set-unit-name').value;
+    const newPass = document.getElementById('set-new-pass').value;
+    
+    if(newName.trim() !== "") config.unit = newName;
+    if(newPass.trim() !== "") config.pass = newPass;
     
     localStorage.setItem('trust_config', JSON.stringify(config));
-    applyConfig();
+    applyConfig(); // Applique le nom immédiatement
     alert('Structure mise à jour !');
 }
 
@@ -187,8 +199,9 @@ function showPage(pId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('page-' + pId).classList.add('active');
-    // En mode écran, on affiche le titre de la page, mais en mode PDF applyConfig() reprend le dessus
-    if(pId !== 'settings') document.getElementById('title-header').textContent = config.unit.toUpperCase() + " - " + pId.toUpperCase();
+    
+    // Garde le nom de la structure en entête même si on change de page
+    document.getElementById('title-header').innerText = config.unit.toUpperCase();
 }
 
 function openM(id) { document.getElementById(id).classList.add('open'); }
@@ -206,15 +219,17 @@ function save(e, k, mid) {
 function refresh() {
     document.getElementById('s-v').textContent = db.v.length;
     document.getElementById('s-p').textContent = db.v.filter(x=>x.state==='En panne').length;
-    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td>${x.brand} ${x.model}</td><td>${x.plate}</td><td style="font-weight:bold">${x.year}</td><td>${x.km} km</td><td>${x.state}</td><td class="btn"><i class="fas fa-trash" onclick="del('v',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td>${x.brand} ${x.model}</td><td>${x.plate}</td><td>${x.year}</td><td>${x.km} km</td><td>${x.state}</td><td class="btn"><i class="fas fa-trash" onclick="del('v',${x.id})"></i></td></tr>`).join('');
     
     const ctx = document.getElementById('chartV').getContext('2d');
     if(chart) chart.destroy();
-    chart = new Chart(ctx, { type:'bar', data: { labels:['En Service', 'En Panne'], datasets:[{label:'Parc', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#28a745','#dc3545']}] }, options:{animation:false}});
+    chart = new Chart(ctx, { type:'bar', data: { labels:['En Service', 'En Panne'], datasets:[{label:'Parc', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#28a745','#dc3545']}] }, options:{animation:false, responsive:true}});
 }
+
 function del(k, id) { if(confirm('Supprimer ?')) { db[k] = db[k].filter(x=>x.id!==id); localStorage.setItem(k+'_301', JSON.stringify(db[k])); refresh(); } }
 
-applyConfig();
+let chart;
+applyConfig(); // Force l'affichage du nom dès le départ
 </script>
 </body>
 </html>
