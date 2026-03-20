@@ -24,11 +24,18 @@
   --radius: 10px;
   --sidebar-width: 260px;
 }
-
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
 
-/* SIDEBAR - DISPARAÎT AU PDF */
+/* --- AMÉLIORATION PDF : MASQUER SIDEBAR --- */
+@media print {
+  .sidebar, .btn, .top-bar button, .nav-item, .sidebar-header { display: none !important; }
+  .main-content { margin-left: 0 !important; width: 100% !important; }
+  .page { display: block !important; padding: 0; }
+  .table-container { box-shadow: none; border: 1px solid #ccc; }
+  body { background: white; }
+}
+
 .sidebar{width:var(--sidebar-width);background:var(--primary);color:#fff;display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100;transition:0.3s;}
 .sidebar-header{padding:25px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1);}
 .sidebar-header h2{font-size:1.4rem;font-weight:700;letter-spacing:1px;color:#fff;}
@@ -36,133 +43,86 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg
 .nav-item{padding:12px 25px;display:flex;align-items:center;color:rgba(255,255,255,0.7);text-decoration:none;cursor:pointer;transition:0.3s;font-size:0.95rem;position:relative;}
 .nav-item i{width:25px;margin-right:10px;font-size:1.1rem;text-align:center;}
 .nav-item:hover, .nav-item.active{background:var(--primary-light);color:#fff;border-left:4px solid var(--accent);}
-
-/* MAIN CONTENT */
 .main-content{flex:1;margin-left:var(--sidebar-width);display:flex;flex-direction:column;transition:0.3s;}
 .top-bar{height:70px;background:var(--card-bg);display:flex;align-items:center;justify-content:space-between;padding:0 30px;box-shadow:var(--shadow);position:sticky;top:0;z-index:90;}
-
 .page{padding:30px;display:none;animation:fadeIn 0.4s;}
 .page.active{display:block;}
-
-/* TABLE STYLES */
 .table-container{background:var(--card-bg);padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-top:20px;overflow-x:auto;}
 table{width:100%;border-collapse:collapse;margin-top:15px;}
 th{text-align:left;padding:12px 15px;background:#f8f9fa;color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.75rem;border-bottom:2px solid var(--border);}
 td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.9rem;}
-
-.img-preview{width:45px;height:45px;border-radius:8px;object-fit:cover;border:1px solid var(--border);}
-
-/* MODIFICATION PDF : RÈGLE D'IMPRESSION */
-@media print {
-  .sidebar, .btn, .top-bar button, .nav-item, .sidebar-header { display: none !important; }
-  .main-content { margin-left: 0 !important; width: 100% !important; }
-  .page { display: block !important; padding: 0; }
-  .table-container { box-shadow: none; border: 1px solid #ccc; }
-  body { background: white; }
-  .top-bar { box-shadow: none; border-bottom: 2px solid #333; }
-}
-
-/* LOCK SCREEN */
-#lock-screen{position:fixed;inset:0;background:var(--primary);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;color:white;}
-.lock-box{background:var(--primary-light);padding:40px;border-radius:15px;text-align:center;box-shadow:0 10px-25px rgba(0,0,0,0.3);width:320px;}
-.lock-box input{width:100%;padding:12px;margin:20px 0;border-radius:6px;border:none;text-align:center;font-size:1.2rem;outline:none;}
-
-@keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
-
-/* BOUTONS */
 .btn{padding:10px 18px;border-radius:6px;border:none;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;transition:0.2s;}
 .btn-primary{background:var(--accent);color:white;}
-.btn-print{background:var(--info);color:white;}
+#lock-screen{position:fixed;inset:0;background:var(--primary);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;color:white;}
+.lock-box{background:var(--primary-light);padding:40px;border-radius:15px;text-align:center;width:320px;}
+.lock-box input{width:100%;padding:12px;margin:20px 0;border-radius:6px;border:none;text-align:center;font-size:1.2rem;}
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
 </style>
 </head>
 <body onload="initApp()">
 
 <div id="lock-screen">
   <div class="lock-box">
-    <i class="fas fa-shield-alt fa-3x" style="color:var(--accent);margin-bottom:15px"></i>
     <h2>BA 301</h2>
-    <p style="opacity:0.7">Gestion de Parc Automobile</p>
-    <input type="password" id="access-code" placeholder="Code secret">
-    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="verifyLogin()">ACCÉDER</button>
+    <input type="password" id="access-code" placeholder="Code d'accès">
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="verifyLogin()">CONNEXION</button>
   </div>
 </div>
 
 <div class="sidebar">
   <div class="sidebar-header"><h2>FLEET<span style="color:var(--accent)">PRO</span></h2></div>
   <div class="sidebar-nav">
-    <div class="nav-item active" onclick="showPage('dash')"><i class="fas fa-home"></i> Tableau de bord</div>
-    <div class="nav-item" onclick="showPage('veh')"><i class="fas fa-car"></i> Parc Véhicules</div>
-    <div class="nav-item" onclick="showPage('fuel')"><i class="fas fa-gas-pump"></i> Consommation</div>
-    <div class="nav-item" onclick="showPage('maint')"><i class="fas fa-tools"></i> Maintenance</div>
-    <div class="nav-item" onclick="showPage('staff')"><i class="fas fa-users"></i> Personnel</div>
-    <div class="nav-item" onclick="showPage('sett')" style="margin-top:20px;border-top:1px solid rgba(255,255,255,0.1)"><i class="fas fa-cog"></i> Paramètres</div>
+    <div class="nav-item active" onclick="showPage('dash')"><i class="fas fa-home"></i> Dashboard</div>
+    <div class="nav-item" onclick="showPage('veh')"><i class="fas fa-car"></i> Véhicules</div>
+    <div class="nav-item" onclick="showPage('sett')"><i class="fas fa-cog"></i> Paramètres</div>
   </div>
 </div>
 
 <div class="main-content" id="app-main" style="display:none">
   <div class="top-bar">
-    <h2 id="page-title">Tableau de Bord</h2>
-    <button class="btn btn-print" onclick="window.print()"><i class="fas fa-file-pdf"></i> GÉNÉRER RAPPORT PDF</button>
+    <h2 id="page-title">Dashboard</h2>
+    <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> PDF</button>
   </div>
 
   <div class="page active" id="page-dash">
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;" id="stat-cards">
-       </div>
-    <div class="table-container">
-      <canvas id="mainChart" height="100"></canvas>
-    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;" id="stat-cards"></div>
   </div>
 
   <div class="page" id="page-veh">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h3>LISTE DES UNITÉS ROULANTES</h3>
-      <button class="btn btn-primary" onclick="alert('Fonction Ajouter')">+ NOUVEAU VÉHICULE</button>
-    </div>
+    <h3>PARC AUTOMOBILE</h3>
     <div class="table-container">
       <table>
         <thead>
           <tr>
-            <th>Photo</th>
-            <th>Modèle / Type</th>
-            <th>Immatriculation</th>
-            <th style="color:var(--accent);background:rgba(255,107,53,0.05)">KM ACTUEL</th>
-            <th>Statut</th>
+            <th>Modèle</th>
+            <th>Plaque</th>
+            <th style="color:var(--accent)">KM ACTUEL</th> <th>État</th>
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody id="vehicle-table-body">
-          </tbody>
+        <tbody id="vehicle-table-body"></tbody>
       </table>
     </div>
   </div>
 
   <div class="page" id="page-sett">
-    <h3>CONFIGURATION DU SYSTÈME</h3>
-    <div class="table-container" style="max-width:500px">
-      <div style="margin-bottom:20px">
-        <label style="display:block;margin-bottom:8px;font-weight:600">Nom de l'Unité</label>
-        <input type="text" id="unit-name-input" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:5px">
-      </div>
-      <div style="margin-bottom:20px">
-        <label style="display:block;margin-bottom:8px;font-weight:600">Modifier le Code d'accès</label>
-        <input type="password" id="new-access-code" placeholder="Nouveau code secret" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:5px">
-      </div>
-      <button class="btn btn-primary" onclick="saveSettings()" style="width:100%;justify-content:center">ENREGISTRER LES MODIFICATIONS</button>
+    <h3>PARAMÈTRES</h3>
+    <div class="table-container" style="max-width:400px">
+      <label>Nom de l'unité</label>
+      <input type="text" id="cfg-unit" style="width:100%;padding:10px;margin:10px 0;">
+      <label>Modifier le code d'accès</label>
+      <input type="password" id="cfg-new-code" placeholder="Nouveau code" style="width:100%;padding:10px;margin:10px 0;">
+      <button class="btn btn-primary" onclick="saveSettings()" style="width:100%;justify-content:center">ENREGISTRER</button>
     </div>
   </div>
-  
-  </div>
+</div>
 
 <script>
-// --- GESTION DES DONNÉES ET CONFIGURATION ---
 let config = JSON.parse(localStorage.getItem('fmp_config')) || { code: '301', unit: 'BA 301' };
-let vehicles = JSON.parse(localStorage.getItem('fmp_vehicles')) || [
-  {id: 1, model: 'Toyota Hilux 4x4', plate: 'BA-301-01', km: 45200, state: 'En service', img: ''},
-  {id: 2, model: 'Land Rover Defender', plate: 'BA-301-02', km: 128500, state: 'En maintenance', img: ''}
-];
+let vehicles = JSON.parse(localStorage.getItem('fmp_v')) || [];
 
 function initApp() {
-  document.getElementById('unit-name-input').value = config.unit;
+  document.getElementById('cfg-unit').value = config.unit;
   renderVehicles();
 }
 
@@ -171,45 +131,35 @@ function verifyLogin() {
   if(input === config.code) {
     document.getElementById('lock-screen').style.display = 'none';
     document.getElementById('app-main').style.display = 'flex';
-  } else {
-    alert("Code d'accès incorrect pour la " + config.unit);
-  }
+  } else { alert("Code incorrect"); }
 }
 
 function saveSettings() {
-  config.unit = document.getElementById('unit-name-input').value;
-  const newCode = document.getElementById('new-access-code').value;
-  if(newCode) config.code = newCode;
-  
+  config.unit = document.getElementById('cfg-unit').value;
+  const nc = document.getElementById('cfg-new-code').value;
+  if(nc) config.code = nc;
   localStorage.setItem('fmp_config', JSON.stringify(config));
-  alert("Paramètres sauvegardés avec succès !");
+  alert("Sauvegardé !");
   location.reload();
 }
 
 function renderVehicles() {
   const tbody = document.getElementById('vehicle-table-body');
-  const placeholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ccc'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E";
-  
   tbody.innerHTML = vehicles.map(v => `
     <tr>
-      <td><img src="${v.img || placeholder}" class="img-preview"></td>
-      <td><b>${v.model}</b></td>
-      <td><span style="background:#eee;padding:4px 8px;border-radius:4px;font-family:monospace">${v.plate}</span></td>
-      <td style="font-weight:700;color:var(--accent)">${v.km.toLocaleString()} KM</td>
-      <td><span style="color:${v.state === 'En service' ? 'var(--success)' : 'var(--danger)'}">● ${v.state}</span></td>
-      <td><button class="btn" style="padding:5px"><i class="fas fa-edit"></i></button></td>
+      <td>${v.model}</td>
+      <td><b>${v.plate}</b></td>
+      <td style="color:var(--accent);font-weight:bold">${v.km || 0} KM</td>
+      <td>${v.state}</td>
+      <td><button onclick="delV(${v.id})"><i class="fas fa-trash"></i></button></td>
     </tr>
   `).join('');
 }
 
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-  event.currentTarget.classList.add('active');
-  document.getElementById('page-title').textContent = event.currentTarget.textContent;
 }
-
 </script>
 </body>
 </html>
