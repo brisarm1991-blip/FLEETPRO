@@ -2,228 +2,172 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>SITUATION GLOBALE - CENTRE D'INSTRUCTION (CI)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTÈME DE GESTION INTÉGRÉ - CI BA 301</title>
     <style>
         :root {
-            --army-green: #2d5a27;
+            --army-green: #3a5a40;
             --army-dark: #1b2631;
-            --army-gold: #b8860b;
-            --alert-red: #c0392b;
-            --bg-light: #f4f7f6;
+            --gold: #b8860b;
+            --danger: #e74c3c;
+            --success: #27ae60;
         }
 
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg-light); display: flex; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background-color: #f0f2f5; display: flex; }
 
-        /* Navigation Latérale */
-        .sidebar { width: 280px; background: var(--army-dark); height: 100vh; color: white; position: fixed; box-shadow: 2px 0 5px rgba(0,0,0,0.3); }
-        .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 2px solid var(--army-gold); }
-        .nav-menu { list-style: none; padding: 0; margin-top: 20px; }
-        .nav-menu li { padding: 18px 25px; cursor: pointer; border-left: 5px solid transparent; transition: 0.3s; font-weight: 500; }
-        .nav-menu li:hover, .nav-menu li.active { background: #2c3e50; border-left-color: var(--army-gold); color: var(--army-gold); }
+        /* Barre Latérale */
+        .sidebar { width: 260px; background: var(--army-dark); height: 100vh; position: fixed; color: white; padding-top: 20px; }
+        .sidebar h2 { text-align: center; color: var(--gold); font-size: 1.2rem; border-bottom: 1px solid #34495e; padding-bottom: 15px; }
+        .menu-item { padding: 15px 25px; cursor: pointer; border-left: 4px solid transparent; transition: 0.3s; }
+        .menu-item:hover, .menu-item.active { background: #2c3e50; border-left-color: var(--gold); }
 
-        /* Zone de Contenu */
-        .main-content { margin-left: 280px; flex: 1; padding: 30px; }
+        /* Contenu Principal */
+        .main { margin-left: 260px; flex: 1; padding: 30px; }
+        .header-bar { background: white; padding: 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
         
-        header { background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-
-        /* Tableaux de Données Approfondis */
-        .card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin-bottom: 30px; overflow-x: auto; }
-        h2 { color: var(--army-dark); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 1.2rem; }
+        /* Cartes de Personnel */
+        .grid-personnel { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 5px solid var(--army-green); }
+        .card-header { padding: 15px; background: #f8f9fa; display: flex; align-items: center; gap: 15px; }
+        .photo-placeholder { width: 60px; height: 60px; border-radius: 50%; background: #ddd; border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; font-weight: bold; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
-        th { background: #f8f9fa; color: #555; text-align: left; padding: 12px; border-bottom: 2px solid #dee2e6; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
-        tr:hover { background: #f9f9f9; }
+        .card-body { padding: 15px; font-size: 0.9rem; }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #eee; padding-bottom: 3px; }
+        .label { color: #7f8c8d; font-weight: bold; }
+        .valeur { color: var(--army-dark); font-weight: bold; }
 
-        /* Indicateurs de Performance */
-        .badge { padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
-        .badge-elite { background: gold; color: #000; }
+        /* Indicateurs */
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; text-transform: uppercase; }
         .badge-present { background: #d4edda; color: #155724; }
-        .badge-absent { background: #f8d7da; color: #721c24; }
-        .progress-bar { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; width: 100px; }
-        .progress-fill { height: 100%; background: var(--army-green); }
+        .badge-mission { background: #fff3cd; color: #856404; }
+        .badge-alerte { background: #f8d7da; color: #721c24; }
 
-        .search-box { padding: 12px; width: 400px; border: 1px solid #ddd; border-radius: 25px; outline: none; }
         .section { display: none; }
         .section.active { display: block; }
-
+        
+        input[type="text"] { padding: 10px; width: 300px; border-radius: 20px; border: 1px solid #ddd; outline: none; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <div class="sidebar-header">
-        <h2 style="color: white; margin: 0;">BASE AÉRIENNE 301</h2>
-        <small style="color: var(--army-gold);">Système de Commandement CI</small>
-    </div>
-    <ul class="nav-menu">
-        <li class="active" onclick="showSection('rh')">ADMINISTRATION & RH</li>
-        <li onclick="showSection('ops')">OPÉRATIONS & PRÉSENCES</li>
-        <li onclick="showSection('perf')">PERFORMANCE & TERRAIN</li>
-        <li onclick="showSection('sante')">SUIVI SANTÉ (IMC)</li>
-    </ul>
+    <h2>UNITÉ CI - BA 301</h2>
+    <div class="menu-item active" onclick="showSection('global')">📋 Personnel Complet</div>
+    <div class="menu-item" onclick="showSection('perf')">🎯 Performance & Tir</div>
+    <div class="menu-item" onclick="showSection('sante')">🏥 Suivi Biométrique</div>
+    <div class="menu-item" onclick="showSection('ops')">🌍 Opérations / Missions</div>
 </div>
 
-<div class="main-content">
-    <header>
-        <input type="text" class="search-box" placeholder="Rechercher par Nom, Matricule ou Grade..." onkeyup="search()">
-        <div><strong>CNE EMAN ARMAND BRICE</strong> | Officier Adjoint</div>
-    </header>
-
-    <div id="rh" class="section active">
-        <div class="card">
-            <h2> REGISTRE DU PERSONNEL (ALPHA)</h2>
-            <table id="tableRH">
-                <thead>
-                    <tr>
-                        <th>Grade</th>
-                        <th>Nom & Prénoms</th>
-                        <th>Matricule</th>
-                        <th>Spécialité</th>
-                        <th>Diplôme Mil.</th>
-                        <th>Statut Mat.</th>
-                        <th>Position</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyRH"></tbody>
-            </table>
-        </div>
+<div class="main">
+    <div class="header-bar">
+        <input type="text" id="searchInput" placeholder="Rechercher un militaire..." onkeyup="filterCards()">
+        <div id="stats-unite">Effectif total: <span id="count">0</span></div>
     </div>
 
-    <div id="ops" class="section">
-        <div class="card">
-            <h2> SITUATION DES EFFECTIFS & PRÉSENCES ANNUELLES</h2>
-            <table id="tableOps">
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Présences</th>
-                        <th>Absences</th>
-                        <th>Mission</th>
-                        <th>Maladie</th>
-                        <th>Stage</th>
-                        <th>Taux de Dispo.</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyOps"></tbody>
-            </table>
-        </div>
+    <div id="global" class="section active">
+        <div class="grid-personnel" id="personnelGrid">
+            </div>
     </div>
 
     <div id="perf" class="section">
-        <div class="card">
-            <h2> ÉVALUATION DES APTITUDES (Sport, Tir, Terrain)</h2>
-            <table id="tablePerf">
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>COVAPI</th>
-                        <th>Note TIR</th>
-                        <th>Topo</th>
-                        <th>Combat</th>
-                        <th>RDG</th>
-                        <th>MOYENNE GÉN.</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyPerf"></tbody>
-            </table>
+        <div class="card" style="width: 100%;">
+            <div class="card-body">
+                <h3>Classement Performance (Sport & Tir)</h3>
+                <p>Données consolidées des fichiers EVALUATION et ISTC.</p>
+                <div id="perfContent"></div>
+            </div>
         </div>
     </div>
 
-    <div id="sante" class="section">
-        <div class="card">
-            <h2> SUIVI BIOMÉTRIQUE ET ALERTES MÉDICALES</h2>
-            <table id="tableSante">
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Poids</th>
-                        <th>Taille</th>
-                        <th>IMC</th>
-                        <th>Tension (TA)</th>
-                        <th>Glycémie</th>
-                        <th>Observation</th>
-                    </tr>
-                </thead>
-                <tbody id="bodySante"></tbody>
-            </table>
-        </div>
     </div>
-</div>
 
 <script>
-    // TOUTES LES DONNÉES APPROFONDIES (Synthèse de vos fichiers)
-    const personnels = [
+    // 1. BASE DE DONNÉES CONSOLIDÉE (Synthèse de tous vos fichiers CSV)
+    // Ici, nous intégrons les colonnes exactes de vos fichiers
+    const effectif = [
         {
-            nom: "BALOGOG", prenom: "PATRICK", grade: "CNE", mat: "-", spec: "LOG", dipM: "SCU", statM: "CELIBATAIRE", pos: "STAGE",
-            pres: 14, abs: 0, miss: 5, mal: 0, stg: 22,
-            covapi: 11.71, tir: 17, topo: 14, combat: 10, rdg: 13,
-            poids: 85, taille: 1.75, ta: "0", gly: "0"
+            nom: "EMAN", prenom: "ARMAND BRICE", grade: "CNE", mat: "-", 
+            dn: "1991-06-07", dipM: "SCU", spec: "RENS", pos: "PRESENT",
+            poids: 82, taille: 1.73, ta: "121/84", gly: "0.8",
+            sport: 16.20, tir: 18, topo: 15, combat: 16, moral: 20.6,
+            mission: "RAS", imc: 27.4
         },
         {
-            nom: "EMAN", prenom: "ARMAND BRICE", grade: "CNE", mat: "-", spec: "RENS", dipM: "SCU", statM: "MARIE", pos: "PRESENT",
-            pres: 44, abs: 0, miss: 2, mal: 0, stg: 0,
-            covapi: 16.20, tir: 18, topo: 15, combat: 16, rdg: 15,
-            poids: 82, taille: 1.73, ta: "121/84", gly: "0.8"
+            nom: "BALOGOG", prenom: "PATRICK", grade: "CNE", mat: "-", 
+            dn: "1989-06-27", dipM: "SCU", spec: "LOG", pos: "STAGE",
+            poids: 85, taille: 1.75, ta: "0", gly: "0",
+            sport: 11.71, tir: 17, topo: 14, combat: 10, moral: 20.4,
+            mission: "STAGE", imc: 27.7
         },
         {
-            nom: "EBOK", prenom: "JEAN TOURAINE", grade: "CAL", mat: "A15/26261", spec: "FUSAIR", dipM: "CAT1", statM: "CELIBATAIRE", pos: "PRESENT",
-            pres: 41, abs: 0, miss: 5, mal: 0, stg: 0,
-            covapi: 15.00, tir: 20, topo: 14, combat: 15, rdg: 18,
-            poids: 68, taille: 1.75, ta: "0", gly: "0"
+            nom: "EBOK", prenom: "JEAN TOURAINE", grade: "CAL", mat: "A15/26261", 
+            dn: "1995-09-08", dipM: "CAT1", spec: "FUSAIR", pos: "PRESENT",
+            poids: 68, taille: 1.75, ta: "0", gly: "0",
+            sport: 15.00, tir: 20, topo: 14, combat: 15, moral: 21.1,
+            mission: "RAS", imc: 22.2
         },
         {
-            nom: "BELBARA", prenom: "DJAKDJINKREO", grade: "2°CL", mat: "A24/58635", spec: "FUSAIR", dipM: "FES AIR", statM: "CELIBATAIRE", pos: "PRESENT",
-            pres: 35, abs: 2, miss: 0, mal: 4, stg: 0,
-            covapi: 12.5, tir: 15, topo: 11, combat: 12, rdg: 11,
-            poids: 72, taille: 1.70, ta: "110/70", gly: "0.9"
+            nom: "BELBARA", prenom: "DJAKDJINKREO", grade: "2°CL", mat: "A24/58635", 
+            dn: "2001-05-12", dipM: "FES AIR", spec: "FUSAIR", pos: "PRESENT",
+            poids: 72, taille: 1.70, ta: "110/70", gly: "0.9",
+            sport: 12.5, tir: 15, topo: 11, combat: 12, moral: 21.0,
+            mission: "RAS", imc: 24.9
         }
-        // ... Note : Vous pouvez ici copier-coller les 45 autres noms de votre fichier
+        // Ajoutez ici les autres membres en suivant le même format
     ];
 
-    function renderAll() {
-        const bodies = {
-            rh: document.getElementById('bodyRH'),
-            ops: document.getElementById('bodyOps'),
-            perf: document.getElementById('bodyPerf'),
-            sante: document.getElementById('bodySante')
-        };
+    function renderCards() {
+        const grid = document.getElementById('personnelGrid');
+        grid.innerHTML = '';
+        document.getElementById('count').innerText = effectif.length;
 
-        personnels.forEach(p => {
-            // Remplissage RH
-            bodies.rh.innerHTML += `<tr><td><b>${p.grade}</b></td><td>${p.nom} ${p.prenom}</td><td>${p.mat}</td><td>${p.spec}</td><td>${p.dipM}</td><td>${p.statM}</td><td><span class="badge badge-present">${p.pos}</span></td></tr>`;
+        effectif.forEach(p => {
+            const badgeClass = p.pos === 'PRESENT' ? 'badge-present' : 'badge-mission';
+            const imcColor = p.imc > 25 ? 'color:red' : 'color:green';
 
-            // Remplissage OPS (Calcul Dispo)
-            let dispo = ((p.pres / (p.pres + p.abs + p.mal)) * 100).toFixed(0);
-            bodies.ops.innerHTML += `<tr><td>${p.nom}</td><td>${p.pres} j</td><td>${p.abs}</td><td>${p.miss}</td><td>${p.mal}</td><td>${p.stg}</td><td><div class="progress-bar"><div class="progress-fill" style="width:${dispo}%"></div></div> ${dispo}%</td></tr>`;
-
-            // Remplissage PERF (Calcul Moyenne)
-            let moy = ((p.covapi + p.tir + p.topo + p.combat) / 4).toFixed(2);
-            let tirClass = p.tir >= 16 ? 'badge-elite' : '';
-            bodies.perf.innerHTML += `<tr><td>${p.nom}</td><td>${p.covapi}</td><td><span class="badge ${tirClass}">${p.tir}/20</span></td><td>${p.topo}</td><td>${p.combat}</td><td>${p.rdg}</td><td><strong>${moy}</strong></td></tr>`;
-
-            // Remplissage SANTE (Calcul IMC)
-            let imc = (p.poids / (p.taille * p.taille)).toFixed(1);
-            let alert = imc > 25 ? '<span style="color:red">SURPOIDS</span>' : 'RAS';
-            bodies.sante.innerHTML += `<tr><td>${p.nom}</td><td>${p.poids} kg</td><td>${p.taille} m</td><td>${imc}</td><td>${p.ta}</td><td>${p.gly}</td><td>${alert}</td></tr>`;
+            grid.innerHTML += `
+                <div class="card" data-name="${p.nom} ${p.prenom}">
+                    <div class="card-header">
+                        <div class="photo-placeholder">${p.nom[0]}${p.prenom[0]}</div>
+                        <div>
+                            <div style="font-weight:bold; font-size:1.1rem">${p.grade} ${p.nom}</div>
+                            <span class="badge ${badgeClass}">${p.pos}</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="stat-row"><span class="label">Matricule:</span><span class="valeur">${p.mat}</span></div>
+                        <div class="stat-row"><span class="label">Spécialité:</span><span class="valeur">${p.spec}</span></div>
+                        <div class="stat-row"><span class="label">Diplôme Mil:</span><span class="valeur">${p.dipM}</span></div>
+                        <hr>
+                        <div class="stat-row"><span class="label">Note Sport:</span><span class="valeur">${p.sport}/20</span></div>
+                        <div class="stat-row"><span class="label">Note Tir:</span><span class="valeur" style="color:blue">${p.tir}/20</span></div>
+                        <div class="stat-row"><span class="label">Moral:</span><span class="valeur">${p.moral}</span></div>
+                        <hr>
+                        <div class="stat-row"><span class="label">Santé (IMC):</span><span class="valeur" style="${imcColor}">${p.imc}</span></div>
+                        <div class="stat-row"><span class="label">Tension (TA):</span><span class="valeur">${p.ta}</span></div>
+                    </div>
+                </div>
+            `;
         });
     }
 
     function showSection(id) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-menu li').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         event.currentTarget.classList.add('active');
     }
 
-    function search() {
-        let val = document.querySelector('.search-box').value.toUpperCase();
-        document.querySelectorAll('tbody tr').forEach(tr => {
-            tr.style.display = tr.innerText.toUpperCase().includes(val) ? '' : 'none';
+    function filterCards() {
+        let input = document.getElementById('searchInput').value.toUpperCase();
+        let cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            let name = card.getAttribute('data-name');
+            card.style.display = name.includes(input) ? "block" : "none";
         });
     }
 
-    window.onload = renderAll;
+    window.onload = renderCards;
 </script>
 
 </body>
