@@ -17,31 +17,37 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden;}
 
-/* --- CONFIGURATION EXPORT PDF --- */
+/* --- CONFIGURATION EXPORT PDF OPTIMISÉE --- */
 @media print {
-  /* Masquer tout ce qui n'est pas de la donnée */
-  .sidebar, .top-bar, .btn, .action-btns, #modal-overlay, #page-settings, #lock-screen, .sidebar-header { 
+  .sidebar, .top-bar, .btn, .action-btns, #modal-overlay, #page-settings, #lock-screen { 
     display: none !important; 
   }
   
   .main-content { margin-left: 0 !important; width: 100% !important; background: white !important; }
   
-  /* Forcer l'affichage de toutes les pages de données */
   .page { 
     display: block !important; 
     opacity: 1 !important; 
-    padding: 20px !important; 
-    border: none !important;
-    page-break-before: always; /* CHAQUE SECTION COMMENCE SUR UNE NOUVELLE PAGE */
+    padding: 10px !important; 
+    page-break-before: always; 
+    width: 100% !important;
   }
 
-  /* La première page (Dashboard) n'a pas besoin de saut avant elle */
-  #page-dash { page-break-before: auto; }
+  #page-dash { page-break-before: avoid; }
 
+  /* Optimisation des graphiques pour le PDF */
   .table-container { 
     box-shadow: none !important; 
     border: 1px solid #eee !important; 
-    page-break-inside: avoid; 
+    page-break-inside: avoid;
+    width: 100% !important;
+    margin-bottom: 20px;
+  }
+
+  canvas { 
+    width: 100% !important; 
+    height: 350px !important; /* Force une hauteur lisible sur papier */
+    display: block !important;
   }
 
   #pdf-header { 
@@ -51,8 +57,8 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg
     border-bottom: 3px solid var(--primary); 
     padding-bottom: 10px; 
   }
-
-  canvas { max-width: 100% !important; height: auto !important; }
+  
+  h3 { margin-top: 10px; border-left: 5px solid var(--accent); padding-left: 10px; }
 }
 
 #pdf-header { display: none; }
@@ -102,7 +108,7 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
 <div id="lock-screen">
   <div class="lock-box">
     <i class="fas fa-shield-alt fa-3x" style="color:var(--accent); margin-bottom:15px"></i>
-    <h2 id="lock-unit-title">CHARGEMENT...</h2>
+    <h2 id="lock-unit-title">IDENTIFICATION</h2>
     <input type="text" id="login-id" placeholder="Identifiant">
     <input type="password" id="login-pass" placeholder="Mot de passe" onkeypress="if(event.key==='Enter') verifyLogin()">
     <button onclick="verifyLogin()" class="btn btn-primary" style="width:100%; justify-content:center;">S'IDENTIFIER</button>
@@ -124,7 +130,7 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
 <div class="main-content" id="app-main" style="display:none">
   <div id="pdf-header">
     <h1 id="pdf-unit-name">UNITÉ</h1>
-    <h2 style="color: #666;">Rapport Global de Gestion de Flotte</h2>
+    <h2 style="color: #666;">Rapport Complet de Gestion de Flotte</h2>
     <p>Généré le : <span id="pdf-date"></span></p>
   </div>
 
@@ -139,12 +145,10 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
 
   <div class="content">
     <div id="page-dash" class="page active">
-      <h2 class="print-only" style="display:none; margin-bottom:20px;">1. État de Situation (KPI)</h2>
+      <h3>1. État de Situation (KPI)</h3>
       <div class="kpi-grid" id="kpi-container"></div>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-        <div class="table-container"><h3>Kilométrage par Véhicule</h3><canvas id="chartKM"></canvas></div>
-        <div class="table-container"><h3>Dépenses Maintenance (CFA)</h3><canvas id="chartMaint"></canvas></div>
-      </div>
+      <div class="table-container"><h3>Graphique : Kilométrage par Véhicule</h3><canvas id="chartKM"></canvas></div>
+      <div class="table-container"><h3>Graphique : Dépenses Maintenance (CFA)</h3><canvas id="chartMaint"></canvas></div>
     </div>
 
     <div id="page-vehicles" class="page">
@@ -155,7 +159,7 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
       <div class="table-container">
         <table>
           <thead>
-            <tr><th>Marque</th><th>Modèle</th><th>Châssis</th><th>Dotation</th><th>Plaque</th><th>KM ACTUEL</th><th>Statut</th><th class="action-btns">Actions</th></tr>
+            <tr><th>Marque</th><th>Plaque</th><th>KM ACTUEL</th><th>Statut</th><th class="action-btns">Actions</th></tr>
           </thead>
           <tbody id="list-v"></tbody>
         </table>
@@ -170,7 +174,7 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.85rem;}
       <div class="table-container">
         <table>
           <thead>
-            <tr><th>Nom</th><th>Grade</th><th>Matricule</th><th>Permis</th><th>Position</th><th class="action-btns">Actions</th></tr>
+            <tr><th>Nom</th><th class="action-btns">Actions</th></tr>
           </thead>
           <tbody id="list-d"></tbody>
         </table>
@@ -249,7 +253,7 @@ function updateSettings() {
   if(document.getElementById('set-user').value) config.user = document.getElementById('set-user').value.trim();
   if(document.getElementById('set-pass').value) config.pass = document.getElementById('set-pass').value.trim();
   save('cfg', config);
-  alert("Paramètres mis à jour.");
+  alert("Paramètres enregistrés.");
   location.reload();
 }
 
@@ -268,63 +272,50 @@ function initApp() {
 }
 
 function renderAll() {
-  const v = load('v');
+  const v = load('v'), d = load('d'), f = load('f'), m = load('m');
   document.getElementById('list-v').innerHTML = v.map(i => `
-    <tr>
-      <td><b>${i.brand}</b></td><td>${i.model || ''}</td><td>${i.chassis}</td><td>${i.year}</td>
-      <td><code>${i.plate}</code></td>
-      <td style="color:var(--accent); font-weight:bold;">${(i.km || 0).toLocaleString()} KM</td>
-      <td><span class="badge ${i.status==='Actif'?'bg-actif':'bg-indispo'}">${i.status}</span></td>
-      <td class="action-btns">
-        <button class="btn" style="color:var(--info)" onclick="openModal('vehicle', ${i.id})"><i class="fas fa-edit"></i></button>
-        <button class="btn" style="color:var(--danger)" onclick="deleteItem('v', ${i.id})"><i class="fas fa-trash"></i></button>
-      </td>
-    </tr>`).join('');
+    <tr><td><b>${i.brand}</b></td><td><code>${i.plate}</code></td>
+    <td style="color:var(--accent); font-weight:bold;">${(i.km || 0).toLocaleString()} KM</td>
+    <td><span class="badge ${i.status==='Actif'?'bg-actif':'bg-indispo'}">${i.status}</span></td>
+    <td class="action-btns"><button class="btn" style="color:var(--info)" onclick="openModal('vehicle', ${i.id})"><i class="fas fa-edit"></i></button>
+    <button class="btn" style="color:var(--danger)" onclick="deleteItem('v', ${i.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
 
-  const d = load('d');
   document.getElementById('list-d').innerHTML = d.map(i => `
-    <tr><td>${i.name}</td><td>${i.grade}</td><td>${i.mat}</td><td>${i.lic}</td>
-    <td><span class="badge ${(i.status==='Disponible' || i.status==='Actif') ?'bg-actif':'bg-indispo'}">${i.status || 'Disponible'}</span></td>
-    <td class="action-btns">
-      <button class="btn" style="color:var(--info)" onclick="openModal('driver', ${i.id})"><i class="fas fa-edit"></i></button>
-      <button class="btn" style="color:var(--danger)" onclick="deleteItem('d', ${i.id})"><i class="fas fa-trash"></i></button>
-    </td></tr>`).join('');
+    <tr><td>${i.name}</td><td class="action-btns">
+    <button class="btn" style="color:var(--info)" onclick="openModal('driver', ${i.id})"><i class="fas fa-edit"></i></button>
+    <button class="btn" style="color:var(--danger)" onclick="deleteItem('d', ${i.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
 
-  const f = load('f');
   document.getElementById('list-f').innerHTML = f.map(i => `
     <tr><td>${i.date}</td><td>${i.v_name}</td><td>${i.litres}L</td><td>${i.km} KM</td>
     <td class="action-btns"><button class="btn" style="color:var(--danger)" onclick="deleteItem('f', ${i.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
 
-  const m = load('m');
   document.getElementById('list-m').innerHTML = m.map(i => `
     <tr><td>${i.date}</td><td>${i.v_name}</td><td>${i.desc}</td><td>${i.cost}</td>
     <td class="action-btns"><button class="btn" style="color:var(--danger)" onclick="deleteItem('m', ${i.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
 }
 
 function openModal(type, id = null) {
-  const overlay = document.getElementById('modal-overlay');
-  const box = document.getElementById('modal-content');
+  const overlay = document.getElementById('modal-overlay'), box = document.getElementById('modal-content');
   overlay.style.display = 'flex';
   let data = id ? load(type.charAt(0)).find(x => x.id === id) : null;
   const vehicles = load('v');
 
   if(type === 'vehicle') {
-    box.innerHTML = `<h3>${id?'Modifier':'Nouveau'}</h3>
+    box.innerHTML = `<h3>Véhicule</h3>
       <div class="form-group"><label>Marque</label><input type="text" id="v-brand" value="${data?data.brand:''}"></div>
-      <div class="form-group"><label>Immatriculation</label><input type="text" id="v-plate" value="${data?data.plate:''}"></div>
+      <div class="form-group"><label>Plaque</label><input type="text" id="v-plate" value="${data?data.plate:''}"></div>
       <div class="form-group"><label>KM Actuel</label><input type="number" id="v-km" value="${data?data.km:''}"></div>
       <div class="form-group"><label>Statut</label><select id="v-status"><option ${data?.status==='Actif'?'selected':''}>Actif</option><option ${data?.status==='Indisponible'?'selected':''}>Indisponible</option></select></div>
       <button class="btn btn-primary" style="width:100%" onclick="saveEntry('v', ${id})">ENREGISTRER</button>`;
   } else if(type === 'fuel' || type === 'maint') {
     const isFuel = type === 'fuel';
     box.innerHTML = `<h3>${isFuel?'Carburant':'Maintenance'}</h3>
-      <div class="form-group"><label>Véhicule (Plaque)</label><select id="xf-v">${vehicles.map(x=>`<option value="${x.plate}">${x.plate}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Plaque</label><select id="xf-v">${vehicles.map(x=>`<option value="${x.plate}">${x.plate}</option>`).join('')}</select></div>
       <div class="form-group"><label>${isFuel?'Litres':'Description'}</label><input type="text" id="xf-1"></div>
-      <div class="form-group"><label>${isFuel?'KM':'Coût'}</label><input type="number" id="xf-2"></div>
+      <div class="form-group"><label>${isFuel?'KM':'Coût (CFA)'}</label><input type="number" id="xf-2"></div>
       <button class="btn btn-primary" style="width:100%" onclick="saveEntry('${isFuel?'f':'m'}')">ENREGISTRER</button>`;
   } else if(type === 'driver') {
-    box.innerHTML = `<h3>Chauffeur</h3>
-      <div class="form-group"><label>Nom</label><input type="text" id="d-name" value="${data?data.name:''}"></div>
+    box.innerHTML = `<h3>Chauffeur</h3><div class="form-group"><label>Nom</label><input type="text" id="d-name" value="${data?data.name:''}"></div>
       <button class="btn btn-primary" style="width:100%" onclick="saveEntry('d', ${id})">ENREGISTRER</button>`;
   }
 }
@@ -359,19 +350,27 @@ function updateKPIs() {
   const totalCost = m.reduce((acc, curr) => acc + parseInt(curr.cost || 0), 0);
   const totalKM = v.reduce((acc, curr) => acc + parseInt(curr.km || 0), 0);
   document.getElementById('kpi-container').innerHTML = `
-    <div class="kpi-card"><h4>TOTAL VÉHICULES</h4><h2>${v.length}</h2></div>
-    <div class="kpi-card" style="border-left-color:var(--success)"><h4>DISTANCE TOTALE</h4><h2>${totalKM.toLocaleString()} KM</h2></div>
-    <div class="kpi-card" style="border-left-color:var(--danger)"><h4>MAINTENANCE TOTALE</h4><h2>${totalCost.toLocaleString()} CFA</h2></div>
+    <div class="kpi-card"><h4>VÉHICULES</h4><h2>${v.length}</h2></div>
+    <div class="kpi-card" style="border-left-color:var(--success)"><h4>DISTANCE</h4><h2>${totalKM.toLocaleString()} KM</h2></div>
+    <div class="kpi-card" style="border-left-color:var(--danger)"><h4>MAINTENANCE</h4><h2>${totalCost.toLocaleString()} CFA</h2></div>
   `;
 }
 
 function initCharts() {
   const v = load('v'), m = load('m');
-  new Chart(document.getElementById('chartKM'), {
-    type: 'bar', data: { labels: v.map(x=>x.plate), datasets: [{ label: 'KM', data: v.map(x=>x.km), backgroundColor: '#ff6b35' }] }
+  const ctxKM = document.getElementById('chartKM').getContext('2d');
+  const ctxMT = document.getElementById('chartMaint').getContext('2d');
+
+  new Chart(ctxKM, {
+    type: 'bar',
+    data: { labels: v.map(x=>x.plate), datasets: [{ label: 'Kilométrage', data: v.map(x=>x.km), backgroundColor: '#ff6b35' }] },
+    options: { responsive: true, maintainAspectRatio: false }
   });
-  new Chart(document.getElementById('chartMaint'), {
-    type: 'line', data: { labels: m.map(x=>x.date), datasets: [{ label: 'CFA', data: m.map(x=>x.cost), borderColor: '#dc3545' }] }
+
+  new Chart(ctxMT, {
+    type: 'line',
+    data: { labels: m.map(x=>x.date), datasets: [{ label: 'Coût CFA', data: m.map(x=>x.cost), borderColor: '#dc3545', tension: 0.1 }] },
+    options: { responsive: true, maintainAspectRatio: false }
   });
 }
 
@@ -388,7 +387,7 @@ function exportToCSV() {
   let csv = "Marque;Plaque;KM\n";
   v.forEach(i => csv += `${i.brand};${i.plate};${i.km}\n`);
   const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Rapport_TrustFleet.csv'; a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Rapport_Fleet.csv'; a.click();
 }
 
 window.onclick = (e) => { if(e.target == document.getElementById('modal-overlay')) document.getElementById('modal-overlay').style.display = 'none'; }
