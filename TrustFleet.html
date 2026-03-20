@@ -2,289 +2,409 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RH Manager - Unité Centrale</title>
+    <title>RH Manager - Système de Gestion Unité Centrale</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        :root {
-            --primary: #2c3e50; /* Bleu Nuit */
-            --secondary: #ecf0f1; /* Gris Clair */
-            --accent: #27ae60; /* Vert Militaire */
-            --text: #333;
-            --white: #ffffff;
+        :root { --army: #2d3e2d; --gold: #c5a059; --bg: #f4f7f6; --white: #ffffff; --accent: #27ae60; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Écran de Connexion */
+        #login-screen { position: fixed; inset: 0; background: var(--army); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; padding: 40px; border-radius: 15px; text-align: center; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+
+        /* Sidebar */
+        .sidebar { width: 280px; background: var(--army); color: white; display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.3); z-index: 100; }
+        .sidebar-header { padding: 20px; text-align: center; border-bottom: 2px solid var(--gold); }
+        .nav-group { flex: 1; overflow-y: auto; padding-top: 10px; }
+        .nav-item { padding: 15px 25px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        .nav-item:hover, .nav-item.active { background: var(--gold); color: var(--army); font-weight: bold; }
+
+        /* Main Content */
+        .main { flex: 1; display: flex; flex-direction: column; height: 100vh; position: relative; }
+        .top-bar { background: var(--white); padding: 15px 25px; display: flex; align-items: center; gap: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .content-area { flex: 1; padding: 30px; overflow-y: auto; }
+        
+        .section-card { display: none; background: var(--white); border-radius: 12px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-top: 6px solid var(--army); animation: fadeIn 0.3s ease; margin-bottom: 20px; }
+        .section-card.active { display: block; }
+
+        /* Photo & Details */
+        .profile-header { display: flex; gap: 30px; margin-bottom: 30px; align-items: flex-start; }
+        .photo-box { width: 160px; height: 200px; border: 3px solid var(--gold); background: #eee; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .photo-box img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-hint { position: absolute; bottom: 0; background: rgba(0,0,0,0.6); color: white; width: 100%; font-size: 10px; text-align: center; padding: 5px; opacity: 0; transition: 0.3s; }
+        .photo-box:hover .photo-hint { opacity: 1; }
+
+        /* Form Layout */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        label { display: block; font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 6px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+        input:disabled, select:disabled, textarea:disabled { background: #f9f9f9; color: #111; border-color: transparent; font-weight: 600; }
+
+        /* Buttons */
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-army { background: var(--army); color: white; }
+        .btn-gold { background: var(--gold); color: var(--army); }
+        .btn-save { background: var(--accent); color: white; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media print {
+            .sidebar, .top-bar, .btn, .photo-hint { display: none !important; }
+            .main { padding: 0; }
+            .section-card { display: block !important; box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
         }
-
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; color: var(--text); background: var(--secondary); height: 100vh; overflow: hidden; }
-        
-        /* Barre Latérale */
-        .sidebar { width: 260px; background: var(--primary); color: var(--white); display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
-        .sidebar h2 { text-align: center; margin-top: 0; border-bottom: 2px solid var(--accent); padding-bottom: 15px; }
-        .nav-link { color: var(--white); text-decoration: none; padding: 12px; cursor: pointer; border-radius: 5px; transition: background 0.3s; margin-bottom: 5px; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); }
-        .nav-link strong { color: var(--accent); }
-
-        /* Contenu Principal */
-        .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; }
-        
-        /* En-tête Dynamique */
-        .header { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; margin-bottom: 25px; }
-        .header h1 { margin: 0; color: var(--primary); font-size: 1.8rem; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Sections (Cachées par défaut) */
-        .content-section { display: none; }
-        .content-section.active { display: block; }
-
-        /* Tableau du Personnel */
-        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.3s; }
-        .btn-add { background: var(--accent); color: var(--white); }
-        .btn-add:hover { background: #219150; }
-        .btn-pdf { background: #e74c3c; color: var(--white); }
-        .btn-pdf:hover { background: #c0392b; }
-
-        .table-container { background: var(--white); padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; }
-        th { background: #f8f9fa; color: var(--primary); text-transform: uppercase; font-size: 0.85rem; }
-        tr:hover { background: #f1f1f1; }
-
-        /* Formulaire Paramètres */
-        .params-form { background: var(--white); padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); max-width: 500px; margin: 0 auto; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--primary); }
-        input[type="text"], input[type="password"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        
-        /* Modal (Fenêtre contextuelle) */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: var(--white); padding: 30px; border-radius: 8px; width: 400px; position: relative; }
-        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #aaa; }
     </style>
 </head>
 <body>
 
+<div id="login-screen">
+    <div class="login-box">
+        <h1 style="color:var(--army); margin-bottom:5px;">RH Manager</h1>
+        <p style="font-size: 0.8rem; color:#666;">Système Unité Centrale</p>
+        <input type="text" id="log-id" placeholder="Identifiant (Matricule ou Admin)" style="margin: 20px 0 10px; text-align:center;">
+        <input type="password" id="log-pass" placeholder="Code d'accès" style="text-align:center; margin-bottom:20px;">
+        <button onclick="access()" class="btn btn-gold" style="width:100%">CONNEXION</button>
+    </div>
+</div>
+
 <div class="sidebar">
-    <h2>RH Manager</h2>
-    <nav>
-        <div class="nav-link active" onclick="showSection('dashboard')">Tableau de bord</div>
-        <div class="nav-link" onclick="showSection('personnel')">Personnel (Central)</div>
-        <div class="nav-link" onclick="showSection('parametres')"><strong>Paramètres Admin</strong></div>
-    </nav>
-</div>
-
-<div class="main-content">
-    <div class="header">
-        <h1 id="unitNameDisplay">UNITÉ PAR DÉFAUT</h1>
+    <div class="sidebar-header">
+        <h2 id="ui-unit" style="color:var(--gold); margin:0; font-size:1.3rem;">UNITÉ</h2>
+        <div id="ui-user" style="font-size:0.9rem; margin-top:5px; opacity:0.8;">Chargement...</div>
     </div>
-
-    <div id="section-dashboard" class="content-section active">
-        <h2>Bienvenue</h2>
-        <p>Bienvenue dans l'outil de gestion RH centralisé. Utilisez la barre latérale pour naviguer.</p>
+    <div class="nav-group">
+        <div class="nav-item active" onclick="nav('sec-ident')">👤 IDENTITÉ & DIPLÔMES</div>
+        <div class="nav-item" onclick="nav('sec-carriere')">🎖 CARRIÈRE MILITAIRE</div>
+        <div class="nav-item" onclick="nav('sec-perf')">📈 PERFORMANCES</div>
+        <div class="nav-item" onclick="nav('sec-act')">📅 ACTIVITÉS & COMPTAGE</div>
+        <div class="nav-item" onclick="nav('sec-med')">🩺 SUIVI MÉDICAL</div>
+        <div id="nav-admin-only" class="nav-item" style="color:var(--gold); display:none;" onclick="nav('sec-admin')">⚙️ PARAMÈTRES ADMIN</div>
     </div>
-
-    <div id="section-personnel" class="content-section">
-        <div class="controls">
-            <h2>Registre du Personnel</h2>
-            <div>
-                <button class="btn btn-add" onclick="openModal()">AJOUTER NOUVEAU PROFIL</button>
-                <button class="btn btn-pdf" onclick="generatePDF()">EXPORTER PDF</button>
-            </div>
-        </div>
-        
-        <div class="table-container">
-            <table id="staffTable">
-                <thead>
-                    <tr>
-                        <th>Identifiant Matricule</th>
-                        <th>Grade</th>
-                        <th>Nom Complet</th>
-                        <th>Fonction</th>
-                    </tr>
-                </thead>
-                <tbody id="staffBody">
-                    </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="section-parametres" class="content-section">
-        <div class="params-form">
-            <h3>Configuration de l'Unité</h3>
-            <div class="form-group">
-                <label>Identifiant Administrateur :</label>
-                <input type="text" id="adminId" placeholder="AdminID">
-            </div>
-            <div class="form-group">
-                <label>Code d'accès sécurisé :</label>
-                <input type="password" id="adminCode" placeholder="****">
-            </div>
-            <div class="form-group">
-                <label>Nom de l'Unité Centrale (affiché sur PDF) :</label>
-                <input type="text" id="unitNameInput" placeholder="Ex: Bataillon d'Intervention Rapide">
-            </div>
-            <button class="btn btn-add" style="width: 100%;" onclick="saveSettings()">ENREGISTRER LES MODIFICATIONS</button>
-        </div>
+    <div style="padding:20px;">
+        <button id="btn-print-pdf" onclick="exportToPDF()" class="btn btn-gold" style="width:100%; margin-bottom:10px;">🖨 EXPORTER PDF</button>
+        <button onclick="location.reload()" class="btn" style="width:100%; background:rgba(255,255,255,0.1); color:white;">DÉCONNEXION</button>
     </div>
 </div>
 
-<div id="addModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal()">&times;</span>
-        <h3>Ajouter un Personnel</h3>
-        <div class="form-group">
-            <label>Matricule :</label>
-            <input type="text" id="newMatricule" required>
+<div class="main">
+    <div class="top-bar">
+        <div style="flex:1; display:flex; gap:10px;">
+            <select id="p-select" onchange="loadP(this.value)" style="max-width:300px; display:none;"></select>
+            <button id="btn-new" onclick="createNew()" class="btn" style="display:none; background:#3498db; color:white;">+ NOUVEAU PROFIL</button>
         </div>
-        <div class="form-group">
-            <label>Grade :</label>
-            <input type="text" id="newGrade" required>
+        <button id="btn-edit" onclick="toggleEdit()" class="btn btn-army" style="display:none;">MODIFIER LE DOSSIER</button>
+    </div>
+
+    <div class="content-area">
+        <div id="sec-ident" class="section-card active">
+            <h3>Identité & Niveau d'Instruction</h3>
+            <div class="profile-header">
+                <div class="photo-box" onclick="triggerPhoto()">
+                    <img id="display-photo" src="https://via.placeholder.com/160x200?text=PHOTO">
+                    <div class="photo-hint">CLIQUER POUR CHANGER</div>
+                    <input type="file" id="photo-input" style="display:none" onchange="updatePhoto(this)">
+                </div>
+                <div class="grid" style="flex:1">
+                    <div><label>Nom</label><input type="text" data-v="nom" disabled></div>
+                    <div><label>Prénom</label><input type="text" data-v="prenom" disabled></div>
+                    <div><label>Matricule</label><input type="text" id="cur-mat" disabled></div>
+                    <div><label>Diplôme Civil</label><input type="text" data-v="dipCiv" disabled></div>
+                    <div><label>Diplôme Militaire</label><input type="text" data-v="dipMil" disabled></div>
+                </div>
+            </div>
+            <div class="grid">
+                <div><label>Date de Naissance</label><input type="date" data-v="dnais" disabled></div>
+                <div><label>Lieu</label><input type="text" data-v="lnais" disabled></div>
+                <div><label>Région d'Origine</label><input type="text" data-v="reg" disabled></div>
+                <div><label>Situation Familiale</label><select data-v="sit" disabled><option>MARIÉ</option><option>CÉLIBATAIRE</option></select></div>
+            </div>
         </div>
-        <div class="form-group">
-            <label>Nom Complet :</label>
-            <input type="text" id="newName" required>
+
+        <div id="sec-carriere" class="section-card">
+            <h3>Carrière & Service</h3>
+            <div class="grid">
+                <div><label>Grade Actuel</label><input type="text" data-v="grade" disabled></div>
+                <div><label>Spécialité</label><input type="text" data-v="spec" disabled></div>
+                <div><label>Date d'Incorporation</label><input type="date" data-v="dinc" disabled></div>
+                <div><label>Unité d'Origine</label><input type="text" data-v="uori" disabled></div>
+                <div><label>Position</label>
+                    <select data-v="pos" disabled><option>PRÉSENT</option><option>MISSION</option><option>STAGE</option><option>PERMISSION</option></select>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label>Fonction :</label>
-            <input type="text" id="newFonction" required>
+
+        <div id="sec-perf" class="section-card">
+            <h3>Évaluation des Performances</h3>
+            <div style="display:flex; gap:40px; flex-wrap: wrap; align-items:center;">
+                <div class="grid" style="flex:1; min-width:300px;">
+                    <div><label>Tir (/20)</label><input type="number" data-v="nTir" oninput="liveUpdate()" disabled></div>
+                    <div><label>Physique (/20)</label><input type="number" data-v="nPhy" oninput="liveUpdate()" disabled></div>
+                    <div><label>Intellect (/20)</label><input type="number" data-v="nInt" oninput="liveUpdate()" disabled></div>
+                    <div><label>Moral (/20)</label><input type="number" data-v="nMor" oninput="liveUpdate()" disabled></div>
+                </div>
+                <div style="width:300px; height:300px;"><canvas id="radar"></canvas></div>
+            </div>
         </div>
-        <button class="btn btn-add" style="width: 100%;" onclick="addPersonnel()">VALIDER L'INSCRIPTION</button>
+
+        <div id="sec-act" class="section-card">
+            <h3>Suivi des Activités (Compteurs Jours)</h3>
+            <div class="grid">
+                <div><label>Cumul Missions</label><input type="number" data-v="cMis" oninput="updateTotal()" disabled></div>
+                <div><label>Cumul Stages</label><input type="number" data-v="cSta" oninput="updateTotal()" disabled></div>
+                <div><label>Cumul Permissions</label><input type="number" data-v="cPer" oninput="updateTotal()" disabled></div>
+                <div style="background:#eef; padding:10px; border-radius:8px;">
+                    <label>Total Absent Base</label>
+                    <input type="text" id="total-days" style="font-weight:bold; color:var(--army)" disabled>
+                </div>
+            </div>
+        </div>
+
+        <div id="sec-med" class="section-card">
+            <h3>Données Médico-Physiologiques</h3>
+            <div class="grid">
+                <div><label>Groupe Sanguin</label><input type="text" data-v="gs" disabled></div>
+                <div><label>Poids (kg)</label><input type="number" data-v="poids" disabled></div>
+                <div><label>Taille (m)</label><input type="number" step="0.01" data-v="taille" disabled></div>
+                <div><label>Aptitude SIGYCOP</label><input type="text" data-v="sgp" disabled></div>
+                <div style="grid-column: span 2;"><label>Allergies & Contre-indications</label><textarea data-v="all" disabled></textarea></div>
+            </div>
+        </div>
+
+        <div id="sec-admin" class="section-card">
+            <h3>Paramètres Système</h3>
+            <div class="grid">
+                <div><label>Nom de l'Unité Centrale</label><input type="text" id="set-unit"></div>
+                <div><label>Identifiant Admin</label><input type="text" id="set-id"></div>
+                <div><label>Code Secret Admin</label><input type="password" id="set-pass"></div>
+            </div>
+            <button onclick="saveSets()" class="btn btn-save" style="margin-top:20px;">APPLIQUER LA CONFIGURATION</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // --- Initialisation et Stockage Local ---
-    let unitName = localStorage.getItem('rh_unitName') || "UNITÉ PAR DÉFAUT";
-    let personnelList = JSON.parse(localStorage.getItem('rh_personnelList')) || [];
+    // --- Initialisation des Données ---
+    let configs = JSON.parse(localStorage.getItem('rh_config')) || { unit: "AIR BASE 301", admin: "ADMIN", pass: "301" };
+    let roster = JSON.parse(localStorage.getItem('rh_roster')) || [
+        { id: "OFF/001", nom: "EMAN", prenom: "Armand Brice", grade: "CNE", dipCiv:"Licence", dipMil:"CIA", nTir:18, nPhy:17, nInt:18, nMor:19, cMis:15, cSta:5, cPer:10, photo:"" }
+    ];
 
-    // Appliquer les paramètres au chargement
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('unitNameDisplay').innerText = unitName;
-        document.getElementById('unitNameInput').value = unitName;
-        renderTable();
-    });
+    let isAdmin = false, myChart = null, isEditing = false;
 
-    // --- Navigation ---
-    function showSection(sectionId) {
-        // Cacher toutes les sections
-        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        
-        // Afficher la section demandée
-        document.getElementById('section-' + sectionId).classList.add('active');
-        
-        // Mettre à jour la barre latérale
+    // --- Sécurité et Accès ---
+    function access() {
+        const i = document.getElementById('log-id').value;
+        const p = document.getElementById('log-pass').value;
+
+        if(i === configs.admin && p === configs.pass) {
+            isAdmin = true;
+            document.getElementById('nav-admin-only').style.display = "flex";
+            document.getElementById('p-select').style.display = "block";
+            document.getElementById('btn-new').style.display = "block";
+            document.getElementById('btn-edit').style.display = "block";
+            fillSel();
+            loadP(roster[0].id);
+        } else {
+            const user = roster.find(x => x.id === i);
+            if(user) { 
+                isAdmin = false;
+                loadP(user.id); 
+            } else { 
+                alert("Identifiants incorrects"); 
+                return; 
+            }
+        }
+        document.getElementById('login-screen').style.display = "none";
+        applyConfigs();
+    }
+
+    function applyConfigs() {
+        document.getElementById('ui-unit').innerText = configs.unit;
+        document.getElementById('set-unit').value = configs.unit;
+        document.getElementById('set-id').value = configs.admin;
+        document.getElementById('set-pass').value = configs.pass;
+    }
+
+    function saveSets() {
+        configs.unit = document.getElementById('set-unit').value;
+        configs.admin = document.getElementById('set-id').value;
+        configs.pass = document.getElementById('set-pass').value;
+        localStorage.setItem('rh_config', JSON.stringify(configs));
+        applyConfigs();
+        alert("Configuration mise à jour.");
+    }
+
+    // --- Gestion de l'affichage ---
+    function fillSel() {
+        const s = document.getElementById('p-select');
+        s.innerHTML = roster.map(x => `<option value="${x.id}">${x.grade} ${x.nom}</option>`).join('');
+    }
+
+    function loadP(id) {
+        const p = roster.find(x => x.id === id);
+        if(!p) return;
+        document.getElementById('cur-mat').value = p.id;
+        document.getElementById('ui-user').innerText = p.grade + " " + p.nom;
+        document.querySelectorAll('[data-v]').forEach(el => {
+            const key = el.getAttribute('data-v');
+            el.value = p[key] || "";
+        });
+        document.getElementById('display-photo').src = p.photo || "https://via.placeholder.com/160x200?text=SANS+PHOTO";
+        updateTotal();
+        drawRadar(p);
+    }
+
+    function nav(id) {
+        document.querySelectorAll('.section-card').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
         event.currentTarget.classList.add('active');
     }
 
-    // --- Gestion des Paramètres ---
-    function saveSettings() {
-        const newInputName = document.getElementById('unitNameInput').value;
-        const adminId = document.getElementById('adminId').value;
-        const adminCode = document.getElementById('adminCode').value;
-
-        // Simulation simple de validation
-        if (adminId === "ADMIN" && adminCode === "1234") {
-            unitName = newInputName || "UNITÉ PAR DÉFAUT";
-            localStorage.setItem('rh_unitName', unitName);
-            document.getElementById('unitNameDisplay').innerText = unitName;
-            alert("Paramètres enregistrés. Le nom de l'unité est mis à jour.");
+    // --- Édition et Sauvegarde ---
+    function toggleEdit() {
+        isEditing = !isEditing;
+        document.querySelectorAll('[data-v], #cur-mat').forEach(el => el.disabled = !isEditing);
+        const b = document.getElementById('btn-edit');
+        if(isEditing) {
+            b.innerText = "💾 SAUVEGARDER LE DOSSIER";
+            b.style.background = "var(--accent)";
         } else {
-            alert("Erreur : Identifiant ou Code Admin incorrect.");
+            b.innerText = "MODIFIER LE DOSSIER";
+            b.style.background = "var(--army)";
+            saveRoster();
         }
     }
 
-    // --- Gestion du Personnel ---
-    function openModal() { document.getElementById('addModal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('addModal').style.display = 'none'; clearModal(); }
-
-    function clearModal() {
-        document.getElementById('newMatricule').value = '';
-        document.getElementById('newGrade').value = '';
-        document.getElementById('newName').value = '';
-        document.getElementById('newFonction').value = '';
+    function saveRoster() {
+        const mat = document.getElementById('cur-mat').value;
+        let p = roster.find(x => x.id === mat);
+        if(!p) { p = { id: mat }; roster.push(p); }
+        
+        document.querySelectorAll('[data-v]').forEach(el => {
+            const k = el.getAttribute('data-v');
+            p[k] = isNaN(el.value) || el.value === "" ? el.value : parseFloat(el.value);
+        });
+        p.photo = document.getElementById('display-photo').src;
+        
+        localStorage.setItem('rh_roster', JSON.stringify(roster));
+        fillSel();
+        drawRadar(p);
+        alert("Dossier enregistré avec succès.");
     }
 
-    function addPersonnel() {
-        const matricule = document.getElementById('newMatricule').value;
-        const grade = document.getElementById('newGrade').value;
-        const name = document.getElementById('newName').value;
-        const fonction = document.getElementById('newFonction').value;
+    function createNew() {
+        isEditing = true;
+        document.querySelectorAll('[data-v], #cur-mat').forEach(el => { el.value = ""; el.disabled = false; });
+        document.getElementById('display-photo').src = "";
+        document.getElementById('btn-edit').innerText = "💾 SAUVEGARDER";
+        document.getElementById('btn-edit').style.display = "block";
+        nav('sec-ident');
+    }
 
-        if (matricule && grade && name && fonction) {
-            personnelList.push({ matricule, grade, name, fonction });
-            localStorage.setItem('rh_personnelList', JSON.stringify(personnelList));
-            renderTable();
-            closeModal();
-        } else {
-            alert("Veuillez remplir tous les champs.");
+    // --- Photo ---
+    function triggerPhoto() { if(isEditing) document.getElementById('photo-input').click(); }
+    function updatePhoto(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => document.getElementById('display-photo').src = e.target.result;
+            reader.readAsDataURL(input.files[0]);
         }
     }
 
-    function renderTable() {
-        const body = document.getElementById('staffBody');
-        body.innerHTML = ''; // Effacer le tableau actuel
-
-        personnelList.forEach(p => {
-            const row = `<tr>
-                <td>${p.matricule}</td>
-                <td>${p.grade}</td>
-                <td>${p.name}</td>
-                <td>${p.fonction}</td>
-            </tr>`;
-            body.innerHTML += row;
+    // --- Graphique Radar ---
+    function drawRadar(p) {
+        const ctx = document.getElementById('radar').getContext('2d');
+        if(myChart) myChart.destroy();
+        myChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Tir', 'Physique', 'Intellect', 'Moral'],
+                datasets: [{ 
+                    label: 'Performances',
+                    data: [p.nTir||0, p.nPhy||0, p.nInt||0, p.nMor||0], 
+                    backgroundColor: 'rgba(197,160,89,0.3)', 
+                    borderColor: '#c5a059',
+                    borderWidth: 2
+                }]
+            },
+            options: { 
+                scales: { r: { min: 0, max: 20, ticks: { display: false } } },
+                plugins: { legend: { display: false } }
+            }
         });
     }
 
-    // --- Génération PDF avec jsPDF ---
-    function generatePDF() {
+    function liveUpdate() {
+        if(myChart) {
+            myChart.data.datasets[0].data = [
+                document.querySelector('[data-v="nTir"]').value || 0,
+                document.querySelector('[data-v="nPhy"]').value || 0,
+                document.querySelector('[data-v="nInt"]').value || 0,
+                document.querySelector('[data-v="nMor"]').value || 0
+            ];
+            myChart.update();
+        }
+    }
+
+    function updateTotal() {
+        const m = parseFloat(document.querySelector('[data-v="cMis"]').value) || 0;
+        const s = parseFloat(document.querySelector('[data-v="cSta"]').value) || 0;
+        const p = parseFloat(document.querySelector('[data-v="cPer"]').value) || 0;
+        document.getElementById('total-days').value = (m + s + p) + " Jours";
+    }
+
+    // --- Export PDF Professionnel ---
+    function exportToPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
+        const mat = document.getElementById('cur-mat').value;
+        const p = roster.find(x => x.id === mat);
 
-        // 1. En-tête : Nom de l'Unité (Centré et Gras)
+        // En-tête Unité (Centré)
+        doc.setFontSize(18);
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(16);
-        const textWidth = doc.getTextWidth(unitName.toUpperCase());
-        const xOffset = (doc.internal.pageSize.width - textWidth) / 2;
-        doc.text(unitName.toUpperCase(), xOffset, 20);
+        const title = configs.unit.toUpperCase();
+        doc.text(title, doc.internal.pageSize.getWidth() / 2, 20, { align: "center" });
 
-        // 2. Sous-titre et Date
-        doc.setFont("helvetica", "normal");
         doc.setFontSize(12);
-        doc.text("Registre Officiel du Personnel Central", 14, 30);
-        doc.setFontSize(10);
-        doc.text(`Généré le : ${dateStr}`, 14, 35);
+        doc.text("FICHE INDIVIDUELLE DU PERSONNEL", doc.internal.pageSize.getWidth() / 2, 30, { align: "center" });
+        doc.line(20, 35, 190, 35);
 
-        // 3. Trait de séparation
-        doc.setLineWidth(0.5);
-        doc.line(14, 40, 196, 40);
+        // Identité
+        doc.setFontSize(11);
+        doc.text(`MATRICULE : ${p.id}`, 20, 50);
+        doc.text(`GRADE : ${p.grade || 'N/A'}`, 20, 60);
+        doc.text(`NOM : ${p.nom || 'N/A'}`, 20, 70);
+        doc.text(`PRENOM : ${p.prenom || 'N/A'}`, 20, 80);
+        doc.text(`POSITION : ${p.pos || 'N/A'}`, 20, 90);
 
-        // 4. Contenu du Tableau (Filtrage des lignes vides automatique car liste stockée)
-        doc.setFont("helvetica", "bold");
-        doc.text("Matricule", 14, 50);
-        doc.text("Grade", 50, 50);
-        doc.text("Nom Complet", 80, 50);
-        doc.text("Fonction", 140, 50);
-        
+        // Diplômes
+        doc.text("DIPLÔMES :", 20, 110);
         doc.setFont("helvetica", "normal");
-        let yPosition = 60;
+        doc.text(`- Civil : ${p.dipCiv || 'Non renseigné'}`, 30, 120);
+        doc.text(`- Militaire : ${p.dipMil || 'Non renseigné'}`, 30, 130);
 
-        personnelList.forEach(p => {
-            if (yPosition > 280) { // Nouvelle page si nécessaire
-                doc.addPage();
-                yPosition = 20;
-            }
-            doc.text(p.matricule, 14, yPosition);
-            doc.text(p.grade, 50, yPosition);
-            doc.text(p.name, 80, yPosition);
-            doc.text(p.fonction, 140, yPosition);
-            yPosition += 10;
-        });
+        // Performances
+        doc.setFont("helvetica", "bold");
+        doc.text("PERFORMANCES :", 20, 150);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Tir: ${p.nTir||0}/20 | Physique: ${p.nPhy||0}/20 | Intellect: ${p.nInt||0}/20 | Moral: ${p.nMor||0}/20`, 30, 160);
 
-        // 5. Sauvegarde du fichier
-        doc.save(`Registre_${unitName.replace(/ /g, '_')}.pdf`);
+        // Médical
+        doc.setFont("helvetica", "bold");
+        doc.text("DONNÉES MÉDICALES :", 20, 180);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Groupe: ${p.gs || 'N/A'} | Poids: ${p.poids||0}kg | Taille: ${p.taille||0}m`, 30, 190);
+        doc.text(`Aptitude SIGYCOP: ${p.sgp || 'N/A'}`, 30, 200);
+
+        // Bas de page
+        doc.setFontSize(9);
+        doc.text(`Document généré par RH Manager le ${new Date().toLocaleDateString()}`, 20, 280);
+
+        doc.save(`Fiche_${p.nom || 'Personnel'}_${p.id}.pdf`);
     }
 </script>
-
 </body>
 </html>
