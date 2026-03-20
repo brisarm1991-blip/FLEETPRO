@@ -2,271 +2,228 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Système de Gestion Militaire Intégré - CI</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>SITUATION GLOBALE - CENTRE D'INSTRUCTION (CI)</title>
     <style>
         :root {
-            --army-dark: #1b2631;
             --army-green: #2d5a27;
+            --army-dark: #1b2631;
             --army-gold: #b8860b;
-            --danger: #c0392b;
-            --light-grey: #ecf0f1;
+            --alert-red: #c0392b;
+            --bg-light: #f4f7f6;
         }
 
-        body { font-family: 'Segoe UI', Arial; margin: 0; background: var(--light-grey); display: flex; height: 100vh; }
-        
-        /* Sidebar */
-        .sidebar { width: 260px; background: var(--army-dark); color: white; display: flex; flex-direction: column; }
-        .sidebar-header { padding: 20px; background: #151d24; text-align: center; border-bottom: 3px solid var(--army-gold); }
-        .menu { list-style: none; padding: 0; flex: 1; }
-        .menu li { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid #2c3e50; transition: 0.3s; }
-        .menu li:hover, .menu li.active { background: var(--army-green); padding-left: 30px; }
-        .menu i { margin-right: 10px; width: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg-light); display: flex; }
 
-        /* Contenu Principal */
-        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        header { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .content-area { padding: 25px; overflow-y: auto; flex: 1; }
+        /* Navigation Latérale */
+        .sidebar { width: 280px; background: var(--army-dark); height: 100vh; color: white; position: fixed; box-shadow: 2px 0 5px rgba(0,0,0,0.3); }
+        .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 2px solid var(--army-gold); }
+        .nav-menu { list-style: none; padding: 0; margin-top: 20px; }
+        .nav-menu li { padding: 18px 25px; cursor: pointer; border-left: 5px solid transparent; transition: 0.3s; font-weight: 500; }
+        .nav-menu li:hover, .nav-menu li.active { background: #2c3e50; border-left-color: var(--army-gold); color: var(--army-gold); }
 
-        /* Tableaux et Data */
-        .data-card { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; padding: 20px; }
-        .section-title { color: var(--army-dark); border-left: 5px solid var(--army-gold); padding-left: 15px; margin-bottom: 20px; text-transform: uppercase; font-weight: bold; }
+        /* Zone de Contenu */
+        .main-content { margin-left: 280px; flex: 1; padding: 30px; }
         
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th { background: #f8f9fa; color: var(--army-dark); padding: 12px 8px; border-bottom: 2px solid #dee2e6; text-align: left; position: sticky; top: 0; }
-        td { padding: 10px 8px; border-bottom: 1px solid #eee; }
-        tr:hover { background-color: #f1f4f6; }
+        header { background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
 
-        /* Badges & Statuts */
-        .status { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; color: white; }
-        .status-present { background: var(--army-green); }
-        .status-mission { background: #2980b9; }
-        .status-perm { background: #f39c12; }
-        .status-malade { background: var(--danger); }
+        /* Tableaux de Données Approfondis */
+        .card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin-bottom: 30px; overflow-x: auto; }
+        h2 { color: var(--army-dark); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 1.2rem; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+        th { background: #f8f9fa; color: #555; text-align: left; padding: 12px; border-bottom: 2px solid #dee2e6; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f9f9f9; }
 
-        .imc-warning { color: var(--danger); font-weight: bold; }
-        
-        /* Recherche */
-        .search-bar { padding: 10px; width: 300px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
-        
-        .page { display: none; }
-        .page.active { display: block; }
+        /* Indicateurs de Performance */
+        .badge { padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .badge-elite { background: gold; color: #000; }
+        .badge-present { background: #d4edda; color: #155724; }
+        .badge-absent { background: #f8d7da; color: #721c24; }
+        .progress-bar { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; width: 100px; }
+        .progress-fill { height: 100%; background: var(--army-green); }
+
+        .search-box { padding: 12px; width: 400px; border: 1px solid #ddd; border-radius: 25px; outline: none; }
+        .section { display: none; }
+        .section.active { display: block; }
+
     </style>
 </head>
 <body>
 
 <div class="sidebar">
     <div class="sidebar-header">
-        <h3>BASE AÉRIENNE 301</h3>
-        <p style="font-size: 0.7rem; color: var(--army-gold);">Gestion du Personnel - CI</p>
+        <h2 style="color: white; margin: 0;">BASE AÉRIENNE 301</h2>
+        <small style="color: var(--army-gold);">Système de Commandement CI</small>
     </div>
-    <ul class="menu">
-        <li class="active" onclick="showPage('page-rh')"><i class="fas fa-user-shield"></i> Administration RH</li>
-        <li onclick="showPage('page-ops')"><i class="fas fa-calendar-check"></i> Présences & Missions</li>
-        <li onclick="showPage('page-eval')"><i class="fas fa-medal"></i> Éval. & Performances</li>
-        <li onclick="showPage('page-sante')"><i class="fas fa-heartbeat"></i> Suivi Médical</li>
+    <ul class="nav-menu">
+        <li class="active" onclick="showSection('rh')">ADMINISTRATION & RH</li>
+        <li onclick="showSection('ops')">OPÉRATIONS & PRÉSENCES</li>
+        <li onclick="showSection('perf')">PERFORMANCE & TERRAIN</li>
+        <li onclick="showSection('sante')">SUIVI SANTÉ (IMC)</li>
     </ul>
 </div>
 
-<div class="main">
+<div class="main-content">
     <header>
-        <input type="text" class="search-bar" placeholder="Rechercher un militaire (Nom, Matricule...)" id="searchInput" onkeyup="filterData()">
-        <div class="user">
-            <span id="date-now"></span> | <strong>CNE EMAN ARMAND BRICE</strong>
-        </div>
+        <input type="text" class="search-box" placeholder="Rechercher par Nom, Matricule ou Grade..." onkeyup="search()">
+        <div><strong>CNE EMAN ARMAND BRICE</strong> | Officier Adjoint</div>
     </header>
 
-    <div class="content-area">
-        
-        <div id="page-rh" class="page active">
-            <div class="section-title">Fiche d'Identification Administrative</div>
-            <div class="data-card">
-                <table id="tableRH">
-                    <thead>
-                        <tr>
-                            <th>Grade</th>
-                            <th>Nom & Prénoms</th>
-                            <th>Matricule</th>
-                            <th>Né(e) le</th>
-                            <th>Lieu</th>
-                            <th>Spécialité</th>
-                            <th>Diplôme Civ/Mil</th>
-                            <th>Statut Mat.</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bodyRH"></tbody>
-                </table>
-            </div>
+    <div id="rh" class="section active">
+        <div class="card">
+            <h2> REGISTRE DU PERSONNEL (ALPHA)</h2>
+            <table id="tableRH">
+                <thead>
+                    <tr>
+                        <th>Grade</th>
+                        <th>Nom & Prénoms</th>
+                        <th>Matricule</th>
+                        <th>Spécialité</th>
+                        <th>Diplôme Mil.</th>
+                        <th>Statut Mat.</th>
+                        <th>Position</th>
+                    </tr>
+                </thead>
+                <tbody id="bodyRH"></tbody>
+            </table>
         </div>
+    </div>
 
-        <div id="page-ops" class="page">
-            <div class="section-title">Situation Opérationnelle & Positions</div>
-            <div class="data-card">
-                <table id="tableOps">
-                    <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Position Actuelle</th>
-                            <th>Jan</th><th>Fév</th><th>Mar</th><th>Avr</th>
-                            <th>Détails Mission</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bodyOps"></tbody>
-                </table>
-            </div>
+    <div id="ops" class="section">
+        <div class="card">
+            <h2> SITUATION DES EFFECTIFS & PRÉSENCES ANNUELLES</h2>
+            <table id="tableOps">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Présences</th>
+                        <th>Absences</th>
+                        <th>Mission</th>
+                        <th>Maladie</th>
+                        <th>Stage</th>
+                        <th>Taux de Dispo.</th>
+                    </tr>
+                </thead>
+                <tbody id="bodyOps"></tbody>
+            </table>
         </div>
+    </div>
 
-        <div id="page-eval" class="page">
-            <div class="section-title">Tableau des Performances (COVAPI / TIR / RDG)</div>
-            <div class="data-card">
-                <table id="tableEval">
-                    <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Physique (COVAPI)</th>
-                            <th>Morale (RDG/RDH)</th>
-                            <th>Tir (ISTC)</th>
-                            <th>Topo/CBT</th>
-                            <th>Moyenne Gén.</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bodyEval"></tbody>
-                </table>
-            </div>
+    <div id="perf" class="section">
+        <div class="card">
+            <h2> ÉVALUATION DES APTITUDES (Sport, Tir, Terrain)</h2>
+            <table id="tablePerf">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>COVAPI</th>
+                        <th>Note TIR</th>
+                        <th>Topo</th>
+                        <th>Combat</th>
+                        <th>RDG</th>
+                        <th>MOYENNE GÉN.</th>
+                    </tr>
+                </thead>
+                <tbody id="bodyPerf"></tbody>
+            </table>
         </div>
+    </div>
 
-        <div id="page-sante" class="page">
-            <div class="section-title">Aptitude Médicale et Biométrie</div>
-            <div class="data-card">
-                <table id="tableSante">
-                    <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Poids (kg)</th>
-                            <th>Taille (m)</th>
-                            <th>IMC</th>
-                            <th>Tension (TA)</th>
-                            <th>Glycémie</th>
-                            <th>Alerte IMC</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bodySante"></tbody>
-                </table>
-            </div>
+    <div id="sante" class="section">
+        <div class="card">
+            <h2> SUIVI BIOMÉTRIQUE ET ALERTES MÉDICALES</h2>
+            <table id="tableSante">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Poids</th>
+                        <th>Taille</th>
+                        <th>IMC</th>
+                        <th>Tension (TA)</th>
+                        <th>Glycémie</th>
+                        <th>Observation</th>
+                    </tr>
+                </thead>
+                <tbody id="bodySante"></tbody>
+            </table>
         </div>
-
     </div>
 </div>
 
 <script>
-    // BASE DE DONNÉES INTÉGRÉE (Données extraites de vos fichiers XLSX)
-    const dbMilitaire = [
+    // TOUTES LES DONNÉES APPROFONDIES (Synthèse de vos fichiers)
+    const personnels = [
         {
-            grade: 'CNE', nom: 'BALOGOG', prenom: 'PATRICK', mat: '-', dob: '1989-06-27', lieu: 'YAOUNDE',
-            spec: 'LOG', dipCiv: 'L3/SIGL', dipMil: 'SCU', matstat: 'CELIBATAIRE',
-            pos: 'STAGE', m1:'S', m2:'P', m3:'C', m4:'-',
-            eval: { covapi: 11.71, morale: 20.46, tir: 17, topo: 14, cbt: 13 },
-            medical: { poids: 85, taille: 1.75, ta: '0', gly: '0' }
+            nom: "BALOGOG", prenom: "PATRICK", grade: "CNE", mat: "-", spec: "LOG", dipM: "SCU", statM: "CELIBATAIRE", pos: "STAGE",
+            pres: 14, abs: 0, miss: 5, mal: 0, stg: 22,
+            covapi: 11.71, tir: 17, topo: 14, combat: 10, rdg: 13,
+            poids: 85, taille: 1.75, ta: "0", gly: "0"
         },
         {
-            grade: 'CNE', nom: 'EMAN', prenom: 'ARMAND BRICE', mat: '-', dob: '1991-06-07', lieu: 'EBOLOWA',
-            spec: 'RENS', dipCiv: 'BAC A4', dipMil: 'SCU', matstat: 'MARIE',
-            pos: 'PRESENT', m1:'P', m2:'P', m3:'P', m4:'PERM',
-            eval: { covapi: 16.20, morale: 20.60, tir: 18, topo: 15, cbt: 16 },
-            medical: { poids: 82, taille: 1.73, ta: '121/84', gly: '0.8' }
+            nom: "EMAN", prenom: "ARMAND BRICE", grade: "CNE", mat: "-", spec: "RENS", dipM: "SCU", statM: "MARIE", pos: "PRESENT",
+            pres: 44, abs: 0, miss: 2, mal: 0, stg: 0,
+            covapi: 16.20, tir: 18, topo: 15, combat: 16, rdg: 15,
+            poids: 82, taille: 1.73, ta: "121/84", gly: "0.8"
         },
         {
-            grade: 'LT', nom: 'DARBAWA', prenom: 'MADELEINE', mat: '-', dob: '1993-04-12', lieu: 'MAROUA',
-            spec: 'FUSAIR', dipCiv: 'BAC', dipMil: 'CAT1', matstat: 'CELIBATAIRE',
-            pos: 'PRESENT', m1:'ML', m2:'P', m3:'P', m4:'-',
-            eval: { covapi: 12.50, morale: 14.20, tir: 12, topo: 10, cbt: 11 },
-            medical: { poids: 74, taille: 1.65, ta: '113/93', gly: '0' }
+            nom: "EBOK", prenom: "JEAN TOURAINE", grade: "CAL", mat: "A15/26261", spec: "FUSAIR", dipM: "CAT1", statM: "CELIBATAIRE", pos: "PRESENT",
+            pres: 41, abs: 0, miss: 5, mal: 0, stg: 0,
+            covapi: 15.00, tir: 20, topo: 14, combat: 15, rdg: 18,
+            poids: 68, taille: 1.75, ta: "0", gly: "0"
         },
         {
-            grade: 'CAL', nom: 'EBOK', prenom: 'JEAN TOURAINE', mat: 'A15/26261', dob: '1995-09-08', lieu: 'BERTOUA',
-            spec: 'FUSAIR', dipCiv: 'BAC D', dipMil: 'CAT1', matstat: 'CELIBATAIRE',
-            pos: 'PRESENT', m1:'P', m2:'P', m3:'P', m4:'-',
-            eval: { covapi: 15.00, morale: 21.06, tir: 20, topo: 14, cbt: 15 },
-            medical: { poids: 68, taille: 1.75, ta: '0', gly: '0' }
+            nom: "BELBARA", prenom: "DJAKDJINKREO", grade: "2°CL", mat: "A24/58635", spec: "FUSAIR", dipM: "FES AIR", statM: "CELIBATAIRE", pos: "PRESENT",
+            pres: 35, abs: 2, miss: 0, mal: 4, stg: 0,
+            covapi: 12.5, tir: 15, topo: 11, combat: 12, rdg: 11,
+            poids: 72, taille: 1.70, ta: "110/70", gly: "0.9"
         }
-        // ... Ajoutez ici les autres membres de l'effectif (ABA, BELBARA, etc.)
+        // ... Note : Vous pouvez ici copier-coller les 45 autres noms de votre fichier
     ];
 
-    function showPage(id) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.menu li').forEach(l => l.classList.remove('active'));
+    function renderAll() {
+        const bodies = {
+            rh: document.getElementById('bodyRH'),
+            ops: document.getElementById('bodyOps'),
+            perf: document.getElementById('bodyPerf'),
+            sante: document.getElementById('bodySante')
+        };
+
+        personnels.forEach(p => {
+            // Remplissage RH
+            bodies.rh.innerHTML += `<tr><td><b>${p.grade}</b></td><td>${p.nom} ${p.prenom}</td><td>${p.mat}</td><td>${p.spec}</td><td>${p.dipM}</td><td>${p.statM}</td><td><span class="badge badge-present">${p.pos}</span></td></tr>`;
+
+            // Remplissage OPS (Calcul Dispo)
+            let dispo = ((p.pres / (p.pres + p.abs + p.mal)) * 100).toFixed(0);
+            bodies.ops.innerHTML += `<tr><td>${p.nom}</td><td>${p.pres} j</td><td>${p.abs}</td><td>${p.miss}</td><td>${p.mal}</td><td>${p.stg}</td><td><div class="progress-bar"><div class="progress-fill" style="width:${dispo}%"></div></div> ${dispo}%</td></tr>`;
+
+            // Remplissage PERF (Calcul Moyenne)
+            let moy = ((p.covapi + p.tir + p.topo + p.combat) / 4).toFixed(2);
+            let tirClass = p.tir >= 16 ? 'badge-elite' : '';
+            bodies.perf.innerHTML += `<tr><td>${p.nom}</td><td>${p.covapi}</td><td><span class="badge ${tirClass}">${p.tir}/20</span></td><td>${p.topo}</td><td>${p.combat}</td><td>${p.rdg}</td><td><strong>${moy}</strong></td></tr>`;
+
+            // Remplissage SANTE (Calcul IMC)
+            let imc = (p.poids / (p.taille * p.taille)).toFixed(1);
+            let alert = imc > 25 ? '<span style="color:red">SURPOIDS</span>' : 'RAS';
+            bodies.sante.innerHTML += `<tr><td>${p.nom}</td><td>${p.poids} kg</td><td>${p.taille} m</td><td>${imc}</td><td>${p.ta}</td><td>${p.gly}</td><td>${alert}</td></tr>`;
+        });
+    }
+
+    function showSection(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-menu li').forEach(l => l.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         event.currentTarget.classList.add('active');
     }
 
-    function renderTables() {
-        const bodies = {
-            rh: document.getElementById('bodyRH'),
-            ops: document.getElementById('bodyOps'),
-            eval: document.getElementById('bodyEval'),
-            sante: document.getElementById('bodySante')
-        };
-
-        dbMilitaire.forEach(m => {
-            // Remplissage RH
-            bodies.rh.innerHTML += `<tr>
-                <td><b>${m.grade}</b></td>
-                <td>${m.nom} ${m.prenom}</td>
-                <td>${m.mat}</td>
-                <td>${m.dob}</td>
-                <td>${m.lieu}</td>
-                <td>${m.spec}</td>
-                <td>${m.dipCiv} / ${m.dipMil}</td>
-                <td>${m.matstat}</td>
-            </tr>`;
-
-            // Remplissage OPS
-            let pClass = m.pos === 'PRESENT' ? 'status-present' : (m.pos === 'MISSION' ? 'status-mission' : 'status-perm');
-            bodies.ops.innerHTML += `<tr>
-                <td>${m.nom}</td>
-                <td><span class="status ${pClass}">${m.pos}</span></td>
-                <td>${m.m1}</td><td>${m.m2}</td><td>${m.m3}</td><td>${m.m4}</td>
-                <td>${m.pos === 'MISSION' ? 'MINUSCA' : '-'}</td>
-            </tr>`;
-
-            // Remplissage EVAL
-            let moy = ((m.eval.covapi + m.eval.morale + m.eval.tir) / 3).toFixed(2);
-            bodies.eval.innerHTML += `<tr>
-                <td>${m.nom}</td>
-                <td>${m.eval.covapi}</td>
-                <td>${m.eval.morale}</td>
-                <td>${m.eval.tir}/20</td>
-                <td>${m.eval.topo}</td>
-                <td><strong style="color:var(--army-green)">${moy}</strong></td>
-            </tr>`;
-
-            // Remplissage SANTE
-            let imc = m.medical.taille > 0 ? (m.medical.poids / (m.medical.taille * m.medical.taille)).toFixed(1) : 'N/A';
-            let alerte = imc > 25 ? '<span class="imc-warning">SURPOIDS</span>' : 'RAS';
-            bodies.sante.innerHTML += `<tr>
-                <td>${m.nom}</td>
-                <td>${m.medical.poids}</td>
-                <td>${m.medical.taille}</td>
-                <td class="${imc > 25 ? 'imc-warning' : ''}">${imc}</td>
-                <td>${m.medical.ta}</td>
-                <td>${m.medical.gly}</td>
-                <td>${alerte}</td>
-            </tr>`;
+    function search() {
+        let val = document.querySelector('.search-box').value.toUpperCase();
+        document.querySelectorAll('tbody tr').forEach(tr => {
+            tr.style.display = tr.innerText.toUpperCase().includes(val) ? '' : 'none';
         });
     }
 
-    function filterData() {
-        let input = document.getElementById('searchInput').value.toUpperCase();
-        let rows = document.querySelectorAll('tbody tr');
-        rows.forEach(row => {
-            let text = row.innerText.toUpperCase();
-            row.style.display = text.includes(input) ? "" : "none";
-        });
-    }
-
-    document.getElementById('date-now').innerText = new Date().toLocaleDateString('fr-FR');
-    window.onload = renderTables;
+    window.onload = renderAll;
 </script>
 
 </body>
