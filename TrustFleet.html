@@ -2,188 +2,214 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>SGP-301 : GESTION INTÉGRALE v9.0</title>
+    <title>SGP-301 : GESTION COMMANDEMENT v10.0</title>
     <style>
-        :root { --army: #2d3e2d; --gold: #c5a059; --light: #f4f4f4; --success: #27ae60; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); color: #333; }
+        :root { --army: #2d3e2d; --gold: #c5a059; --bg: #f0f2f0; --white: #ffffff; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg); color: #333; }
         
-        /* Écran de Connexion */
-        #login-screen { position: fixed; inset: 0; background: var(--army); display: flex; align-items: center; justify-content: center; z-index: 1000; color: white; }
+        /* Connexion */
+        #auth-screen { position: fixed; inset: 0; background: var(--army); display: flex; align-items: center; justify-content: center; z-index: 1000; color: white; }
         .login-card { background: rgba(255,255,255,0.1); padding: 40px; border-radius: 15px; border: 1px solid var(--gold); text-align: center; width: 350px; backdrop-filter: blur(10px); }
         
-        /* Dashboard */
-        #dashboard { display: none; padding: 20px; }
-        .header { background: var(--army); color: white; padding: 20px; border-bottom: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        /* Layout */
+        header { background: var(--army); color: white; padding: 15px 30px; border-bottom: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .container { max-width: 1100px; margin: 20px auto; padding: 0 20px; display: none; }
+        .card { background: var(--white); padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 25px; }
         
-        /* Admin */
-        .admin-bar { background: #e9ecef; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; border-left: 5px solid var(--gold); }
-        .is-admin .admin-bar { display: flex; gap: 15px; align-items: center; }
+        /* Admin Bar */
+        .admin-only { display: none; background: #e9ecef; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--gold); align-items: center; gap: 15px; }
+        .is-admin .admin-only { display: flex; }
 
         /* Formulaire */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        label { display: block; font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        input:disabled, select:disabled { background: #eee; cursor: not-allowed; border-color: transparent; color: #000; font-weight: 600; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .grid-wide { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+        label { display: block; font-size: 10px; font-weight: bold; color: #777; text-transform: uppercase; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; }
+        input:disabled, select:disabled { background: #f8f9fa; color: #000; font-weight: bold; border-color: transparent; }
         
-        h3 { border-bottom: 2px solid var(--gold); padding-bottom: 5px; color: var(--army); margin-top: 0; }
-        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .btn-gold { background: var(--gold); color: white; }
-        .btn-army { background: var(--army); color: white; }
+        h3 { color: var(--army); border-left: 4px solid var(--gold); padding-left: 10px; margin-top: 0; text-transform: uppercase; font-size: 1.1rem; }
+        .btn { padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-print { background: #34495e; color: white; }
+        .btn-edit { background: var(--army); color: white; }
+        
+        @media print {
+            header, .admin-only, .btn { display: none !important; }
+            .card { box-shadow: none; border: 1px solid #eee; }
+            body { background: white; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
+    <div id="auth-screen">
         <div class="login-card">
-            <h1 style="color:var(--gold); margin:0;">BA 301</h1>
-            <p>Système de Gestion du Personnel</p>
-            <input type="text" id="pass" placeholder="Matricule ou Code Admin" style="text-align:center; margin-bottom:15px; border:none;">
-            <button class="btn btn-gold" style="width:100%" onclick="login()">ACCÉDER AU PORTAIL</button>
+            <h1 style="color:var(--gold); margin-bottom:5px;">AIR BASE 301</h1>
+            <p style="margin-top:0; opacity:0.8;">Portail RH - Centre d'Instruction</p>
+            <input type="text" id="login-id" placeholder="Matricule ou Code 301" style="text-align:center; margin-top:20px; font-size:1.1rem;">
+            <button class="btn" style="background:var(--gold); color:var(--army); width:100%; margin-top:15px;" onclick="connecter()">S'IDENTIFIER</button>
         </div>
     </div>
 
-    <div id="dashboard">
-        <div class="header">
-            <div>
-                <span id="role-tag" style="font-size:12px; background:var(--gold); padding:2px 8px; border-radius:4px;">PROFIL</span>
-                <h2 id="user-title" style="margin:5px 0 0 0;">NOM GRADE</h2>
-            </div>
+    <header id="main-header">
+        <div>
+            <span id="badge-role" style="font-size:10px; background:var(--gold); color:var(--army); padding:2px 6px; border-radius:3px; font-weight:bold;">PROFIL</span>
+            <h2 id="nom-header" style="margin:5px 0 0 0;">-</h2>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-print" onclick="window.print()">🖨 IMPRIMER FICHE</button>
             <button class="btn" style="background:rgba(255,255,255,0.2); color:white;" onclick="location.reload()">DÉCONNEXION</button>
         </div>
+    </header>
 
-        <div style="max-width: 1000px; margin: 20px auto;">
-            
-            <div class="admin-bar">
-                <strong>SÉLECTION DU PERSONNEL :</strong>
-                <select id="select-p" onchange="loadUser(this.value)" style="flex:1"></select>
-                <button id="edit-btn" class="btn btn-army" onclick="toggleEdit()">MODIFIER LA FICHE</button>
-            </div>
-
-            <div class="card">
-                <h3>📋 IDENTITÉ & SERVICE</h3>
-                <div class="grid">
-                    <div><label>Nom</label><input type="text" data-f="nom" disabled></div>
-                    <div><label>Prénom</label><input type="text" data-f="prenom" disabled></div>
-                    <div><label>Grade</label><input type="text" data-f="grade" disabled></div>
-                    <div><label>Matricule</label><input type="text" id="disp-mat" disabled></div>
-                    <div><label>Spécialité</label><input type="text" data-f="spec" disabled></div>
-                    <div><label>Position</label>
-                        <select data-f="pos" disabled>
-                            <option value="PRESENT">PRÉSENT</option>
-                            <option value="STAGE">STAGE</option>
-                            <option value="MISSION">MISSION</option>
-                            <option value="MALADE">MALADE</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>📊 PERFORMANCES & NOTES</h3>
-                <div class="grid">
-                    <div><label>Physique /20</label><input type="number" data-f="nPhys" disabled></div>
-                    <div><label>Intellectuelle /20</label><input type="number" data-f="nIntel" disabled></div>
-                    <div><label>Morale /20</label><input type="number" data-f="nMor" disabled></div>
-                    <div><label>Note de Tir</label><input type="number" data-f="nTir" disabled></div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>🏥 SANTÉ & BIOMÉTRIE</h3>
-                <div class="grid">
-                    <div><label>Poids (kg)</label><input type="number" data-f="poids" oninput="calcIMC()" disabled></div>
-                    <div><label>Taille (m)</label><input type="number" step="0.01" data-f="taille" oninput="calcIMC()" disabled></div>
-                    <div><label>IMC (Auto)</label><input type="text" id="imc" style="background:#f8f9fa; border:none; font-weight:bold;" disabled></div>
-                    <div><label>Tension (TA)</label><input type="text" data-f="ta" disabled></div>
-                </div>
-            </div>
-
+    <div class="container" id="app-container">
+        
+        <div class="admin-only">
+            <strong>PERSONNEL :</strong>
+            <select id="select-soldat" onchange="chargerSoldat(this.value)" style="flex:2;"></select>
+            <button id="btn-edit" class="btn btn-edit" onclick="modeEdition()">✏️ MODIFIER</button>
         </div>
+
+        <div class="card">
+            <h3>1. Renseignements Généraux</h3>
+            <div class="grid">
+                <div><label>Nom</label><input type="text" data-field="nom" disabled></div>
+                <div><label>Prénom</label><input type="text" data-field="prenom" disabled></div>
+                <div><label>Grade</label><input type="text" data-field="grade" disabled></div>
+                <div><label>Matricule</label><input type="text" id="disp-id" disabled></div>
+                <div><label>Spécialité</label><input type="text" data-field="spec" disabled></div>
+                <div><label>Position</label>
+                    <select data-field="pos" disabled>
+                        <option value="PRESENT">PRÉSENT</option>
+                        <option value="STAGE">STAGE</option>
+                        <option value="MISSION">MISSION (FMM/MINUSCA)</option>
+                        <option value="PERM">PERMISSION</option>
+                        <option value="MALADE">MALADE / HOSPITALISÉ</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>2. Récapitulatif Annuel d'Activité (Jours)</h3>
+            <div class="grid grid-wide">
+                <div><label>Présence</label><input type="number" data-field="cPre" disabled></div>
+                <div><label>Permission</label><input type="number" data-field="cPer" disabled></div>
+                <div><label>Mission</label><input type="number" data-field="cMis" disabled></div>
+                <div><label>Stage</label><input type="number" data-field="cSta" disabled></div>
+                <div><label>Sport</label><input type="number" data-field="cSpo" disabled></div>
+                <div><label>Instruction</label><input type="number" data-field="cIns" disabled></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>3. Évaluations & Aptitudes (/20)</h3>
+            <div class="grid">
+                <div><label>Valeur Physique</label><input type="number" step="0.01" data-field="nPhy" disabled></div>
+                <div><label>Valeur Intellectuelle</label><input type="number" step="0.01" data-field="nInt" disabled></div>
+                <div><label>Valeur Morale</label><input type="number" step="0.01" data-field="nMor" disabled></div>
+                <div><label>Note de Tir</label><input type="number" step="0.01" data-field="nTir" disabled></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>4. Paramètres de Santé</h3>
+            <div class="grid">
+                <div><label>Poids (kg)</label><input type="number" data-field="poids" oninput="calculerIMC()" disabled></div>
+                <div><label>Taille (m)</label><input type="number" step="0.01" data-field="taille" oninput="calculerIMC()" disabled></div>
+                <div><label>IMC</label><input type="text" id="val-imc" style="font-weight:bold; color:var(--army);" disabled></div>
+                <div><label>Tension (TA)</label><input type="text" data-field="ta" disabled></div>
+                <div><label>Glycémie</label><input type="text" data-field="gly" disabled></div>
+            </div>
+        </div>
+
     </div>
 
 <script>
-    // BASE DE DONNÉES COMPLÈTE (1-50)
-    const db = [
-        { id: "301", role: "ADMIN", nom: "COMMANDEMENT", grade: "COL" },
-        { id: "OFF/001", role: "USER", nom: "BALOGOG", prenom: "Patrick", grade: "CNE", spec: "LOG", pos: "STAGE", nPhys: 11.7, nIntel: 15, nMor: 20.4, nTir: 17, poids: 85, taille: 1.75 },
-        { id: "OFF/002", role: "USER", nom: "EMAN", prenom: "Armand Brice", grade: "CNE", spec: "RENS", pos: "PRESENT", nPhys: 16.2, nIntel: 18, nMor: 20.6, nTir: 18, poids: 82, taille: 1.73, ta: "121/84" },
-        { id: "A15/26261", role: "USER", nom: "EBOK", prenom: "Jean T.", grade: "CAL", spec: "FUSAIR", pos: "PRESENT", nPhys: 14.5, nIntel: 12, nMor: 21, nTir: 20, poids: 75, taille: 1.78 },
-        { id: "A24/57038", role: "USER", nom: "MBIA ZANGA", prenom: "Amélie", grade: "2°CL", spec: "FUSAIR", pos: "PRESENT", nPhys: 12, nIntel: 20.6, nMor: 20.6, nTir: 15, poids: 60, taille: 1.65 },
-        { id: "A24/58635", role: "USER", nom: "BELBARA", prenom: "Djakdjinkreo", grade: "2°CL", spec: "FUSAIR", pos: "PRESENT", nPhys: 10, nIntel: 10.7, nMor: 21, nTir: 14, poids: 70, taille: 1.72 }
-        // Ajoutez les autres ici...
+    // BASE DE DONNÉES COMPLÈTE (CONSOLIDÉE 1-50)
+    const baseDonnees = [
+        { id:"301", role:"ADMIN", nom:"COMMANDEMENT", grade:"COL" },
+        { id:"OFF/001", nom:"BALOGOG", prenom:"Patrick", grade:"CNE", spec:"LOG", pos:"STAGE", cPre:14, cPer:7, cMis:5, cSta:22, cSpo:6, cIns:1, nPhy:11.7, nInt:0, nMor:20.4, nTir:17, poids:85, taille:1.75 },
+        { id:"OFF/002", nom:"EMAN", prenom:"Armand Brice", grade:"CNE", spec:"RENS", pos:"PRESENT", cPre:44, cPer:0, cMis:2, cSta:0, cSpo:7, cIns:2, nPhy:16.2, nInt:0, nMor:20.6, nTir:18, poids:82, taille:1.73, ta:"121/84", gly:"0.8" },
+        { id:"A24/58635", nom:"DIEBALBE", prenom:"Emmanuel", grade:"AC", spec:"FUSAIR", pos:"FMM", cPre:0, cPer:0, cMis:40, cSta:0, cSpo:0, cIns:0, nPhy:0, nInt:9.35, nMor:20, nTir:0 },
+        { id:"A15/26261", nom:"EBOK", prenom:"Jean T.", grade:"CAL", spec:"FUSAIR", pos:"PRESENT", cPre:41, cPer:0, cMis:5, cSta:0, cSpo:14, cIns:2, nPhy:14.5, nInt:0, nMor:21.07, nTir:20 },
+        { id:"A24/57038", nom:"MBIA ZANGA", prenom:"Amélie", grade:"2°CL", spec:"FUSAIR", pos:"PRESENT", cPre:35, cPer:2, cMis:0, cSta:0, cSpo:12, cIns:4, nPhy:12, nInt:20.6, nMor:20.6, nTir:9 },
+        { id:"A24/58636", nom:"BELBARA", prenom:"Djakdjinkreo", grade:"2°CL", spec:"FUSAIR", pos:"PRESENT", cPre:38, cPer:0, cMis:0, cSta:0, cSpo:8, cIns:3, nPhy:10, nInt:10.7, nMor:21.07, nTir:14 },
+        { id:"A24/56586", nom:"BAKAIWE", prenom:"Armand", grade:"2°CL", spec:"FUSAIR", pos:"PRESENT", cPre:40, cPer:0, cMis:0, cSta:0, cSpo:10, cIns:2, nPhy:0, nInt:9.6, nMor:20.5, nTir:0 }
+        // ... (Les autres personnels s'ajoutent ici sur le même modèle)
     ];
 
-    let current = null;
-    let isEdit = false;
+    let session = null;
+    let editable = false;
 
-    function login() {
-        const pass = document.getElementById('pass').value.trim();
-        const user = db.find(u => u.id === pass);
+    function connecter() {
+        const val = document.getElementById('login-id').value.trim();
+        const user = baseDonnees.find(u => u.id === val);
 
-        if (user) {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
+        if(user) {
+            session = user;
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
             
-            if (user.role === "ADMIN") {
+            if(user.role === "ADMIN") {
                 document.body.classList.add('is-admin');
-                document.getElementById('role-tag').innerText = "ADMINISTRATEUR";
-                fillSelect();
-                loadUser(db[1].id); 
+                document.getElementById('badge-role').innerText = "ADMINISTRATEUR";
+                genererListe();
+                chargerSoldat(baseDonnees[1].id);
             } else {
-                document.getElementById('role-tag').innerText = "PROFIL PERSONNEL";
-                loadUser(user.id);
+                document.getElementById('badge-role').innerText = "PROFIL PERSONNEL";
+                chargerSoldat(user.id);
             }
-        } else { alert("Accès refusé."); }
+        } else { alert("Matricule non répertorié."); }
     }
 
-    function fillSelect() {
-        const s = document.getElementById('select-p');
-        s.innerHTML = db.filter(u => u.role !== "ADMIN").map(u => `<option value="${u.id}">${u.grade} ${u.nom}</option>`).join('');
+    function genererListe() {
+        const sel = document.getElementById('select-soldat');
+        sel.innerHTML = baseDonnees.filter(u => u.role !== "ADMIN")
+                                   .map(u => `<option value="${u.id}">${u.grade} ${u.nom}</option>`).join('');
     }
 
-    function loadUser(id) {
-        current = db.find(u => u.id === id);
-        document.getElementById('user-title').innerText = current.grade + " " + current.nom;
-        document.getElementById('disp-mat').value = current.id;
+    function chargerSoldat(id) {
+        const p = baseDonnees.find(u => u.id === id);
+        document.getElementById('nom-header').innerText = p.grade + " " + p.nom;
+        document.getElementById('disp-id').value = p.id;
         
-        document.querySelectorAll('[data-f]').forEach(el => {
-            const key = el.getAttribute('data-f');
-            el.value = current[key] || "";
+        document.querySelectorAll('[data-field]').forEach(f => {
+            const key = f.getAttribute('data-field');
+            f.value = p[key] || (f.type === "number" ? 0 : "");
         });
-        calcIMC();
+        calculerIMC();
     }
 
-    function toggleEdit() {
-        isEdit = !isEdit;
-        const btn = document.getElementById('edit-btn');
-        document.querySelectorAll('[data-f]').forEach(el => el.disabled = !isEdit);
+    function modeEdition() {
+        editable = !editable;
+        const btn = document.getElementById('btn-edit');
+        document.querySelectorAll('[data-field]').forEach(f => f.disabled = !editable);
         
-        if (isEdit) {
-            btn.innerText = "💾 ENREGISTRER";
-            btn.style.background = "var(--success)";
+        if(editable) {
+            btn.innerText = "💾 SAUVEGARDER";
+            btn.style.background = "#27ae60";
         } else {
-            btn.innerText = "MODIFIER LA FICHE";
+            btn.innerText = "✏️ MODIFIER";
             btn.style.background = "var(--army)";
-            saveToLocal();
+            // Logique de mise à jour de l'objet en mémoire
+            const idActuel = document.getElementById('disp-id').value;
+            const p = baseDonnees.find(u => u.id === idActuel);
+            document.querySelectorAll('[data-field]').forEach(f => {
+                const key = f.getAttribute('data-field');
+                p[key] = f.type === "number" ? parseFloat(f.value) : f.value;
+            });
+            alert("Données mises à jour avec succès.");
         }
     }
 
-    function calcIMC() {
-        const p = parseFloat(document.querySelector('[data-f="poids"]').value);
-        const t = parseFloat(document.querySelector('[data-f="taille"]').value);
-        if (p > 0 && t > 0) {
-            document.getElementById('imc').value = (p / (t * t)).toFixed(1);
-        } else { document.getElementById('imc').value = "-"; }
-    }
-
-    function saveToLocal() {
-        // Logique de sauvegarde des modifications dans l'objet en mémoire
-        document.querySelectorAll('[data-f]').forEach(el => {
-            const key = el.getAttribute('data-f');
-            current[key] = isNaN(el.value) || el.value === "" ? el.value : parseFloat(el.value);
-        });
-        alert("Modifications appliquées.");
+    function calculerIMC() {
+        const p = parseFloat(document.querySelector('[data-field="poids"]').value);
+        const t = parseFloat(document.querySelector('[data-field="taille"]').value);
+        const res = document.getElementById('val-imc');
+        if(p > 0 && t > 0) {
+            const imc = (p / (t * t)).toFixed(1);
+            res.value = imc;
+        } else { res.value = "-"; }
     }
 </script>
 </body>
