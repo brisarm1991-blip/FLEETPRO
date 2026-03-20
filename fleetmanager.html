@@ -24,18 +24,23 @@
   --radius: 10px;
   --sidebar-width: 260px;
 }
+
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
 
-/* --- AMÉLIORATION PDF : MASQUER SIDEBAR --- */
+/* --- AMÉLIORATION PDF : MASQUAGE DES ÉLÉMENTS INTERACTIFS --- */
 @media print {
-  .sidebar, .btn, .top-bar button, .nav-item, .sidebar-header { display: none !important; }
+  .sidebar, .btn, .top-bar button, .nav-item, .sidebar-header, .action-btns, th:last-child, td:last-child { 
+    display: none !important; 
+  }
   .main-content { margin-left: 0 !important; width: 100% !important; }
   .page { display: block !important; padding: 0; }
   .table-container { box-shadow: none; border: 1px solid #ccc; }
   body { background: white; }
+  .top-bar { box-shadow: none; border-bottom: 2px solid #333; }
 }
 
+/* SIDEBAR */
 .sidebar{width:var(--sidebar-width);background:var(--primary);color:#fff;display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100;transition:0.3s;}
 .sidebar-header{padding:25px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1);}
 .sidebar-header h2{font-size:1.4rem;font-weight:700;letter-spacing:1px;color:#fff;}
@@ -43,19 +48,28 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg
 .nav-item{padding:12px 25px;display:flex;align-items:center;color:rgba(255,255,255,0.7);text-decoration:none;cursor:pointer;transition:0.3s;font-size:0.95rem;position:relative;}
 .nav-item i{width:25px;margin-right:10px;font-size:1.1rem;text-align:center;}
 .nav-item:hover, .nav-item.active{background:var(--primary-light);color:#fff;border-left:4px solid var(--accent);}
+
+/* MAIN CONTENT */
 .main-content{flex:1;margin-left:var(--sidebar-width);display:flex;flex-direction:column;transition:0.3s;}
 .top-bar{height:70px;background:var(--card-bg);display:flex;align-items:center;justify-content:space-between;padding:0 30px;box-shadow:var(--shadow);position:sticky;top:0;z-index:90;}
 .page{padding:30px;display:none;animation:fadeIn 0.4s;}
 .page.active{display:block;}
+
+/* TABLES */
 .table-container{background:var(--card-bg);padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-top:20px;overflow-x:auto;}
 table{width:100%;border-collapse:collapse;margin-top:15px;}
 th{text-align:left;padding:12px 15px;background:#f8f9fa;color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.75rem;border-bottom:2px solid var(--border);}
 td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.9rem;}
+
+/* LOCK SCREEN */
+#lock-screen{position:fixed;inset:0;background:var(--primary);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;color:white;}
+.lock-box{background:var(--primary-light);padding:40px;border-radius:15px;text-align:center;box-shadow:0 10px-25px rgba(0,0,0,0.3);width:320px;}
+.lock-box input{width:100%;padding:12px;margin:20px 0;border-radius:6px;border:none;text-align:center;font-size:1.2rem;outline:none;}
+
 .btn{padding:10px 18px;border-radius:6px;border:none;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;transition:0.2s;}
 .btn-primary{background:var(--accent);color:white;}
-#lock-screen{position:fixed;inset:0;background:var(--primary);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;color:white;}
-.lock-box{background:var(--primary-light);padding:40px;border-radius:15px;text-align:center;width:320px;}
-.lock-box input{width:100%;padding:12px;margin:20px 0;border-radius:6px;border:none;text-align:center;font-size:1.2rem;}
+.img-preview{width:45px;height:45px;border-radius:8px;object-fit:cover;border:1px solid var(--border);}
+
 @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
 </style>
 </head>
@@ -63,8 +77,9 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.9rem;}
 
 <div id="lock-screen">
   <div class="lock-box">
-    <h2>BA 301</h2>
-    <input type="password" id="access-code" placeholder="Code d'accès">
+    <i class="fas fa-lock fa-3x" style="color:var(--accent);margin-bottom:15px"></i>
+    <h2 id="lock-unit-name">BA 301</h2>
+    <input type="password" id="access-code" placeholder="Code secret">
     <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="verifyLogin()">CONNEXION</button>
   </div>
 </div>
@@ -72,66 +87,83 @@ td{padding:12px 15px;border-bottom:1px solid var(--border);font-size:0.9rem;}
 <div class="sidebar">
   <div class="sidebar-header"><h2>FLEET<span style="color:var(--accent)">PRO</span></h2></div>
   <div class="sidebar-nav">
-    <div class="nav-item active" onclick="showPage('dash')"><i class="fas fa-home"></i> Dashboard</div>
-    <div class="nav-item" onclick="showPage('veh')"><i class="fas fa-car"></i> Véhicules</div>
-    <div class="nav-item" onclick="showPage('sett')"><i class="fas fa-cog"></i> Paramètres</div>
+    <div class="nav-item active" onclick="showPage('dash', event)"><i class="fas fa-home"></i> Dashboard</div>
+    <div class="nav-item" onclick="showPage('veh', event)"><i class="fas fa-car"></i> Véhicules</div>
+    <div class="nav-item" onclick="showPage('sett', event)" style="margin-top:20px;border-top:1px solid rgba(255,255,255,0.1)"><i class="fas fa-cog"></i> Paramètres</div>
   </div>
 </div>
 
 <div class="main-content" id="app-main" style="display:none">
   <div class="top-bar">
-    <h2 id="page-title">Dashboard</h2>
-    <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> PDF</button>
+    <h2 id="page-title">Tableau de Bord</h2>
+    <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> GÉNÉRER PDF</button>
   </div>
 
   <div class="page active" id="page-dash">
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;" id="stat-cards"></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;" id="stat-cards">
+      </div>
   </div>
 
   <div class="page" id="page-veh">
-    <h3>PARC AUTOMOBILE</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>GESTION DES VÉHICULES</h3>
+      <button class="btn btn-primary" onclick="alert('Fonction Ajouter (Structure Initiale)')">+ NOUVEAU</button>
+    </div>
     <div class="table-container">
       <table>
         <thead>
           <tr>
+            <th>Photo</th>
             <th>Modèle</th>
-            <th>Plaque</th>
-            <th style="color:var(--accent)">KM ACTUEL</th> <th>État</th>
+            <th>Immatriculation</th>
+            <th style="color:var(--accent);background:rgba(255,107,53,0.05)">KM ACTUEL</th>
+            <th>État</th>
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody id="vehicle-table-body"></tbody>
+        <tbody id="vehicle-list">
+          </tbody>
       </table>
     </div>
   </div>
 
   <div class="page" id="page-sett">
-    <h3>PARAMÈTRES</h3>
-    <div class="table-container" style="max-width:400px">
-      <label>Nom de l'unité</label>
-      <input type="text" id="cfg-unit" style="width:100%;padding:10px;margin:10px 0;">
-      <label>Modifier le code d'accès</label>
-      <input type="password" id="cfg-new-code" placeholder="Nouveau code" style="width:100%;padding:10px;margin:10px 0;">
+    <h3>CONFIGURATION</h3>
+    <div class="table-container" style="max-width:500px">
+      <div style="margin-bottom:20px">
+        <label style="display:block;margin-bottom:8px;font-weight:600">Nom de l'Unité</label>
+        <input type="text" id="cfg-unit" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:5px">
+      </div>
+      <div style="margin-bottom:20px">
+        <label style="display:block;margin-bottom:8px;font-weight:600">Modifier le Code d'accès</label>
+        <input type="password" id="cfg-new-code" placeholder="Nouveau code" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:5px">
+      </div>
       <button class="btn btn-primary" onclick="saveSettings()" style="width:100%;justify-content:center">ENREGISTRER</button>
     </div>
   </div>
 </div>
 
 <script>
+// --- CONFIG ET DONNÉES ---
 let config = JSON.parse(localStorage.getItem('fmp_config')) || { code: '301', unit: 'BA 301' };
-let vehicles = JSON.parse(localStorage.getItem('fmp_v')) || [];
+let vehicles = JSON.parse(localStorage.getItem('fmp_v')) || [
+  {id: 1, model: 'Toyota Hilux', plate: 'BA-301-01', km: 45000, state: 'En service', img: ''},
+  {id: 2, model: 'Land Rover', plate: 'BA-301-02', km: 120500, state: 'En panne', img: ''}
+];
 
 function initApp() {
+  document.getElementById('lock-unit-name').textContent = config.unit;
   document.getElementById('cfg-unit').value = config.unit;
+  updateStats();
   renderVehicles();
 }
 
 function verifyLogin() {
-  const input = document.getElementById('access-code').value;
-  if(input === config.code) {
+  const code = document.getElementById('access-code').value;
+  if(code === config.code) {
     document.getElementById('lock-screen').style.display = 'none';
     document.getElementById('app-main').style.display = 'flex';
-  } else { alert("Code incorrect"); }
+  } else { alert("Code Incorrect"); }
 }
 
 function saveSettings() {
@@ -139,26 +171,40 @@ function saveSettings() {
   const nc = document.getElementById('cfg-new-code').value;
   if(nc) config.code = nc;
   localStorage.setItem('fmp_config', JSON.stringify(config));
-  alert("Sauvegardé !");
+  alert("Modifications enregistrées !");
   location.reload();
 }
 
 function renderVehicles() {
-  const tbody = document.getElementById('vehicle-table-body');
+  const tbody = document.getElementById('vehicle-list');
   tbody.innerHTML = vehicles.map(v => `
     <tr>
-      <td>${v.model}</td>
-      <td><b>${v.plate}</b></td>
-      <td style="color:var(--accent);font-weight:bold">${v.km || 0} KM</td>
-      <td>${v.state}</td>
-      <td><button onclick="delV(${v.id})"><i class="fas fa-trash"></i></button></td>
+      <td><img src="https://via.placeholder.com/45" class="img-preview"></td>
+      <td><b>${v.model}</b></td>
+      <td><span style="background:#eee;padding:3px 8px;border-radius:4px">${v.plate}</span></td>
+      <td style="font-weight:bold;color:var(--accent)">${v.km.toLocaleString()} KM</td>
+      <td><span style="color:${v.state === 'En service' ? 'var(--success)' : 'var(--danger)'}">● ${v.state}</span></td>
+      <td><button class="btn" onclick="alert('Action sur '+ '${v.plate}')"><i class="fas fa-edit"></i></button></td>
     </tr>
   `).join('');
 }
 
-function showPage(id) {
+function updateStats() {
+  const grid = document.getElementById('stat-cards');
+  grid.innerHTML = `
+    <div class="table-container" style="text-align:center"><h4>VÉHICULES</h4><h2>${vehicles.length}</h2></div>
+    <div class="table-container" style="text-align:center"><h4>EN PANNE</h4><h2 style="color:var(--danger)">${vehicles.filter(v=>v.state!=='En service').length}</h2></div>
+    <div class="table-container" style="text-align:center"><h4>CARBURANT</h4><h2>0 L</h2></div>
+    <div class="table-container" style="text-align:center"><h4>ALERTE</h4><h2>0</h2></div>
+  `;
+}
+
+function showPage(id, event) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  document.getElementById('page-title').textContent = event.currentTarget.textContent;
 }
 </script>
 </body>
