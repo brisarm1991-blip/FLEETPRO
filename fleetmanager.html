@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TrustFleet Pro v3.8 | CI BA301</title>
+<title>TrustFleet Pro v3.9 | CI BA301</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -36,6 +36,9 @@ table { width:100%; border-collapse:collapse; }
 th { text-align:left; padding:12px; border-bottom:2px solid var(--border); font-size:11px; color:#888; text-transform:uppercase; }
 td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertical-align:middle; }
 
+/* MISE EN AVANT DU MODÈLE */
+.td-model { font-weight: bold; color: var(--primary); }
+
 .status-badge { padding:4px 10px; border-radius:20px; font-size:10px; font-weight:bold; color:white; display: inline-flex; align-items: center; gap: 5px; }
 .bg-success { background: var(--success); }
 .bg-danger { background: var(--danger); }
@@ -48,7 +51,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
 .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
 .modal-content { background:white; width:95%; max-width:650px; border-radius:var(--radius); padding:25px; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
-.form-grid input, .form-grid select { width:100%; padding:10px; border:1px solid var(--border); border-radius:6px; }
+.form-grid input, .form-grid select { width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; }
 
 .btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; display: inline-flex; align-items: center; gap: 8px; }
 .btn-primary { background:var(--primary); color:white; }
@@ -65,10 +68,10 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
 <div id="login-screen">
   <div class="login-box">
     <i class="fas fa-shield-halved fa-3x" style="color:var(--primary); margin-bottom:15px;"></i>
-    <h2>TrustFleet Security</h2>
+    <h2>TrustFleet CI BA301</h2>
     <input type="text" id="user-id" placeholder="Identifiant">
     <input type="password" id="user-pass" placeholder="Mot de passe">
-    <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="checkAuth()">Connexion</button>
+    <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="checkAuth()">Accéder au Système</button>
   </div>
 </div>
 
@@ -83,7 +86,7 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
       <li onclick="showSection('maint', this)"><i class="fas fa-tools"></i> Entretiens</li>
       <li onclick="showSection('settings', this)"><i class="fas fa-user-lock"></i> Paramètres</li>
     </ul>
-    <button class="btn btn-excel" onclick="exportToCSV()"><i class="fas fa-file-excel"></i> Export CSV (Excel)</button>
+    <button class="btn btn-excel" onclick="exportToCSV()"><i class="fas fa-file-excel"></i> Rapport Excel (.csv)</button>
   </div>
 
   <div class="main-content">
@@ -94,21 +97,21 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
 
     <div id="section-dashboard" class="content-section">
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:25px;">
-        <div class="card" style="text-align:center;"><h4>KM TOTAL FLOTTE</h4><h2 id="dash-km">0 km</h2></div>
-        <div class="card" style="text-align:center;"><h4>VÉHICULES / CHAUFFEURS</h4><h2 id="dash-counts">0 / 0</h2></div>
+        <div class="card" style="text-align:center;"><h4>KILOMÉTRAGE FLOTTE</h4><h2 id="dash-km">0 km</h2></div>
+        <div class="card" style="text-align:center;"><h4>RESSOURCES</h4><h2 id="dash-counts">0 / 0</h2></div>
       </div>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
-          <div class="card"><h3><i class="fas fa-chart-bar"></i> Conso Carburant (Litres)</h3><canvas id="fuelChart" height="200"></canvas></div>
-          <div class="card"><h3><i class="fas fa-chart-pie"></i> Répartition KM</h3><canvas id="kmPieChart" height="200"></canvas></div>
+          <div class="card"><h3>Consommation (Litres)</h3><canvas id="fuelChart" height="200"></canvas></div>
+          <div class="card"><h3>Utilisation KM</h3><canvas id="kmPieChart" height="200"></canvas></div>
       </div>
     </div>
 
     <div id="section-vehicles" class="content-section" style="display:none">
       <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;"><h3>Parc Automobile</h3><button class="btn btn-accent" onclick="openModal('vehicle')"><i class="fas fa-plus"></i> Ajouter</button></div>
+        <div style="display:flex; justify-content:space-between; align-items:center;"><h3>Parc Automobile</h3><button class="btn btn-accent" onclick="openModal('vehicle')"><i class="fas fa-plus"></i> Nouveau Véhicule</button></div>
         <div class="table-container">
             <table>
-                <thead><tr><th>Photo</th><th>Marque</th><th>Modèle</th><th>Immat.</th><th>Châssis</th><th>KM</th><th>Position</th><th>Actions</th></tr></thead>
+                <thead><tr><th>Photo</th><th>Marque</th><th>MODÈLE</th><th>Immat.</th><th>N° Châssis</th><th>KM Actuel</th><th>Statut</th><th>Actions</th></tr></thead>
                 <tbody id="tbody-vehicles"></tbody>
             </table>
         </div>
@@ -117,30 +120,30 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
 
     <div id="section-drivers" class="content-section" style="display:none">
       <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;"><h3>Chauffeurs</h3><button class="btn btn-accent" onclick="openModal('driver')"><i class="fas fa-plus"></i> Ajouter</button></div>
-        <div class="table-container"><table><thead><tr><th>Photo</th><th>Nom</th><th>Matricule</th><th>Permis</th><th>Position</th><th>Actions</th></tr></thead><tbody id="tbody-drivers"></tbody></table></div>
+        <div style="display:flex; justify-content:space-between; align-items:center;"><h3>Chauffeurs</h3><button class="btn btn-accent" onclick="openModal('driver')"><i class="fas fa-plus"></i> Nouveau Chauffeur</button></div>
+        <div class="table-container"><table><thead><tr><th>Photo</th><th>Grade & Nom</th><th>Matricule</th><th>Permis</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="tbody-drivers"></tbody></table></div>
       </div>
     </div>
 
     <div id="section-fuel" class="content-section" style="display:none">
         <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center;"><h3>Suivi Carburant</h3><button class="btn btn-primary" onclick="openModal('fuel')"><i class="fas fa-gas-pump"></i> Plein</button></div>
-            <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Litres</th><th>KM</th><th>Montant</th><th>Action</th></tr></thead><tbody id="tbody-fuel"></tbody></table></div>
+            <div style="display:flex; justify-content:space-between; align-items:center;"><h3>Suivi des Pleins</h3><button class="btn btn-primary" onclick="openModal('fuel')"><i class="fas fa-gas-pump"></i> Saisir Plein</button></div>
+            <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Litres</th><th>KM</th><th>Coût</th><th>Action</th></tr></thead><tbody id="tbody-fuel"></tbody></table></div>
         </div>
     </div>
 
     <div id="section-maint" class="content-section" style="display:none">
         <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center;"><h3>Registre Maintenance</h3><button class="btn btn-primary" onclick="openModal('maint')"><i class="fas fa-wrench"></i> Saisir Entretien</button></div>
-            <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Nature</th><th>KM</th><th>Coût (FCFA)</th><th>Action</th></tr></thead><tbody id="tbody-maint"></tbody></table></div>
+            <div style="display:flex; justify-content:space-between; align-items:center;"><h3>Registre des Travaux</h3><button class="btn btn-primary" onclick="openModal('maint')"><i class="fas fa-wrench"></i> Nouvel Entretien</button></div>
+            <div class="table-container"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Nature</th><th>KM</th><th>Coût</th><th>Action</th></tr></thead><tbody id="tbody-maint"></tbody></table></div>
         </div>
     </div>
 
     <div id="section-settings" class="content-section" style="display:none">
-        <div class="card" style="max-width:400px;"><h3>Sécurité</h3><br>
+        <div class="card" style="max-width:400px;"><h3>Accès Sécurisé</h3><br>
             <input type="text" id="new-id" style="width:100%; padding:10px; margin-bottom:10px;" placeholder="Nouvel ID">
             <input type="password" id="new-pass" style="width:100%; padding:10px; margin-bottom:10px;" placeholder="Nouveau Pass">
-            <button class="btn btn-primary" onclick="updateAuth()">Mettre à jour</button>
+            <button class="btn btn-primary" onclick="updateAuth()">Appliquer</button>
         </div>
     </div>
   </div>
@@ -148,27 +151,27 @@ td { padding:12px; border-bottom:1px solid var(--border); font-size:13px; vertic
 
 <div id="modal-vehicle" class="modal">
     <div class="modal-content">
-        <h3>Fiche Véhicule</h3><br>
+        <h3>Enregistrement Véhicule</h3><br>
         <form id="form-vehicle"><input type="hidden" name="id">
             <div class="form-grid">
                 <input type="text" name="brand" placeholder="Marque (ex: Toyota)" required>
-                <input type="text" name="model" placeholder="Modèle (ex: Hilux)" required>
+                <input type="text" name="model" placeholder="MODÈLE (ex: Hilux Pickup)" required>
                 <input type="text" name="plate" placeholder="Immatriculation" required>
-                <input type="text" name="chassis" placeholder="N° Châssis">
-                <input type="number" name="year" placeholder="Année Dotation">
+                <input type="text" name="chassis" placeholder="N° de Châssis">
+                <input type="number" name="year" placeholder="Année de dotation">
                 <input type="number" name="km" placeholder="KM actuel" required>
-                <select name="status"><option value="En service">En service</option><option value="Indisponible">Indisponible</option></select>
-                <input type="file" onchange="compressImg(this, 'h-v')"><input type="hidden" name="image" id="h-v">
+                <select name="status"><option value="En service">En service</option><option value="Indisponible">En panne / Indispo</option></select>
+                <input type="file" accept="image/*" onchange="compressImg(this, 'h-v')"><input type="hidden" name="image" id="h-v">
             </div><br>
-            <button type="button" class="btn btn-primary" onclick="handleSave('vehicles','vehicle')">Valider</button>
-            <button type="button" class="btn" onclick="closeModal('vehicle')">Annuler</button>
+            <button type="button" class="btn btn-primary" onclick="handleSave('vehicles','vehicle')">Sauvegarder</button>
+            <button type="button" class="btn" onclick="closeModal('vehicle')">Fermer</button>
         </form>
     </div>
 </div>
 
-<div id="modal-maint" class="modal"><div class="modal-content"><h3>Maintenance</h3><br><form id="form-maint"><div class="form-grid"><select name="vehicle" class="v-select-list" required></select><input type="text" name="type" placeholder="Nature" required><input type="number" name="km" placeholder="KM" required><input type="number" name="cost" placeholder="FCFA" required></div><br><button type="button" class="btn btn-primary" onclick="handleSave('maint','maint')">Enregistrer</button></form></div></div>
-<div id="modal-driver" class="modal"><div class="modal-content"><h3>Chauffeur</h3><br><form id="form-driver"><input type="hidden" name="id"><div class="form-grid"><input type="text" name="name" placeholder="Nom" required><input type="text" name="mat" placeholder="Matricule"><select name="lictype"><option value="VL">VL</option><option value="PL">PL</option></select><select name="status"><option value="Actif">Actif</option><option value="Indisponible">Indisponible</option></select><input type="file" onchange="compressImg(this, 'h-d')"><input type="hidden" name="image" id="h-d"></div><br><button type="button" class="btn btn-primary" onclick="handleSave('drivers','driver')">Valider</button></form></div></div>
-<div id="modal-fuel" class="modal"><div class="modal-content"><h3>Carburant</h3><br><form id="form-fuel"><div class="form-grid"><select name="vehicle" class="v-select-list" required></select><input type="number" name="liters" placeholder="Litres" required><input type="number" name="km" placeholder="KM" required><input type="number" name="cost" placeholder="FCFA" required></div><br><button type="button" class="btn btn-primary" onclick="handleSave('fuel','fuel')">Valider</button></form></div></div>
+<div id="modal-maint" class="modal"><div class="modal-content"><h3>Saisie Entretien</h3><br><form id="form-maint"><div class="form-grid"><select name="vehicle" class="v-select-list" required></select><input type="text" name="type" placeholder="Nature de l'intervention" required><input type="number" name="km" placeholder="KM au compteur" required><input type="number" name="cost" placeholder="Coût en FCFA" required></div><br><button type="button" class="btn btn-primary" onclick="handleSave('maint','maint')">Enregistrer</button></form></div></div>
+<div id="modal-driver" class="modal"><div class="modal-content"><h3>Fiche Chauffeur</h3><br><form id="form-driver"><input type="hidden" name="id"><div class="form-grid"><input type="text" name="name" placeholder="Grade & Nom" required><input type="text" name="mat" placeholder="Matricule"><select name="lictype"><option value="VL">VL</option><option value="PL">PL</option><option value="VL-PL">VL-PL</option></select><select name="status"><option value="Actif">Actif</option><option value="Indisponible">Indisponible</option></select><input type="file" onchange="compressImg(this, 'h-d')"><input type="hidden" name="image" id="h-d"></div><br><button type="button" class="btn btn-primary" onclick="handleSave('drivers','driver')">Sauvegarder</button></form></div></div>
+<div id="modal-fuel" class="modal"><div class="modal-content"><h3>Carburant</h3><br><form id="form-fuel"><div class="form-grid"><select name="vehicle" class="v-select-list" required></select><input type="number" name="liters" placeholder="Litres" required><input type="number" name="km" placeholder="KM" required><input type="number" name="cost" placeholder="FCFA" required></div><br><button type="button" class="btn btn-primary" onclick="handleSave('fuel','fuel')">Sauvegarder</button></form></div></div>
 
 <script>
 const KEYS = { vehicles: 'tf_v3_v', drivers: 'tf_v3_d', fuel: 'tf_v3_f', maint: 'tf_v3_m', auth: 'tf_auth_301' };
@@ -177,12 +180,12 @@ function checkAuth() {
     const u = document.getElementById('user-id').value, p = document.getElementById('user-pass').value;
     const cfg = JSON.parse(localStorage.getItem(KEYS.auth)) || {id:"admin", pw:"1234"};
     if(u === cfg.id && p === cfg.pw) { document.getElementById('login-screen').style.display='none'; document.getElementById('app-interface').style.display='block'; refreshUI(); }
-    else { alert("Accès refusé"); }
+    else { alert("Identifiants incorrects"); }
 }
 
 function updateAuth() {
     const ni = document.getElementById('new-id').value, np = document.getElementById('new-pass').value;
-    if(ni && np) { localStorage.setItem(KEYS.auth, JSON.stringify({id:ni, pw:np})); alert("Identifiants mis à jour !"); }
+    if(ni && np) { localStorage.setItem(KEYS.auth, JSON.stringify({id:ni, pw:np})); alert("Sécurité mise à jour !"); }
 }
 
 function compressImg(input, hid) {
@@ -226,7 +229,7 @@ function deleteItem(key, id) { if(confirm("Supprimer ?")) { localStorage.setItem
 function printItem(id) {
     const v = load('vehicles').find(x => x.id == id);
     const area = document.getElementById('print-area');
-    area.innerHTML = `<div style="padding:40px; background:white;"><h2>FICHE VÉHICULE - CI BA301</h2><br><img src="${v.image}" style="width:200px;"><p><br><b>Marque :</b> ${v.brand}<br><b>Modèle :</b> ${v.model}<br><b>Immat :</b> ${v.plate}<br><b>Chassis :</b> ${v.chassis}<br><b>KM :</b> ${v.km}</p></div>`;
+    area.innerHTML = `<div style="padding:40px; background:white;"><h2>CENTRE D'INSTRUCTION BA301 - GAROUA</h2><br><h3>FICHE TECHNIQUE VÉHICULE</h3><br><img src="${v.image}" style="width:250px;"><p><br><b>MARQUE :</b> ${v.brand}<br><b>MODÈLE :</b> ${v.model}<br><b>IMMATRICULATION :</b> ${v.plate}<br><b>CHÂSSIS :</b> ${v.chassis}<br><b>DÉCOMPTE KM :</b> ${v.km} km</p></div>`;
     window.print();
 }
 
@@ -234,27 +237,42 @@ let kChart, fChart;
 function refreshUI() {
     const v = load('vehicles'), dr = load('drivers'), f = load('fuel'), m = load('maint');
     document.getElementById('dash-km').textContent = v.reduce((s,c)=>s+parseInt(c.km||0),0).toLocaleString() + " km";
-    document.getElementById('dash-counts').textContent = `${v.length} VH / ${dr.length} CHF`;
+    document.getElementById('dash-counts').textContent = `${v.length} Véhicules / ${dr.length} Chauffeurs`;
 
-    document.getElementById('tbody-vehicles').innerHTML = v.map(x=>`<tr><td><img src="${x.image||''}" class="img-preview"></td><td>${x.brand}</td><td>${x.model}</td><td>${x.plate}</td><td>${x.chassis}</td><td>${x.km}</td><td><span class="status-badge ${x.status==='En service'?'bg-success':'bg-danger'}">${x.status}</span></td><td class="actions"><i class="fas fa-pencil-alt btn-edit" onclick="editItem('vehicles','vehicle',${x.id})"></i><i class="fas fa-print btn-print" onclick="printItem(${x.id})"></i><i class="fas fa-trash-alt btn-delete" onclick="deleteItem('vehicles',${x.id})"></i></td></tr>`).join('');
+    /* ICI : AFFICHAGE DU MODÈLE DANS LE TABLEAU */
+    document.getElementById('tbody-vehicles').innerHTML = v.map(x=>`<tr>
+        <td><img src="${x.image||''}" class="img-preview"></td>
+        <td>${x.brand}</td>
+        <td class="td-model">${x.model}</td>
+        <td>${x.plate}</td>
+        <td>${x.chassis}</td>
+        <td>${x.km}</td>
+        <td><span class="status-badge ${x.status==='En service'?'bg-success':'bg-danger'}">${x.status}</span></td>
+        <td class="actions">
+            <i class="fas fa-pencil-alt btn-edit" onclick="editItem('vehicles','vehicle',${x.id})"></i>
+            <i class="fas fa-print btn-print" onclick="printItem(${x.id})"></i>
+            <i class="fas fa-trash-alt btn-delete" onclick="deleteItem('vehicles',${x.id})"></i>
+        </td>
+    </tr>`).join('');
+
     document.getElementById('tbody-drivers').innerHTML = dr.map(x=>`<tr><td><img src="${x.image||''}" class="img-preview" style="border-radius:50%"></td><td>${x.name}</td><td>${x.mat}</td><td>${x.lictype}</td><td><span class="status-badge ${x.status==='Actif'?'bg-success':'bg-danger'}">${x.status}</span></td><td class="actions"><i class="fas fa-pencil-alt btn-edit" onclick="editItem('drivers','driver',${x.id})"></i><i class="fas fa-trash-alt btn-delete" onclick="deleteItem('drivers',${x.id})"></i></td></tr>`).join('');
-    document.getElementById('tbody-fuel').innerHTML = f.map(x=>`<tr><td>${x.date}</td><td>${x.vehicle}</td><td>${x.liters}</td><td>${x.km}</td><td>${x.cost}</td><td><i class="fas fa-trash-alt btn-delete" onclick="deleteItem('fuel',${x.id})"></i></td></tr>`).join('');
-    document.getElementById('tbody-maint').innerHTML = m.map(x=>`<tr><td>${x.date}</td><td>${x.vehicle}</td><td>${x.type}</td><td>${x.km}</td><td>${x.cost}</td><td><i class="fas fa-trash-alt btn-delete" onclick="deleteItem('maint',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('tbody-fuel').innerHTML = f.map(x=>`<tr><td>${x.date}</td><td>${x.vehicle}</td><td>${x.liters} L</td><td>${x.km} km</td><td>${x.cost} FCFA</td><td><i class="fas fa-trash-alt btn-delete" onclick="deleteItem('fuel',${x.id})"></i></td></tr>`).join('');
+    document.getElementById('tbody-maint').innerHTML = m.map(x=>`<tr><td>${x.date}</td><td>${x.vehicle}</td><td>${x.type}</td><td>${x.km} km</td><td>${x.cost} FCFA</td><td><i class="fas fa-trash-alt btn-delete" onclick="deleteItem('maint',${x.id})"></i></td></tr>`).join('');
 
-    const options = v.map(x=>`<option value="${x.plate}">${x.brand} ${x.model} (${x.plate})</option>`).join('');
+    const options = v.map(x=>`<option value="${x.plate}">${x.brand} ${x.model} [${x.plate}]</option>`).join('');
     document.querySelectorAll('.v-select-list').forEach(s => s.innerHTML = options);
 
     if(kChart) kChart.destroy(); if(fChart) fChart.destroy();
     kChart = new Chart(document.getElementById('kmPieChart'), { type:'doughnut', data:{ labels:v.map(x=>x.plate), datasets:[{data:v.map(x=>x.km), backgroundColor:['#1a2d4a','#ff6b35','#28a745','#17a2b8','#ffc107']}] } });
-    fChart = new Chart(document.getElementById('fuelChart'), { type:'bar', data:{ labels:f.map(x=>x.date), datasets:[{label:'Litres', data:f.map(x=>x.liters), backgroundColor:'#ff6b35'}] } });
+    fChart = new Chart(document.getElementById('fuelChart'), { type:'bar', data:{ labels:f.map(x=>x.date), datasets:[{label:'Litres consommés', data:f.map(x=>x.liters), backgroundColor:'#ff6b35'}] } });
 }
 
 function exportToCSV() {
-    let csv = "\uFEFFDate;Immat;Marque;Modele;Chassis;KM;Statut\n";
-    load('vehicles').forEach(x=> csv+=`${x.date};${x.plate};${x.brand};${x.model};${x.chassis};${x.km};${x.status}\n`);
+    let csv = "\uFEFFDate;Marque;Modele;Immat;Chassis;KM;Statut\n";
+    load('vehicles').forEach(x=> csv+=`${x.date};${x.brand};${x.model};${x.plate};${x.chassis};${x.km};${x.status}\n`);
     const link = document.createElement("a");
     link.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
-    link.download = "Rapport_Flotte_CI_BA301.csv"; link.click();
+    link.download = "FLOTTE_CI_BA301.csv"; link.click();
 }
 
 function showSection(id, el) {
@@ -265,7 +283,7 @@ function showSection(id, el) {
 }
 function openModal(t) { document.getElementById('modal-'+t).style.display='flex'; }
 function closeModal(t) { document.getElementById('modal-'+t).style.display='none'; document.getElementById('form-'+t).reset(); }
-window.onload = () => { document.getElementById('date-display').textContent = new Date().toLocaleDateString(); };
+window.onload = () => { document.getElementById('date-display').textContent = new Date().toLocaleDateString('fr-FR'); };
 </script>
 </body>
 </html>
