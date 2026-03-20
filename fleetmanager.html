@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CI BA301 - FleetManager Pro v6.0</title>
+<title>CI BA301 - FleetManager Pro v7.0</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -40,9 +40,10 @@ th{background:#f8f9fa; padding:12px; text-align:left; font-size:.75rem; text-tra
 td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertical-align:middle;}
 .img-thumb{width:45px; height:45px; border-radius:8px; object-fit:cover; border:1px solid var(--border);}
 
-.btn{padding:8px 16px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:8px;}
+.btn{padding:10px 18px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:8px;}
 .btn-primary{background:var(--primary); color:white;}
 .btn-accent{background:var(--accent); color:white;}
+.btn-secondary{background:#6c757d; color:white;}
 
 /* MODALS */
 .modal-overlay{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(3px);}
@@ -50,13 +51,12 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 .modal{background:white; border-radius:12px; width:90%; max-width:600px; padding:25px; max-height:90vh; overflow-y:auto;}
 .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:15px;}
 .form-group{display:flex; flex-direction:column; gap:4px; margin-bottom:10px;}
-.form-group input, .form-group select, .form-group textarea {padding:10px; border:1px solid var(--border); border-radius:6px;}
+.form-group input, .form-group select {padding:10px; border:1px solid var(--border); border-radius:6px;}
 
 @media print {
   .sidebar, .btn, .header-btns, .modal-overlay, th:last-child, td:last-child { display: none !important; }
   .main { margin-left: 0 !important; }
   .page { display: block !important; }
-  .card { box-shadow: none; border: 1px solid #eee; }
 }
 </style>
 </head>
@@ -87,7 +87,7 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
   <header class="header">
     <h2 id="title">Dashboard</h2>
     <div class="header-btns">
-        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> PDF</button>
+        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> EXPORT PDF</button>
     </div>
   </header>
 
@@ -104,12 +104,12 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 
     <div id="page-vehicles" class="page">
       <div style="display:flex; justify-content:space-between; margin-bottom:15px">
-        <h3>Parc Automobile</h3>
+        <h3>Registre Automobile</h3>
         <button class="btn btn-primary" onclick="openM('m-v')">Nouveau Véhicule</button>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Photo</th><th>Modèle</th><th>Immat.</th><th>Dotation</th><th>KM</th><th>État</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Photo</th><th>Marque & Modèle</th><th>Immat.</th><th>Année Dotation</th><th>KM</th><th>État</th><th>Actions</th></tr></thead>
           <tbody id="t-v"></tbody>
         </table>
       </div>
@@ -117,24 +117,25 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
 
     <div id="page-drivers" class="page">
         <div style="display:flex; justify-content:space-between; margin-bottom:15px">
-          <h3>Chauffeurs</h3>
-          <button class="btn btn-primary" onclick="openM('m-d')">Nouveau</button>
+          <h3>Registre des Chauffeurs</h3>
+          <button class="btn btn-primary" onclick="openM('m-d')">Ajouter Chauffeur</button>
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Photo</th><th>Grade & Nom</th><th>Matricule</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Photo</th><th>Grade & Nom</th><th>Matricule</th><th>Permis</th><th>Actions</th></tr></thead>
             <tbody id="t-d"></tbody>
           </table>
         </div>
     </div>
-
-    <div id="page-maint" class="page"><h3>Maintenance</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Travaux</th><th>Action</th></tr></thead><tbody id="t-m"></tbody></table></div></div>
-    <div id="page-fuel" class="page"><h3>Carburant</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Véhicule</th><th>L/Coût</th><th>Action</th></tr></thead><tbody id="t-f"></tbody></table></div></div>
-    <div id="page-interviews" class="page"><h3>Entretiens Individuels</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Nom</th><th>Objet</th><th>Action</th></tr></thead><tbody id="t-i"></tbody></table></div></div>
+    
+    <div id="page-maint" class="page"><h3>Maintenance</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Désignation</th><th>Coût</th><th>Action</th></tr></thead><tbody id="t-m"></tbody></table></div></div>
+    <div id="page-fuel" class="page"><h3>Carburant</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Véhicule</th><th>Litres</th><th>Coût</th><th>Action</th></tr></thead><tbody id="t-f"></tbody></table></div></div>
+    <div id="page-interviews" class="page"><h3>Entretiens Personnel</h3><div class="table-wrap"><table><thead><tr><th>Date</th><th>Personnel</th><th>Objet</th><th>Action</th></tr></thead><tbody id="t-i"></tbody></table></div></div>
   </div>
 </div>
 
-<div id="m-v" class="modal-overlay"><div class="modal"><h3>Fiche Véhicule</h3><form id="f-v" onsubmit="save(event,'v','m-v')">
+<div id="m-v" class="modal-overlay"><div class="modal"><h3>Fiche Véhicule</h3><br>
+<form id="f-v" onsubmit="save(event,'v','m-v')">
   <input type="hidden" id="v_id">
   <div class="form-grid">
     <div class="form-group"><label>Marque</label><input type="text" id="v1" required></div>
@@ -145,10 +146,14 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
     <div class="form-group"><label>État</label><select id="v5"><option>En service</option><option>En panne</option></select></div>
     <div class="form-group"><label>Photo</label><input type="file" onchange="up(this,'v_img')"><input type="hidden" id="v_img"></div>
   </div><br>
-  <button class="btn btn-accent">Enregistrer les données</button>
+  <div style="display:flex; gap:10px; justify-content:flex-end">
+    <button type="button" class="btn btn-secondary" onclick="closeM('m-v')">Annuler</button>
+    <button type="submit" class="btn btn-accent">Enregistrer</button>
+  </div>
 </form></div></div>
 
-<div id="m-d" class="modal-overlay"><div class="modal"><h3>Fiche Chauffeur</h3><form id="f-d" onsubmit="save(event,'d','m-d')">
+<div id="m-d" class="modal-overlay"><div class="modal"><h3>Fiche Chauffeur</h3><br>
+<form id="f-d" onsubmit="save(event,'d','m-d')">
     <input type="hidden" id="d_id">
     <div class="form-grid">
       <div class="form-group"><label>Grade & Nom</label><input type="text" id="d1" required></div>
@@ -156,7 +161,10 @@ td{padding:12px; border-bottom:1px solid var(--border); font-size:.85rem; vertic
       <div class="form-group"><label>Permis</label><input type="text" id="d3" required></div>
       <div class="form-group"><label>Photo</label><input type="file" onchange="up(this,'d_img')"><input type="hidden" id="d_img"></div>
     </div><br>
-    <button class="btn btn-accent">Enregistrer</button>
+    <div style="display:flex; gap:10px; justify-content:flex-end">
+        <button type="button" class="btn btn-secondary" onclick="closeM('m-d')">Annuler</button>
+        <button type="submit" class="btn btn-accent">Enregistrer</button>
+    </div>
 </form></div></div>
 
 <script>
@@ -168,7 +176,7 @@ let db = {
     i: JSON.parse(localStorage.getItem('i_301')) || []
 };
 
-function login() { if(document.getElementById('pass').value === '301') { document.getElementById('lock-screen').style.display='none'; document.getElementById('app').style.display='block'; refresh(); } else alert('Code incorrect'); }
+function login() { if(document.getElementById('pass').value === '301') { document.getElementById('lock-screen').style.display='none'; document.getElementById('app').style.display='block'; refresh(); } else alert('Accès refusé'); }
 
 function up(input, hid) {
     const r = new FileReader();
@@ -193,15 +201,10 @@ function save(e, k, mid) {
     if(k==='v') o = {...o, brand:document.getElementById('v1').value, model:document.getElementById('v2').value, plate:document.getElementById('v3').value, year:document.getElementById('v_year').value, km:document.getElementById('v4').value, state:document.getElementById('v5').value, img:document.getElementById('v_img').value || (id ? db.v.find(x=>x.id==id).img : '')};
     if(k==='d') o = {...o, name:document.getElementById('d1').value, mat:document.getElementById('d2').value, lic:document.getElementById('d3').value, img:document.getElementById('d_img').value || (id ? db.d.find(x=>x.id==id).img : '')};
 
-    if(id) { // Modification
-        db[k] = db[k].map(x => x.id == id ? o : x);
-    } else { // Nouveau
-        db[k].push(o);
-    }
+    if(id) { db[k] = db[k].map(x => x.id == id ? o : x); } else { db[k].push(o); }
 
     localStorage.setItem(k+'_301', JSON.stringify(db[k]));
-    document.getElementById(mid).classList.remove('open');
-    e.target.reset(); document.getElementById(k+'_id').value = '';
+    closeM(mid);
     refresh();
 }
 
@@ -215,13 +218,12 @@ function edit(k, id, mid) {
     }
     if(k==='d') {
         document.getElementById('d_id').value = o.id;
-        document.getElementById('d1').value = o.name; document.getElementById('d2').value = o.mat;
-        document.getElementById('d3').value = o.lic;
+        document.getElementById('d1').value = o.name; document.getElementById('d2').value = o.mat; document.getElementById('d3').value = o.lic;
     }
     openM(mid);
 }
 
-function del(k, id) { if(confirm('Supprimer définitivement ?')) { db[k] = db[k].filter(x=>x.id!==id); localStorage.setItem(k+'_301', JSON.stringify(db[k])); refresh(); } }
+function del(k, id) { if(confirm('Supprimer ?')) { db[k] = db[k].filter(x=>x.id!==id); localStorage.setItem(k+'_301', JSON.stringify(db[k])); refresh(); } }
 
 function showPage(id) {
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -230,18 +232,25 @@ function showPage(id) {
 }
 
 function openM(id) { document.getElementById(id).classList.add('open'); }
+function closeM(id) { 
+    document.getElementById(id).classList.remove('open'); 
+    const formId = id === 'm-v' ? 'f-v' : 'f-d';
+    document.getElementById(formId).reset();
+    const hiddenId = id === 'm-v' ? 'v_id' : 'd_id';
+    document.getElementById(hiddenId).value = '';
+}
 
 let chart;
 function refresh() {
     document.getElementById('s-v').textContent = db.v.length;
     document.getElementById('s-p').textContent = db.v.filter(x=>x.state==='En panne').length;
     
-    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td><img src="${x.img||''}" class="img-thumb"></td><td>${x.model}</td><td>${x.plate}</td><td>${x.year}</td><td>${x.km}</td><td>${x.state}</td><td><i class="fas fa-edit" onclick="edit('v',${x.id},'m-v')"></i> <i class="fas fa-trash" onclick="del('v',${x.id})" style="margin-left:10px"></i></td></tr>`).join('');
-    document.getElementById('t-d').innerHTML = db.d.map(x=>`<tr><td><img src="${x.img||''}" class="img-thumb" style="border-radius:50%"></td><td>${x.name}</td><td>${x.mat}</td><td><i class="fas fa-edit" onclick="edit('d',${x.id},'m-d')"></i> <i class="fas fa-trash" onclick="del('d',${x.id})" style="margin-left:10px"></i></td></tr>`).join('');
+    document.getElementById('t-v').innerHTML = db.v.map(x=>`<tr><td><img src="${x.img||''}" class="img-thumb"></td><td>${x.brand} ${x.model}</td><td>${x.plate}</td><td style="font-weight:bold">${x.year || 'N/A'}</td><td>${x.km} km</td><td>${x.state}</td><td><i class="fas fa-edit" onclick="edit('v',${x.id},'m-v')"></i> <i class="fas fa-trash" onclick="del('v',${x.id})" style="margin-left:10px"></i></td></tr>`).join('');
+    document.getElementById('t-d').innerHTML = db.d.map(x=>`<tr><td><img src="${x.img||''}" class="img-thumb" style="border-radius:50%"></td><td>${x.name}</td><td>${x.mat}</td><td>${x.lic}</td><td><i class="fas fa-edit" onclick="edit('d',${x.id},'m-d')"></i> <i class="fas fa-trash" onclick="del('d',${x.id})" style="margin-left:10px"></i></td></tr>`).join('');
 
     const ctx = document.getElementById('chartV').getContext('2d');
     if(chart) chart.destroy();
-    chart = new Chart(ctx, { type:'bar', data: { labels:['Opérationnel', 'En Panne'], datasets:[{label:'Véhicules', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#28a745','#dc3545']}] }, options:{animation:false}});
+    chart = new Chart(ctx, { type:'bar', data: { labels:['En Service', 'En Panne'], datasets:[{label:'Statut Parc', data:[db.v.filter(x=>x.state==='En service').length, db.v.filter(x=>x.state==='En panne').length], backgroundColor:['#28a745','#dc3545']}] }, options:{animation:false}});
 }
 </script>
 </body>
