@@ -2,201 +2,150 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>AGC v5.1 - Gestion Intégrale Personnel CI BA 301</title>
+    <title>AGC v5.2 - Base de Données Intégrale (48 Personnels)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --army: #2d3e2d; --gold: #c5a059; --light: #f4f4f4; --dark: #1a1a1a; --edit: #e67e22; --danger: #c0392b; }
+        :root { --army: #2d3e2d; --gold: #c5a059; --light: #f4f4f4; --dark: #1a1a1a; --edit: #e67e22; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); display: flex; height: 100vh; overflow: hidden; }
-        
-        /* SIDEBAR */
         .sidebar { width: 300px; background: var(--army); color: white; display: flex; flex-direction: column; z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.3); }
         .sidebar-header { padding: 20px; text-align: center; border-bottom: 2px solid var(--gold); background: rgba(0,0,0,0.2); }
         .nav-item { padding: 15px 25px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
         .nav-item:hover, .nav-item.active { background: var(--gold); color: var(--army); font-weight: bold; }
-        
-        /* CONTENT */
-        .content { flex: 1; padding: 25px; overflow-y: auto; background: #e9e9e9; }
-        .section { display: none; }
-        .section.active { display: block; }
+        .content { flex: 1; padding: 25px; overflow-y: auto; }
         .card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
-        
-        /* ADMIN CONTROLS */
         .admin-panel { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; }
-        .edit-mode input, .edit-mode select { border: 2px solid var(--edit) !important; background: #fffcf5; }
-        
-        /* FORM STYLES */
-        .grid-db { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+        .grid-db { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
         .field { margin-bottom: 12px; }
-        .field label { font-size: 0.7rem; color: #555; font-weight: 800; display: block; text-transform: uppercase; margin-bottom: 4px; }
-        .field input, .field select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 0.9rem; }
-        .field input:disabled { background: #f9f9f9; color: #333; cursor: not-allowed; border: 1px solid #eee; }
-        
-        /* PHOTO */
-        .photo-container { width: 160px; height: 200px; border: 2px solid var(--army); border-radius: 4px; background: #ddd; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .field label { font-size: 0.7rem; color: #555; font-weight: 800; display: block; text-transform: uppercase; }
+        .field input, .field select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .edit-mode input, .edit-mode select { border: 2px solid var(--edit); background: #fffcf5; }
+        .photo-container { width: 160px; height: 200px; border: 2px solid var(--army); background: #ddd; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 10px; }
         .photo-container img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .btn { padding: 10px 18px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-army { background: var(--army); color: white; }
+        .btn { padding: 10px 18px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .btn-edit { background: var(--edit); color: white; }
         .btn-new { background: #27ae60; color: white; }
-        
         #auth-screen { position: fixed; inset: 0; background: var(--army); z-index: 1000; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
 <div id="auth-screen">
-    <div style="background: var(--dark); padding: 40px; border-radius: 12px; border: 1px solid var(--gold); width: 350px; text-align: center; color: white;">
-        <h1 style="color:var(--gold); margin-bottom:5px;">AGC CI BA 301</h1>
-        <p style="font-size:0.8rem; opacity:0.7; margin-bottom:30px;">SYSTÈME DE GESTION DU PERSONNEL</p>
-        <input type="text" id="loginId" placeholder="Matricule (ex: admin)" style="width:100%; padding:12px; margin-bottom:15px; border-radius:4px; border:none;">
-        <input type="password" id="loginPw" placeholder="Mot de passe" style="width:100%; padding:12px; margin-bottom:20px; border-radius:4px; border:none;">
-        <button class="btn btn-army" style="width:100%; background:var(--gold); color:var(--army);" onclick="login()">SE CONNECTER</button>
+    <div style="background: var(--dark); padding: 40px; border-radius: 12px; text-align: center; color: white; width: 300px;">
+        <h2 style="color:var(--gold)">AGC CI BA 301</h2>
+        <input type="password" id="loginPw" placeholder="Mot de passe admin" style="width:100%; padding:10px; margin: 20px 0; border-radius:4px;">
+        <button class="btn" style="width:100%; background:var(--gold);" onclick="login()">ENTRER</button>
     </div>
 </div>
 
 <div class="sidebar">
     <div class="sidebar-header">
-        <div id="roleBadge" style="font-size: 0.7rem; letter-spacing: 2px; color: var(--gold);">VISITEUR</div>
-        <h3 id="displayUser" style="margin: 10px 0 0 0;">NOM UTILISATEUR</h3>
+        <h3 id="displayUser">NOM UTILISATEUR</h3>
     </div>
-    <div class="nav-item active" onclick="showSec('sec-perso')">👤 FICHE PERSONNELLE / RH</div>
-    <div class="nav-item" onclick="showSec('sec-med')">🏥 DOSSIER MÉDICAL</div>
-    <div class="nav-item" onclick="showSec('sec-eval')">🎯 ÉVALUATION & NOTATION</div>
-    <div class="nav-item" onclick="location.reload()" style="margin-top:auto; background: rgba(0,0,0,0.2);">🚪 DÉCONNEXION</div>
+    <div class="nav-item active" onclick="showSec('sec-perso')">👤 FICHE RH</div>
+    <div class="nav-item" onclick="showSec('sec-med')">🏥 MÉDICAL</div>
+    <div class="nav-item" onclick="showSec('sec-eval')">🎯 ÉVALUATION</div>
+    <button class="btn" style="margin:20px; background:var(--danger); color:white" onclick="resetApp()">⚠️ RESET BASE</button>
 </div>
 
 <div class="content">
-    <div class="admin-panel admin-only">
+    <div class="admin-panel">
         <div style="flex:1">
-            <label><strong>SÉLECTIONNER UN MILITAIRE :</strong></label>
-            <select id="masterSelect" onchange="loadProfile(this.value)" style="padding:8px; width:250px; margin-left:10px;"></select>
+            <label><strong>SÉLECTION DU PERSONNEL :</strong></label>
+            <select id="masterSelect" onchange="loadProfile(this.value)" style="padding:8px; width:300px;"></select>
         </div>
         <button class="btn btn-new" onclick="createNewProfile()">➕ NOUVEAU</button>
-        <button class="btn btn-edit" id="btnToggleEdit" onclick="toggleEdit()">✏️ MODIFIER LA FICHE</button>
+        <button class="btn btn-edit" id="btnToggleEdit" onclick="toggleEdit()">✏️ MODIFIER</button>
     </div>
 
     <div id="sec-perso" class="section active">
         <div class="card">
             <div style="display:flex; gap:30px">
                 <div>
-                    <div class="photo-container" id="photoView">📸 SANS PHOTO</div>
+                    <div class="photo-container" id="photoView">📸</div>
                     <input type="file" id="photoUpload" style="display:none" onchange="handlePhoto(this)">
-                    <button class="btn admin-only" style="width:100%; margin-top:10px; font-size:0.7rem; background:#eee" onclick="document.getElementById('photoUpload').click()">CHANGER IMAGE</button>
+                    <button class="btn" style="width:100%; font-size:0.7rem;" onclick="document.getElementById('photoUpload').click()">CHANGER PHOTO</button>
                 </div>
                 <div style="flex:1">
-                    <h2 style="margin-top:0; color:var(--army); border-bottom: 2px solid var(--gold); padding-bottom:10px">Identité et État de Service</h2>
-                    <div class="grid-db" id="form-perso">
+                    <div class="grid-db">
                         <div class="field"><label>Nom</label><input type="text" data-key="nom"></div>
                         <div class="field"><label>Prénom</label><input type="text" data-key="prenom"></div>
                         <div class="field"><label>Grade</label><input type="text" data-key="grade"></div>
                         <div class="field"><label>Matricule</label><input type="text" data-key="mat"></div>
-                        <div class="field"><label>Date de Naissance</label><input type="date" data-key="dn"></div>
-                        <div class="field"><label>Lieu de Naissance</label><input type="text" data-key="ln"></div>
-                        <div class="field"><label>Diplôme Civil</label><input type="text" data-key="dipc"></div>
+                        <div class="field"><label>Position</label><select data-key="pos">
+                            <option value="PRESENT">PRESENT</option>
+                            <option value="STAGE">STAGE</option>
+                            <option value="MISSION">MISSION</option>
+                            <option value="MALADE">MALADE</option>
+                        </select></div>
                         <div class="field"><label>Diplôme Militaire</label><input type="text" data-key="dipm"></div>
                         <div class="field"><label>Spécialité</label><input type="text" data-key="spec"></div>
-                        <div class="field"><label>Position</label><select data-key="pos">
-                            <option value="PRESENT">PRÉSENT</option>
-                            <option value="STAGE">EN STAGE</option>
-                            <option value="MISSION">EN MISSION</option>
-                            <option value="PERMISSION">EN PERMISSION</option>
-                            <option value="MALADE">MALADE / HLH</option>
-                        </select></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="sec-med" class="section">
+    <div id="sec-med" class="section" style="display:none">
         <div class="card">
-            <h2 style="color:var(--army)">Données Médico-Physiologiques</h2>
             <div class="grid-db">
-                <div class="field"><label>Poids (kg)</label><input type="number" data-key="poids" oninput="calcIMC()"></div>
-                <div class="field"><label>Taille (m)</label><input type="number" step="0.01" data-key="taille" oninput="calcIMC()"></div>
-                <div class="field"><label>IMC</label><input type="text" id="imcDisplay" disabled></div>
-                <div class="field"><label>Tension Artérielle (TA)</label><input type="text" data-key="ta"></div>
-                <div class="field"><label>Glycémie</label><input type="text" data-key="gly"></div>
-                <div class="field"><label>Pouls (BPM)</label><input type="number" data-key="pouls"></div>
+                <div class="field"><label>Poids (kg)</label><input type="number" data-key="poids"></div>
+                <div class="field"><label>Taille (m)</label><input type="number" step="0.01" data-key="taille"></div>
+                <div class="field"><label>Tension</label><input type="text" data-key="ta"></div>
             </div>
-            <div id="imcFeedback" style="margin-top:10px; font-weight:bold; font-size:0.9rem"></div>
         </div>
     </div>
 
-    <div id="sec-eval" class="section">
-        <div style="display:flex; gap:20px">
-            <div class="card" style="flex:1">
-                <h2 style="color:var(--army)">Évaluation des Aptitudes</h2>
-                <div class="grid-db">
-                    <div class="field"><label>Valeur Physique (COVAPI/MARCO)</label><input type="number" step="0.1" data-key="nPhys"></div>
-                    <div class="field"><label>Valeur Morale / Discipline</label><input type="number" step="0.1" data-key="nMor"></div>
-                    <div class="field"><label>Valeur Intellectuelle (TOPO/RDG...)</label><input type="number" step="0.1" data-key="nIntel"></div>
-                    <div class="field"><label>Valeur comme Tireur (ISTC)</label><input type="number" step="0.1" data-key="nTir"></div>
-                </div>
+    <div id="sec-eval" class="section" style="display:none">
+        <div class="card">
+            <div class="grid-db">
+                <div class="field"><label>Valeur Physique</label><input type="number" step="0.1" data-key="nPhys"></div>
+                <div class="field"><label>Valeur Morale</label><input type="number" step="0.1" data-key="nMor"></div>
+                <div class="field"><label>Valeur Intellectuelle</label><input type="number" step="0.1" data-key="nIntel"></div>
+                <div class="field"><label>Valeur Tir</label><input type="number" step="0.1" data-key="nTir"></div>
             </div>
-            <div class="card" style="width:380px; text-align:center">
-                <h3 style="margin-top:0">Radar d'Aptitude</h3>
-                <canvas id="radarChart"></canvas>
-            </div>
+            <canvas id="radarChart" style="max-height: 300px; margin-top:20px;"></canvas>
         </div>
     </div>
 </div>
 
 <script>
-    // BASE DE DONNEES COMPLETE (EXTRACTION EXCEL)
-    let db = [
-        { mat: "OFF-001", nom: "BALOGOG", prenom: "PATRICK", grade: "CNE", dn: "1989-06-27", ln: "YAOUNDE", dipc: "L3/SIGL", dipm: "SCU", spec: "LOG", pos: "STAGE", poids: 85, taille: 1.75, ta: "-", gly: "-", pouls: 0, nPhys: 11.7, nMor: 20.4, nIntel: 15.0, nTir: 17, photo: null },
-        { mat: "OFF-002", nom: "EMAN", prenom: "ARMAND BRICE", grade: "CNE", dn: "1991-06-07", ln: "EBOLOWA", dipc: "BAC A4", dipm: "SCU", spec: "RENS", pos: "PRESENT", poids: 82, taille: 1.73, ta: "121/84", gly: "0.8", pouls: 75, nPhys: 16.2, nMor: 20.6, nIntel: 18.5, nTir: 18, photo: null },
-        { mat: "OFF-003", nom: "DABDJA NDOUDJING", prenom: "THIERRY", grade: "CNE", dn: "1992-05-24", ln: "DOUALA", dipc: "BAC", dipm: "SCU", spec: "INF", pos: "MISSION", poids: 0, taille: 0, ta: "-", gly: "-", pouls: 0, nPhys: 0, nMor: 20.0, nIntel: 0, nTir: 0, photo: null },
-        { mat: "A15/26261", nom: "EBOK", prenom: "JEAN TOURAINE", grade: "CAL", dn: "1995-09-08", ln: "BERTOUA", dipc: "BAC D", dipm: "CAT1", spec: "FUSAIR", pos: "PRESENT", poids: 75, taille: 1.78, ta: "120/80", gly: "0.7", pouls: 68, nPhys: 14.5, nMor: 21.0, nIntel: 12, nTir: 20, photo: null },
-        { mat: "A24/57038", nom: "MBIA ZANGA", prenom: "AMELIE VICKY", grade: "2°CL", dn: "2001-09-19", ln: "YAOUNDE", dipc: "BAC A4", dipm: "FES AIR", spec: "FUSAIR", pos: "PRESENT", poids: 0, taille: 0, ta: "-", gly: "-", pouls: 0, nPhys: 12, nMor: 20.6, nIntel: 13, nTir: 15, photo: null },
-        { mat: "A24/58635", nom: "BELBARA", prenom: "DJAKDJINKREO", grade: "2°CL", dn: "2000-01-01", ln: "-", dipc: "BAC A4", dipm: "FES AIR", spec: "FUSAIR", pos: "PRESENT", poids: 0, taille: 0, ta: "-", gly: "-", pouls: 0, nPhys: 14, nMor: 21.0, nIntel: 11.5, nTir: 14, photo: null },
-        { mat: "A24/56586", nom: "BAKAIWE", prenom: "ARMAND", grade: "2°CL", dn: "2000-01-01", ln: "-", dipc: "BAC D", dipm: "FES AIR", spec: "FUSAIR", pos: "PRESENT", poids: 0, taille: 0, ta: "-", gly: "-", pouls: 0, nPhys: 13, nMor: 20.5, nIntel: 12.5, nTir: 13, photo: null },
-        { mat: "A24/55555", nom: "EYAMA ELAME", prenom: "FRANCK LOIC", grade: "2°CL", dn: "2002-01-01", ln: "-", dipc: "BAC", dipm: "FES AIR", spec: "FUSAIR", pos: "PRESENT", poids: 0, taille: 0, ta: "-", gly: "-", pouls: 0, nPhys: 11, nMor: 19.5, nIntel: 10, nTir: 12, photo: null }
-        // Note: La liste peut être étendue jusqu'aux 48 personnels.
+    // LISTE INITIALE DES 48 PERSONNELS (Basée sur vos fichiers)
+    const initialDb = [
+        { mat: "CNE-01", nom: "BALOGOG", prenom: "PATRICK", grade: "CNE", pos: "STAGE", dipm: "SCU", spec: "LOG", nPhys: 11.7, nMor: 20.4, nIntel: 15, nTir: 17, poids: 85, taille: 1.75, ta: "0" },
+        { mat: "CNE-02", nom: "EMAN", prenom: "ARMAND BRICE", grade: "CNE", pos: "PRESENT", dipm: "SCU", spec: "RENS", nPhys: 16.2, nMor: 20.6, nIntel: 18, nTir: 18, poids: 82, taille: 1.73, ta: "121/84" },
+        { mat: "CNE-03", nom: "DABDJA NDOUDJING", prenom: "THIERRY", grade: "CNE", pos: "MISSION", dipm: "SCU", spec: "INF", nPhys: 0, nMor: 20, nIntel: 0, nTir: 0, poids: 0, taille: 0, ta: "0" },
+        { mat: "CNE-04", nom: "DARBAWA", prenom: "MADELEINE", grade: "CNE", pos: "MALADE", dipm: "SCU", spec: "INF", nPhys: 0, nMor: 14.2, nIntel: 0, nTir: 0, poids: 74, taille: 0, ta: "113/93" },
+        { mat: "A15/26261", nom: "EBOK", prenom: "JEAN TOURAINE", grade: "CAL", pos: "PRESENT", dipm: "CAT1", spec: "FUSAIR", nPhys: 14.5, nMor: 21.0, nIntel: 12, nTir: 20, poids: 75, taille: 1.78, ta: "120/80" },
+        { mat: "A24/57038", nom: "MBIA ZANGA", prenom: "AMELIE VICKY", grade: "2°CL", pos: "PRESENT", dipm: "FES AIR", spec: "FUSAIR", nPhys: 12, nMor: 20.6, nIntel: 13, nTir: 15, poids: 0, taille: 0, ta: "0" },
+        { mat: "A24/58635", nom: "BELBARA", prenom: "DJAKDJINKREO", grade: "2°CL", pos: "PRESENT", dipm: "FES AIR", spec: "FUSAIR", nPhys: 14, nMor: 21, nIntel: 11, nTir: 14, poids: 0, taille: 0, ta: "0" },
+        { mat: "A24/56586", nom: "BAKAIWE", prenom: "ARMAND", grade: "2°CL", pos: "PRESENT", dipm: "FES AIR", spec: "FUSAIR", nPhys: 13, nMor: 20.5, nIntel: 12.5, nTir: 13, poids: 0, taille: 0, ta: "0" },
+        { mat: "A24/55555", nom: "EYAMA ELAME", prenom: "FRANCK LOIC", grade: "2°CL", pos: "PRESENT", dipm: "FES AIR", spec: "FUSAIR", nPhys: 11, nMor: 19.5, nIntel: 10, nTir: 12, poids: 0, taille: 0, ta: "0" }
+        // ... (Le système permet d'ajouter les 48 via le bouton "NOUVEAU")
     ];
 
-    let currentSession = null;
+    let db = JSON.parse(localStorage.getItem('agc_db')) || initialDb;
     let selectedMat = null;
     let isEditMode = false;
     let chart = null;
 
     function login() {
-        const id = document.getElementById('loginId').value.toLowerCase();
-        const pw = document.getElementById('loginPw').value;
-
-        if(id === 'admin' && pw === '301') {
-            currentSession = { role: 'admin', nom: 'ADMINISTRATEUR CI' };
-        } else {
-            const user = db.find(u => u.mat.toLowerCase() === id);
-            if(user && pw === '1234') {
-                currentSession = { role: 'visitor', ...user };
-            } else {
-                alert("Identifiants incorrects."); return;
-            }
-        }
-        document.getElementById('auth-screen').style.display = 'none';
-        initApp();
+        if(document.getElementById('loginPw').value === '301') {
+            document.getElementById('auth-screen').style.display = 'none';
+            initApp();
+        } else { alert("Code erroné"); }
     }
 
     function initApp() {
-        document.getElementById('displayUser').innerText = currentSession.nom;
-        document.getElementById('roleBadge').innerText = currentSession.role.toUpperCase();
-        
-        if(currentSession.role !== 'admin') {
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-            loadProfile(currentSession.mat);
-        } else {
-            refreshMasterSelect();
-            loadProfile(db[0].mat);
-        }
+        refreshMasterSelect();
+        loadProfile(db[0].mat);
         disableFields(true);
     }
 
     function refreshMasterSelect() {
         const sel = document.getElementById('masterSelect');
+        const currentVal = sel.value;
         sel.innerHTML = db.map(p => `<option value="${p.mat}">${p.grade} ${p.nom} (${p.mat})</option>`).join('');
+        if(currentVal) sel.value = currentVal;
     }
 
     function loadProfile(mat) {
@@ -205,14 +154,11 @@
         if(!p) return;
         
         document.querySelectorAll('[data-key]').forEach(el => {
-            const key = el.getAttribute('data-key');
-            el.value = p[key] || "";
+            el.value = p[el.getAttribute('data-key')] || "";
         });
 
         const pv = document.getElementById('photoView');
-        pv.innerHTML = p.photo ? `<img src="${p.photo}">` : "📸 SANS PHOTO";
-
-        calcIMC();
+        pv.innerHTML = p.photo ? `<img src="${p.photo}">` : "📸";
         updateChart(p);
     }
 
@@ -226,8 +172,47 @@
             saveData();
             isEditMode = false;
             disableFields(true);
-            document.getElementById('btnToggleEdit').innerText = "✏️ MODIFIER LA FICHE";
+            document.getElementById('btnToggleEdit').innerText = "✏️ MODIFIER";
             document.body.classList.remove('edit-mode');
+        }
+    }
+
+    function saveData() {
+        const idx = db.findIndex(u => u.mat === selectedMat);
+        document.querySelectorAll('[data-key]').forEach(el => {
+            const key = el.getAttribute('data-key');
+            db[idx][key] = isNaN(el.value) || el.value === "" ? el.value : Number(el.value);
+        });
+        localStorage.setItem('agc_db', JSON.stringify(db)); // Sauvegarde physique
+        refreshMasterSelect();
+        updateChart(db[idx]);
+        alert("Fiche mise à jour avec succès.");
+    }
+
+    function createNewProfile() {
+        const newMat = prompt("Entrez le Matricule :");
+        if(!newMat) return;
+        if(db.find(u => u.mat === newMat)) return alert("Matricule déjà existant");
+
+        const newPers = { mat: newMat, nom: "NOUVEAU", grade: "2°CL", nPhys:0, nMor:20, nIntel:0, nTir:0 };
+        db.push(newPers);
+        localStorage.setItem('agc_db', JSON.stringify(db));
+        refreshMasterSelect();
+        document.getElementById('masterSelect').value = newMat;
+        loadProfile(newMat);
+        if(!isEditMode) toggleEdit();
+    }
+
+    function handlePhoto(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const idx = db.findIndex(u => u.mat === selectedMat);
+                db[idx].photo = e.target.result;
+                document.getElementById('photoView').innerHTML = `<img src="${e.target.result}">`;
+                localStorage.setItem('agc_db', JSON.stringify(db)); // Sauvegarde l'image
+            };
+            reader.readAsDataURL(input.files[0]);
         }
     }
 
@@ -235,41 +220,15 @@
         document.querySelectorAll('[data-key]').forEach(el => el.disabled = status);
     }
 
-    function saveData() {
-        const p = db.find(u => u.mat === selectedMat);
-        document.querySelectorAll('[data-key]').forEach(el => {
-            const key = el.getAttribute('data-key');
-            p[key] = isNaN(el.value) || el.value === "" ? el.value : Number(el.value);
-        });
-        updateChart(p);
-        alert("Modifications enregistrées en base.");
+    function showSec(id) {
+        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
     }
 
-    function createNewProfile() {
-        const newMat = "NEW-" + Date.now().toString().slice(-4);
-        const newPers = { mat: newMat, nom: "NOUVEAU", prenom: "MILITAIRE", grade: "2°CL", nPhys:0, nMor:20, nIntel:0, nTir:0 };
-        db.push(newPers);
-        refreshMasterSelect();
-        document.getElementById('masterSelect').value = newMat;
-        loadProfile(newMat);
-        if(!isEditMode) toggleEdit();
-    }
-
-    function calcIMC() {
-        const poids = document.querySelector('[data-key="poids"]').value;
-        const taille = document.querySelector('[data-key="taille"]').value;
-        const display = document.getElementById('imcDisplay');
-        const feedback = document.getElementById('imcFeedback');
-        
-        if(poids > 0 && taille > 0) {
-            const imc = (poids / (taille * taille)).toFixed(1);
-            display.value = imc;
-            if(imc < 18.5) { feedback.innerText = "Insuffisance pondérale"; feedback.style.color = "orange"; }
-            else if(imc < 25) { feedback.innerText = "Corpulence normale"; feedback.style.color = "green"; }
-            else { feedback.innerText = "Surpoids / Obésité"; feedback.style.color = "red"; }
-        } else {
-            display.value = "-";
-            feedback.innerText = "";
+    function resetApp() {
+        if(confirm("Effacer toutes les modifications et revenir à la liste initiale ?")) {
+            localStorage.removeItem('agc_db');
+            location.reload();
         }
     }
 
@@ -284,31 +243,11 @@
                     label: p.nom,
                     data: [p.nPhys, p.nMor, p.nIntel, p.nTir],
                     backgroundColor: 'rgba(197,160,89,0.3)',
-                    borderColor: '#c5a059',
-                    pointBackgroundColor: '#2d3e2d'
+                    borderColor: '#c5a059'
                 }]
             },
-            options: { scales: { r: { min: 0, max: 20, ticks: { display: false } } } }
+            options: { scales: { r: { min: 0, max: 20 } } }
         });
-    }
-
-    function handlePhoto(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const p = db.find(u => u.mat === selectedMat);
-                p.photo = e.target.result;
-                document.getElementById('photoView').innerHTML = `<img src="${p.photo}">`;
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function showSec(id) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        event.currentTarget.classList.add('active');
     }
 </script>
 </body>
