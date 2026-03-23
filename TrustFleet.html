@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RH Manager v16.0 - Gestion Complète du Personnel Militaire</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
     <style>
@@ -16,6 +16,7 @@
             --info: #3498db;
             --warning: #f39c12;
             --light: #ecf0f1;
+            --muted: #6c757d;
         }
 
         * { box-sizing: border-box; }
@@ -27,6 +28,7 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
+            color: #222;
         }
 
         .sidebar {
@@ -35,8 +37,8 @@
             color: white;
             display: flex;
             flex-direction: column;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.3);
-            z-index: 100;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.25);
+            z-index: 20;
             overflow-y: auto;
         }
 
@@ -44,9 +46,10 @@
             padding: 20px;
             text-align: center;
             border-bottom: 3px solid var(--gold);
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.18);
             position: sticky;
             top: 0;
+            z-index: 3;
         }
 
         .sidebar-header h2 {
@@ -58,7 +61,7 @@
         .sidebar-header p {
             font-size: 0.8rem;
             margin: 3px 0;
-            opacity: 0.8;
+            opacity: 0.9;
         }
 
         .nav-group {
@@ -77,7 +80,7 @@
             text-transform: uppercase;
             color: var(--gold);
             font-weight: bold;
-            opacity: 0.8;
+            opacity: 0.85;
             letter-spacing: 1px;
         }
 
@@ -85,8 +88,8 @@
             padding: 12px 20px;
             cursor: pointer;
             border-left: 4px solid transparent;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
+            font-size: 0.92rem;
+            transition: all 0.25s ease;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -94,7 +97,7 @@
         }
 
         .nav-item:hover {
-            background: rgba(197, 160, 89, 0.2);
+            background: rgba(197, 160, 89, 0.18);
             border-left-color: var(--gold);
         }
 
@@ -102,13 +105,13 @@
             background: var(--gold);
             color: var(--army);
             font-weight: bold;
-            border-left-color: var(--army);
+            border-left-color: #fff;
         }
 
         .sidebar-footer {
             padding: 15px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.1);
+            border-top: 1px solid rgba(255,255,255,0.12);
+            background: rgba(0,0,0,0.14);
         }
 
         .sidebar-footer button {
@@ -122,15 +125,16 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
+            min-width: 0;
         }
 
         .top-bar {
             background: var(--white);
-            padding: 12px 25px;
+            padding: 12px 22px;
             display: flex;
             align-items: center;
-            gap: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            gap: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
             flex-wrap: wrap;
             position: sticky;
             top: 0;
@@ -142,7 +146,7 @@
             display: flex;
             gap: 10px;
             align-items: center;
-            min-width: 300px;
+            min-width: 280px;
             flex-wrap: wrap;
         }
 
@@ -166,7 +170,7 @@
             padding: 30px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.08);
             border-top: 6px solid var(--army);
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.25s ease;
             margin-bottom: 20px;
         }
 
@@ -184,42 +188,43 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
             gap: 15px;
             margin-bottom: 30px;
         }
 
         .stat-card {
             background: linear-gradient(135deg, var(--white) 0%, #f9f9f9 100%);
-            padding: 25px;
+            padding: 22px;
             border-radius: 10px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
             border-left: 5px solid var(--gold);
-            transition: transform 0.3s ease;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
 
         .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 18px rgba(0,0,0,0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 7px 18px rgba(0,0,0,0.12);
         }
 
         .stat-card h4 {
             margin: 0 0 10px 0;
-            font-size: 0.9rem;
+            font-size: 0.86rem;
             color: #666;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .stat-card .value {
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: bold;
             color: var(--army);
+            line-height: 1.1;
         }
 
         .stat-card .subtitle {
-            font-size: 0.85rem;
-            color: #999;
+            font-size: 0.83rem;
+            color: #888;
             margin-top: 5px;
         }
 
@@ -244,8 +249,8 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            transition: transform 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: transform 0.25s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.12);
         }
 
         .photo-box:hover {
@@ -261,14 +266,14 @@
         .photo-hint {
             position: absolute;
             bottom: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.72);
             color: white;
             width: 100%;
             font-size: 10px;
             text-align: center;
             padding: 6px 5px;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.25s ease;
         }
 
         .photo-box:hover .photo-hint {
@@ -277,14 +282,14 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 20px;
             margin-bottom: 20px;
         }
 
         .grid-compact {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
             gap: 15px;
         }
 
@@ -310,19 +315,19 @@
             border-radius: 6px;
             font-size: 14px;
             font-family: inherit;
-            transition: border-color 0.3s ease;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
         }
 
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--gold);
-            box-shadow: 0 0 5px rgba(197, 160, 89, 0.3);
+            box-shadow: 0 0 5px rgba(197, 160, 89, 0.25);
         }
 
         input:disabled, select:disabled, textarea:disabled {
-            background: #f5f5f5;
+            background: #f6f6f6;
             color: #333;
-            border-color: #e0e0e0;
+            border-color: #e5e5e5;
             font-weight: 600;
             cursor: not-allowed;
         }
@@ -333,7 +338,7 @@
         }
 
         .btn {
-            padding: 12px 20px;
+            padding: 12px 18px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
@@ -344,12 +349,8 @@
         }
 
         .btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        .btn:active:not(:disabled) {
-            transform: translateY(0);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.16);
         }
 
         .btn:disabled {
@@ -362,17 +363,9 @@
             color: white;
         }
 
-        .btn-army:hover:not(:disabled) {
-            background: #1a2b1a;
-        }
-
         .btn-gold {
             background: var(--gold);
             color: var(--army);
-        }
-
-        .btn-gold:hover:not(:disabled) {
-            background: #b8944e;
         }
 
         .btn-success {
@@ -391,7 +384,7 @@
         }
 
         .btn-small {
-            padding: 8px 15px;
+            padding: 8px 14px;
             font-size: 12px;
         }
 
@@ -407,10 +400,10 @@
 
         .login-container {
             background: var(--white);
-            padding: 50px;
+            padding: 42px;
             border-radius: 15px;
-            width: 350px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 360px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.32);
             text-align: center;
         }
 
@@ -421,9 +414,9 @@
         }
 
         .login-container p {
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             color: #666;
-            margin: 0 0 30px 0;
+            margin: 0 0 26px 0;
         }
 
         .login-container input {
@@ -446,14 +439,13 @@
         .table thead {
             background: var(--army);
             color: white;
-            position: sticky;
-            top: 0;
         }
 
         .table th, .table td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #e3e3e3;
+            vertical-align: middle;
         }
 
         .table tbody tr:hover {
@@ -461,7 +453,7 @@
         }
 
         .table tbody tr:nth-child(even) {
-            background: #fafafa;
+            background: #fcfcfc;
         }
 
         .search-container {
@@ -488,67 +480,130 @@
 
         .charts-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
             gap: 20px;
-            margin-top: 30px;
+            margin-top: 25px;
         }
 
         .chart-box {
             background: var(--white);
-            padding: 25px;
+            padding: 22px;
             border-radius: 12px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
             position: relative;
-            min-height: 350px;
+            min-height: 330px;
         }
 
         .chart-box h4 {
-            margin: 0 0 20px 0;
+            margin: 0 0 18px 0;
             color: var(--army);
             border-bottom: 2px solid var(--gold);
             padding-bottom: 10px;
+            font-size: 1rem;
         }
+
+        .chart-box canvas {
+            width: 100% !important;
+            height: 260px !important;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-green { background: #eafaf1; color: #1e8449; }
+        .badge-blue { background: #ebf5fb; color: #21618c; }
+        .badge-orange { background: #fef5e7; color: #af601a; }
+        .badge-red { background: #fdedec; color: #a93226; }
+        .badge-gray { background: #f2f4f4; color: #566573; }
 
         .alert-toast {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
+            top: 18px;
+            right: 18px;
+            max-width: 360px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            color: #fff;
             font-weight: 600;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-            z-index: 9999;
-            animation: slideIn 0.3s ease;
-            max-width: 380px;
+            z-index: 99999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+            animation: slideIn 0.25s ease;
+        }
+
+        .hint-box {
+            background: #f8fbfd;
+            border-left: 4px solid var(--info);
+            padding: 14px 16px;
+            border-radius: 8px;
+            color: #4e5b61;
+            font-size: 0.95rem;
+            margin-bottom: 18px;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateX(25px); }
+            from { opacity: 0; transform: translateX(20px); }
             to { opacity: 1; transform: translateX(0); }
         }
 
-        @media (max-width: 768px) {
-            body { flex-direction: column; height: auto; overflow: auto; }
-            .sidebar { width: 100%; max-height: none; overflow: visible; }
-            .grid { grid-template-columns: 1fr; }
-            .profile-header { flex-direction: column; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .charts-container { grid-template-columns: 1fr; }
-            .main { height: auto; }
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+                height: auto;
+                overflow: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: none;
+            }
+
+            .main {
+                height: auto;
+            }
+
+            .content-area {
+                overflow: visible;
+            }
+
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            }
+
+            .profile-header {
+                flex-direction: column;
+            }
         }
 
         @media print {
-            .sidebar, .top-bar, .btn, .photo-hint, #login-screen { display: none !important; }
-            .section-card { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
-            body { height: auto; }
-            .main { height: auto; }
-            .content-area { overflow: visible; }
+            .sidebar, .top-bar, .btn, .photo-hint, #login-screen {
+                display: none !important;
+            }
+
+            .section-card {
+                display: block !important;
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+            }
+
+            body, .main, .content-area {
+                height: auto;
+                overflow: visible;
+            }
         }
     </style>
 </head>
@@ -558,16 +613,16 @@
     <div class="login-container">
         <h1>RH Manager</h1>
         <p>Portail Sécurisé BA 301</p>
-        <input type="text" id="log-id" placeholder="Identifiant" autocomplete="username">
-        <input type="password" id="log-pass" placeholder="Code" autocomplete="current-password">
+        <input type="text" id="log-id" placeholder="Identifiant" autocomplete="username" />
+        <input type="password" id="log-pass" placeholder="Code" autocomplete="current-password" />
         <button onclick="access()" class="btn btn-gold">CONNEXION</button>
-        <button onclick="accessGuest()" class="btn btn-info" style="margin-top:10px;">ACCÈS VISITEUR</button>
+        <button onclick="accessGuest()" class="btn btn-info">ACCÈS VISITEUR</button>
     </div>
 </div>
 
 <div class="sidebar">
     <div class="sidebar-header">
-        <h2 id="ui-unit">BA 301</h2>
+        <h2 id="ui-unit">AIR BASE 301</h2>
         <p id="ui-user">Bienvenue</p>
         <p id="ui-role" style="font-size: 0.75rem; color: var(--gold); margin: 5px 0 0 0;">-</p>
     </div>
@@ -597,7 +652,7 @@
 
     <div class="sidebar-footer">
         <button onclick="window.print()" class="btn btn-gold">🖨 IMPRIMER</button>
-        <button onclick="location.reload()" class="btn" style="background:rgba(255,255,255,0.1); color:white; margin-top:10px;">🚪 DÉCONNEXION</button>
+        <button onclick="location.reload()" class="btn" style="background:rgba(255,255,255,0.12); color:white;">🚪 DÉCONNEXION</button>
     </div>
 </div>
 
@@ -619,11 +674,15 @@
         <div id="sec-dashboard" class="section-card active">
             <h3>📊 Tableau de Bord Général</h3>
 
-            <div class="stats-grid" id="dashboard-stats">
+            <div class="hint-box">
+                Vue synthétique de l’effectif : présence, positions, notes moyennes et indicateurs globaux du personnel.
+            </div>
+
+            <div class="stats-grid">
                 <div class="stat-card">
                     <h4>Total Personnel</h4>
                     <div class="value" id="stat-total">0</div>
-                    <div class="subtitle">Agents militaires</div>
+                    <div class="subtitle">Effectif global</div>
                 </div>
                 <div class="stat-card">
                     <h4>Présents</h4>
@@ -641,36 +700,43 @@
                     <div class="subtitle">Formation</div>
                 </div>
                 <div class="stat-card">
-                    <h4>Morale Moyenne</h4>
-                    <div class="value" id="stat-morale">-</div>
+                    <h4>Moyenne Morale</h4>
+                    <div class="value" id="stat-morale">0</div>
                     <div class="subtitle">/20</div>
                 </div>
                 <div class="stat-card">
-                    <h4>Performance Phys.</h4>
-                    <div class="value" id="stat-physique">-</div>
+                    <h4>Moyenne Physique</h4>
+                    <div class="value" id="stat-physique">0</div>
                     <div class="subtitle">/20</div>
                 </div>
             </div>
 
             <div class="charts-container">
                 <div class="chart-box">
-                    <h4>Distribution par Grade</h4>
-                    <canvas id="chart-grades"></canvas>
+                    <h4>Répartition des positions</h4>
+                    <canvas id="chart-positions"></canvas>
                 </div>
                 <div class="chart-box">
-                    <h4>Distribution par Position</h4>
-                    <canvas id="chart-positions"></canvas>
+                    <h4>Répartition par grade</h4>
+                    <canvas id="chart-grades"></canvas>
                 </div>
             </div>
 
             <div class="charts-container">
                 <div class="chart-box">
-                    <h4>Top 10 Meilleures Morales</h4>
-                    <canvas id="chart-morale"></canvas>
+                    <h4>Notes moyennes par domaine</h4>
+                    <canvas id="chart-averages"></canvas>
                 </div>
                 <div class="chart-box">
-                    <h4>Performance Physique</h4>
-                    <canvas id="chart-physique"></canvas>
+                    <h4>Top 10 des meilleures morales</h4>
+                    <canvas id="chart-morale"></canvas>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-box">
+                    <h4>Répartition cumulée des jours déclarés</h4>
+                    <canvas id="chart-activity"></canvas>
                 </div>
             </div>
         </div>
@@ -683,6 +749,7 @@
                     <div class="photo-hint">CLIQUER POUR CHANGER</div>
                     <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="updatePhoto(this)">
                 </div>
+
                 <div class="grid" style="flex:1">
                     <div class="form-group">
                         <label>Nom</label>
@@ -738,7 +805,7 @@
         </div>
 
         <div id="sec-carriere" class="section-card">
-            <h3>🎖️ Carrière Militaire</h3>
+            <h3>🎖 Carrière Militaire</h3>
             <div class="grid">
                 <div class="form-group">
                     <label>Grade</label>
@@ -803,7 +870,7 @@
                 </div>
                 <div class="form-group">
                     <label>IMC Calculé</label>
-                    <input type="text" id="imc-calc" disabled style="font-weight:bold; background:#f0f0f0;">
+                    <input type="text" id="imc-calc" disabled>
                 </div>
                 <div class="form-group">
                     <label>Aptitude SGPDIC</label>
@@ -822,7 +889,7 @@
                     <input type="text" data-v="tension" placeholder="120/80">
                 </div>
             </div>
-            <div class="form-group" style="margin-top:20px;">
+            <div class="form-group">
                 <label>Allergies / Notes Médicales</label>
                 <textarea data-v="all" placeholder="Allergies, pathologies, restrictions..."></textarea>
             </div>
@@ -830,7 +897,9 @@
 
         <div id="sec-act" class="section-card">
             <h3>📅 Récapitulatif des Activités</h3>
-            <p style="font-size:0.95rem; color:#666; margin-bottom:20px;">Mise à jour des compteurs cumulatifs. Ces données permettent de suivre l'engagement du personnel hors de la base.</p>
+            <p style="font-size:0.95rem; color:#666; margin-bottom:20px;">
+                Mise à jour des compteurs cumulatifs du personnel.
+            </p>
             <div class="grid">
                 <div class="form-group">
                     <label>Jours Présents à la Base</label>
@@ -857,44 +926,45 @@
                     <input type="number" data-v="cSta" min="0" placeholder="0" oninput="updateActivityTotal()">
                 </div>
             </div>
+
             <div class="grid">
                 <div class="form-group" style="background:#f0f8ff; padding:15px; border-radius:8px; border-left:4px solid var(--info);">
                     <label>TOTAL Jours Hors Base</label>
-                    <input type="text" id="total-hors-base" style="font-weight:bold; color:var(--army); font-size:1.1rem; background:white;" disabled>
+                    <input type="text" id="total-hors-base" disabled>
                 </div>
                 <div class="form-group" style="background:#f0fff0; padding:15px; border-radius:8px; border-left:4px solid var(--success);">
                     <label>TOTAL Jours Travaillés</label>
-                    <input type="text" id="total-travailles" style="font-weight:bold; color:var(--army); font-size:1.1rem; background:white;" disabled>
+                    <input type="text" id="total-travailles" disabled>
                 </div>
             </div>
         </div>
 
         <div id="sec-perf" class="section-card">
             <h3>📈 Évaluation de Performance</h3>
-            <div style="display:flex; gap:40px; flex-wrap:wrap;">
-                <div class="grid-compact">
+            <div style="display:flex; gap:40px; flex-wrap:wrap; align-items:flex-start;">
+                <div class="grid-compact" style="flex:1;">
                     <div class="form-group">
                         <label>Valeur Physique (/20)</label>
-                        <input type="number" data-v="nPhy" min="0" max="20" oninput="liveUpdate()" placeholder="0">
+                        <input type="number" data-v="nPhy" min="0" max="20" step="0.1" oninput="liveUpdate()" placeholder="0">
                     </div>
                     <div class="form-group">
                         <label>Valeur Morale (/20)</label>
-                        <input type="number" data-v="nMor" min="0" max="20" oninput="liveUpdate()" placeholder="0">
+                        <input type="number" data-v="nMor" min="0" max="20" step="0.1" oninput="liveUpdate()" placeholder="0">
                     </div>
                     <div class="form-group">
                         <label>Intellect (/20)</label>
-                        <input type="number" data-v="nInt" min="0" max="20" oninput="liveUpdate()" placeholder="0">
+                        <input type="number" data-v="nInt" min="0" max="20" step="0.1" oninput="liveUpdate()" placeholder="0">
                     </div>
                     <div class="form-group">
                         <label>Comme Tireur (/20)</label>
-                        <input type="number" data-v="nTir" min="0" max="20" oninput="liveUpdate()" placeholder="0">
+                        <input type="number" data-v="nTir" min="0" max="20" step="0.1" oninput="liveUpdate()" placeholder="0">
                     </div>
                     <div class="form-group">
                         <label>Leadership / Commandement (/20)</label>
-                        <input type="number" data-v="nCom" min="0" max="20" oninput="liveUpdate()" placeholder="0">
+                        <input type="number" data-v="nCom" min="0" max="20" step="0.1" oninput="liveUpdate()" placeholder="0">
                     </div>
                 </div>
-                <div style="width:320px; height:320px; position:relative;">
+                <div style="width:340px; height:340px; position:relative;">
                     <canvas id="radar"></canvas>
                 </div>
             </div>
@@ -902,6 +972,7 @@
 
         <div id="sec-eval" class="section-card">
             <h3>⭐ Évaluation Générale Complète</h3>
+
             <div class="stats-grid">
                 <div class="stat-card">
                     <h4>Valeur Physique</h4>
@@ -1015,8 +1086,11 @@
         <div id="sec-admin" class="section-card">
             <h3>⚙️ Paramètres Administrateur</h3>
             <div style="background:#fff9e6; padding:15px; border-radius:8px; border-left:4px solid var(--warning); margin-bottom:20px;">
-                <p style="margin:0; color:#856404; font-size:0.95rem;">⚠️ <strong>Zone Sensible :</strong> Les modifications ici affectent tous les utilisateurs de l'application.</p>
+                <p style="margin:0; color:#856404; font-size:0.95rem;">
+                    ⚠️ <strong>Zone sensible :</strong> les modifications ici affectent tous les utilisateurs du navigateur.
+                </p>
             </div>
+
             <div class="grid">
                 <div class="form-group">
                     <label>Nom de l'Unité/Base</label>
@@ -1031,6 +1105,7 @@
                     <input type="password" id="set-pass" placeholder="Code sécurisé">
                 </div>
             </div>
+
             <button onclick="saveSets()" class="btn btn-success" style="margin-top:20px;">💾 ENREGISTRER LES PARAMÈTRES</button>
             <button onclick="loadAdminSettings()" class="btn btn-army btn-small" style="margin-top:20px; margin-left:10px;">🔄 CHARGER ACTUELS</button>
         </div>
@@ -1038,22 +1113,143 @@
 </div>
 
 <script>
-const personnelData = [
-    { id: "OFF/001", nom: "BALOGOG", prenom: "PATRICK", grade: "CNE", dipCiv: "L3/SIGL", dipMil: "SCU", nTir: 17, nPhy: 11.71, nInt: 0, nMor: 20.47, cMis: 5, cSta: 22, cPer: 7, cPres: 14, cAbs: 0, cMal: 0, pos: "STAGE", email: "balogog@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 85, taille: 1.75, gs: "", tension: "", dinc: "2012-03-01", dnais: "1989-06-27", lnais: "YAOUNDE", spec: "LOG" },
-    { id: "OFF/002", nom: "EMAN", prenom: "ARMAND BRICE", grade: "CNE", dipCiv: "BAC A4", dipMil: "SCU", nTir: 18, nPhy: 0, nInt: 0, nMor: 20.6, cMis: 2, cSta: 0, cPer: 0, cPres: 44, cAbs: 0, cMal: 0, pos: "PRESENT", email: "eman@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 82, taille: 1.73, gs: "O+", tension: "121/84", dinc: "2012-03-02", dnais: "1991-06-07", lnais: "EBOLOWA", spec: "RENS" },
-    { id: "OFF/003", nom: "DABDJA NDOUDJING", prenom: "THIERRY", grade: "CNE", dipCiv: "LICENSE", dipMil: "SCU", nTir: 0, nPhy: 0, nInt: 0, nMor: 20, cMis: 46, cSta: 0, cPer: 0, cPres: 0, cAbs: 0, cMal: 0, pos: "MISSION", email: "dabdja@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 0, taille: 0, gs: "", tension: "", dinc: "2018-03-03", dnais: "1992-05-24", lnais: "DOUALA", spec: "SG" },
-    { id: "OFF/004", nom: "DARBAWA", prenom: "MADELEINE", grade: "CNE", dipCiv: "CAPA DROIT", dipMil: "SCU", nTir: 0, nPhy: 0, nInt: 0, nMor: 14.2, cMis: 0, cSta: 0, cPer: 0, cPres: 24, cAbs: 0, cMal: 22, pos: "MALADE", email: "darbawa@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 74, taille: 0, gs: "", tension: "113/93", dinc: "1995-03-04", dnais: "1977-11-11", lnais: "MAROUA", spec: "SG" },
-    { id: "OFF/005", nom: "DJEUTCHA NGASSA", prenom: "DANIEL STEPHANE", grade: "SLT", dipCiv: "BAC A4", dipMil: "DIP EMIA", nTir: 0, nPhy: 0, nInt: 0, nMor: 20, cMis: 0, cSta: 0, cPer: 0, cPres: 0, cAbs: 0, cMal: 0, pos: "PRESENT", email: "djeutcha@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 0, taille: 0, gs: "", tension: "", dinc: "2022-03-05", dnais: "2001-05-30", lnais: "NKONGSAMBA", spec: "SG" },
-    { id: "OFF/006", nom: "VEYE", prenom: "-", grade: "ACM", dipCiv: "CEP", dipMil: "BA 2", nTir: 0, nPhy: 0, nInt: 0, nMor: 20.47, cMis: 0, cSta: 0, cPer: 27, cPres: 27, cAbs: 0, cMal: 0, pos: "PRESENT", email: "veye@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 82, taille: 0, gs: "", tension: "146/85", dinc: "1998-11-13", dnais: "1977-03-07", lnais: "TOKOMBERE", spec: "FUSAIR" },
-    { id: "OFF/007", nom: "FADIMATOU", prenom: "ADAMOU", grade: "AC", dipCiv: "CEPE", dipMil: "BS2", nTir: 0, nPhy: 0, nInt: 0, nMor: 19.67, cMis: 0, cSta: 0, cPer: 1, cPres: 43, cAbs: 0, cMal: 2, pos: "MALADE", email: "fadimatou@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 87, taille: 0, gs: "", tension: "148/90", dinc: "2000-10-10", dnais: "1981-08-25", lnais: "GAROUA", spec: "GT" },
-    { id: "OFF/008", nom: "DIEBALBE", prenom: "EMMANUEL", grade: "AC", dipCiv: "PROBATOIRE", dipMil: "BA2", nTir: 0, nPhy: 0, nInt: 0, nMor: 20, cMis: 46, cSta: 0, cPer: 0, cPres: 0, cAbs: 0, cMal: 0, pos: "MISSION", email: "diebalbe@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 0, taille: 0, gs: "", tension: "", dinc: "2000-10-10", dnais: 0, lnais: "KAELE", spec: "FUSAIR" },
-    { id: "OFF/009", nom: "PETSOUONKOUO", prenom: "CHRISTIAN", grade: "AC", dipCiv: "CAPA DROIT ECO", dipMil: "BS2", nTir: 0, nPhy: 0, nInt: 0, nMor: 18.47, cMis: 0, cSta: 0, cPer: 0, cPres: 20, cAbs: 0, cMal: 0, pos: "PRESENT", email: "petsouonkouo@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 0, taille: 0, gs: "", tension: "", dinc: "2011-04-08", dnais: "1990-01-20", lnais: "EDEA", spec: "CDP" },
-    { id: "OFF/010", nom: "NJEI", prenom: "DERICK", grade: "AC", dipCiv: "CAP WORLD", dipMil: "BS2", nTir: 0, nPhy: 0, nInt: 0, nMor: 0, cMis: 0, cSta: 0, cPer: 0, cPres: 0, cAbs: 46, cMal: 0, pos: "DESERTION", email: "njei@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 0, taille: 0, gs: "", tension: "", dinc: "2006-07-03", dnais: "1986-07-05", lnais: "BAMENDA", spec: "ELEC IND" },
-    { id: "OFF/011", nom: "MOHAMIDOU BEBE", prenom: "FELICITE", grade: "ADT", dipCiv: "BAC A4", dipMil: "BS1", nTir: 0, nPhy: 0, nInt: 0, nMor: 19.13, cMis: 0, cSta: 0, cPer: 0, cPres: 43, cAbs: 3, cMal: 0, pos: "PRESENT", email: "mohamidou@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 0, taille: 0, gs: "", tension: "", dinc: "2015-04-06", dnais: "1992-06-06", lnais: "MBE", spec: "EPMS" },
-    { id: "OFF/012", nom: "NGUBE", prenom: "DERICK", grade: "S/C", dipCiv: "FSL", dipMil: "BA1", nTir: 5, nPhy: 0, nInt: 0, nMor: 20.4, cMis: 10, cSta: 0, cPer: 0, cPres: 36, cAbs: 0, cMal: 0, pos: "PRESENT", email: "ngube@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 0, taille: 0, gs: "", tension: "", dinc: "2011-04-15", dnais: "1988-05-25", lnais: "NKACK", spec: "FUSAIR" },
-    { id: "OFF/013", nom: "BALENG EKONDO", prenom: "SORELLE DIANE", grade: "S/C", dipCiv: "BAC ACC", dipMil: "CAT2", nTir: 3, nPhy: 0, nInt: 0, nMor: 20.73, cMis: 10, cSta: 0, cPer: 0, cPres: 36, cAbs: 0, cMal: 0, pos: "PRESENT", email: "baleng@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 77, taille: 0, gs: "", tension: "127/87", dinc: "2019-08-26", dnais: "1997-08-10", lnais: "BOKITO", spec: "SG" },
-    { id: "OFF/014", nom: "BAMBO", prenom: "LEONARD", grade: "S/C", dipCiv: "CAP ELEQ", dipMil: "BS1", nTir: 0, nPhy: 0, nInt: 0, nMor: 20, cMis: 46, cSta: 0, cPer: 0, cPres: 0, cAbs: 0, cMal: 0, pos: "MISSION", email: "bambo@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 0, taille: 0, gs: "", tension: "", dinc: "2013-03-22", dnais: 0, lnais: "POLI", spec: "EPMS" },
-    { id: "OFF/015", nom: "OKEM", prenom: "CYPRIAN AWA", grade: "SGT", dipCiv: "BAC A4 ALL", dipMil: "CAT2", nTir: 0, nPhy: 0, nInt: 0, nMor: 20, cMis: 0, cSta: 46, cPer: 0, cPres: 0, cAbs: 0, cMal: 0, pos: "STAGE", email: "okem@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 74, taille: 0, gs: "", tension: "112/83", dinc: "2013-03-22", dnais: "1992-03-25", lnais: "BENABENGE-ESIMBI", spec: "FUSAIR" },
-    { id: "OFF/016", nom: "MEDAGUE", prenom: "CLAUDE", grade: "SGT", dipCiv: "BAC A4 ESP", dipMil: "CAT2", nTir: 0, nPhy: 0, nInt: 0, nMor: 20, cMis: 0, cSta: 0, cPer: 20, cPres: 30, cAbs: 1, cMal: 1, pos: "PRESENT", email: "medague@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 65, taille: 0, gs: "", tension: "129/86", dinc: "2022-06-03", dnais: "1999-06-17", lnais: "MAYOS", spec: "SG" },
-    { id: "OFF/017", nom: "MBAZEPANZ", prenom: "ABANDA", grade: "SGT", dipCiv: "BAC A4 ESP", dipMil: "CAT2", nTir: 0, nPhy: 0, nInt: 0, nMor: 20, cMis: 0, cSta: 0, cPer: 0, cPres: 0, cAbs: 0, cMal: 0, pos: "DETACHE", email: "mbazepanz@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 0, taille: 0, gs: "", tension: "", dinc: "2022-06-03", dnais: "2000-06-22", lnais: "MODJENDI 2", spec: "SG" },
-    { id: "OFF/018", nom: "AZOA MEDJO", prenom: "ORNELLA SANDRA", grade: "SGT", dipCiv: "BAC A4", dipMil: "CAT2", nTir: 0, nPhy: 0, nInt: 0, nMor: 19.27, cMis: 0, cSta: 0, cPer: 20, cPres: 28, cAbs: 1, cMal: 2, pos: "PRESENT", email: "azoa@ba301.mil
+    const PHOTO_PLACEHOLDER =
+        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='200' viewBox='0 0 160 200'%3E%3Crect fill='%23e2e2e2' width='160' height='200'/%3E%3Ccircle cx='80' cy='70' r='28' fill='%23b9b9b9'/%3E%3Cpath d='M30 170c6-28 27-44 50-44s44 16 50 44' fill='%23b9b9b9'/%3E%3Ctext x='80' y='190' text-anchor='middle' font-family='Arial' font-size='12' fill='%23777'%3EPHOTO%3C/text%3E%3C/svg%3E";
+
+    const personnelData = [
+        { id: "OFF/001", nom: "BALOGOG", prenom: "PATRICK", grade: "CNE", dipCiv: "L3/SIGL", dipMil: "SCU", nTir: 17, nPhy: 11.7, nInt: 13.0, nMor: 19.5, nCom: 14.5, cMis: 5, cSta: 22, cPer: 7, cPres: 14, cAbs: 0, cMal: 0, pos: "STAGE", email: "balogog@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 85, taille: 1.75, gs: "", tension: "", dinc: "2012-03-01", dnais: "1989-06-27", lnais: "YAOUNDE", spec: "LOG" },
+        { id: "OFF/002", nom: "EMAN", prenom: "ARMAND BRICE", grade: "CNE", dipCiv: "BAC A4", dipMil: "SCU", nTir: 18, nPhy: 12.5, nInt: 14.0, nMor: 20.0, nCom: 15.0, cMis: 2, cSta: 0, cPer: 0, cPres: 44, cAbs: 0, cMal: 0, pos: "PRESENT", email: "eman@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 82, taille: 1.73, gs: "O+", tension: "121/84", dinc: "2012-03-02", dnais: "1991-06-07", lnais: "EBOLOWA", spec: "RENS" },
+        { id: "OFF/003", nom: "DABDJA NDOUDJING", prenom: "THIERRY", grade: "CNE", dipCiv: "LICENCE", dipMil: "SCU", nTir: 10, nPhy: 11, nInt: 13.5, nMor: 18.5, nCom: 14.5, cMis: 46, cSta: 0, cPer: 0, cPres: 0, cAbs: 0, cMal: 0, pos: "MISSION", email: "dabdja@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 78, taille: 1.74, gs: "", tension: "", dinc: "2018-03-03", dnais: "1992-05-24", lnais: "DOUALA", spec: "SG" },
+        { id: "OFF/004", nom: "DARBAWA", prenom: "MADELEINE", grade: "CNE", dipCiv: "CAPA DROIT", dipMil: "SCU", nTir: 8, nPhy: 9.5, nInt: 12.5, nMor: 14.2, nCom: 13, cMis: 0, cSta: 0, cPer: 0, cPres: 24, cAbs: 0, cMal: 22, pos: "MALADE", email: "darbawa@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 74, taille: 1.64, gs: "", tension: "113/93", dinc: "1995-03-04", dnais: "1977-11-11", lnais: "MAROUA", spec: "SG" },
+        { id: "OFF/005", nom: "DJEUTCHA NGASSA", prenom: "DANIEL STEPHANE", grade: "SLT", dipCiv: "BAC A4", dipMil: "DIP EMIA", nTir: 12, nPhy: 13, nInt: 15, nMor: 18.7, nCom: 12, cMis: 0, cSta: 0, cPer: 0, cPres: 46, cAbs: 0, cMal: 0, pos: "PRESENT", email: "djeutcha@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 76, taille: 1.77, gs: "", tension: "", dinc: "2022-03-05", dnais: "2001-05-30", lnais: "NKONGSAMBA", spec: "SG" },
+        { id: "OFF/006", nom: "VEYE", prenom: "-", grade: "ACM", dipCiv: "CEP", dipMil: "BA2", nTir: 10, nPhy: 11, nInt: 10, nMor: 19.0, nCom: 11.5, cMis: 0, cSta: 0, cPer: 27, cPres: 27, cAbs: 0, cMal: 0, pos: "PRESENT", email: "veye@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 82, taille: 1.69, gs: "", tension: "146/85", dinc: "1998-11-13", dnais: "1977-03-07", lnais: "TOKOMBERE", spec: "FUSAIR" },
+        { id: "OFF/007", nom: "FADIMATOU", prenom: "ADAMOU", grade: "AC", dipCiv: "CEPE", dipMil: "BS2", nTir: 9, nPhy: 10, nInt: 11, nMor: 18.9, nCom: 10.5, cMis: 0, cSta: 0, cPer: 1, cPres: 43, cAbs: 0, cMal: 2, pos: "MALADE", email: "fadimatou@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 87, taille: 1.66, gs: "", tension: "148/90", dinc: "2000-10-10", dnais: "1981-08-25", lnais: "GAROUA", spec: "GT" },
+        { id: "OFF/008", nom: "DIEBALBE", prenom: "EMMANUEL", grade: "AC", dipCiv: "PROBATOIRE", dipMil: "BA2", nTir: 8, nPhy: 10.5, nInt: 9.5, nMor: 18.2, nCom: 10.5, cMis: 46, cSta: 0, cPer: 0, cPres: 0, cAbs: 0, cMal: 0, pos: "MISSION", email: "diebalbe@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 72, taille: 1.72, gs: "", tension: "", dinc: "2000-10-10", dnais: "1990-10-10", lnais: "KAELE", spec: "FUSAIR" },
+        { id: "OFF/009", nom: "PETSOUONKOUO", prenom: "CHRISTIAN", grade: "AC", dipCiv: "CAPA DROIT ECO", dipMil: "BS2", nTir: 10, nPhy: 11.5, nInt: 12, nMor: 17.8, nCom: 11, cMis: 0, cSta: 0, cPer: 0, cPres: 20, cAbs: 0, cMal: 0, pos: "PRESENT", email: "petsouonkouo@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 69, taille: 1.71, gs: "", tension: "", dinc: "2011-04-08", dnais: "1990-01-20", lnais: "EDEA", spec: "CDP" },
+        { id: "OFF/010", nom: "NJEI", prenom: "DERICK", grade: "AC", dipCiv: "CAP WORLD", dipMil: "BS2", nTir: 0, nPhy: 0, nInt: 0, nMor: 0, nCom: 0, cMis: 0, cSta: 0, cPer: 0, cPres: 0, cAbs: 46, cMal: 0, pos: "DESERTION", email: "njei@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 0, taille: 0, gs: "", tension: "", dinc: "2006-07-03", dnais: "1986-07-05", lnais: "BAMENDA", spec: "ELEC IND" },
+        { id: "OFF/011", nom: "MOHAMIDOU BEBE", prenom: "FELICITE", grade: "ADT", dipCiv: "BAC A4", dipMil: "BS1", nTir: 9.5, nPhy: 12, nInt: 12.5, nMor: 18.1, nCom: 12, cMis: 0, cSta: 0, cPer: 0, cPres: 43, cAbs: 3, cMal: 0, pos: "PRESENT", email: "mohamidou@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 68, taille: 1.63, gs: "", tension: "", dinc: "2015-04-06", dnais: "1992-06-06", lnais: "MBE", spec: "EPMS" },
+        { id: "OFF/012", nom: "NGUBE", prenom: "DERICK", grade: "S/C", dipCiv: "FSL", dipMil: "BA1", nTir: 15, nPhy: 13.5, nInt: 12.5, nMor: 19.4, nCom: 12.5, cMis: 10, cSta: 0, cPer: 0, cPres: 36, cAbs: 0, cMal: 0, pos: "PRESENT", email: "ngube@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 77, taille: 1.8, gs: "", tension: "", dinc: "2011-04-15", dnais: "1988-05-25", lnais: "NKACK", spec: "FUSAIR" },
+        { id: "OFF/013", nom: "BALENG EKONDO", prenom: "SORELLE DIANE", grade: "S/C", dipCiv: "BAC ACC", dipMil: "CAT2", nTir: 13, nPhy: 12.5, nInt: 13.5, nMor: 19.8, nCom: 13, cMis: 10, cSta: 0, cPer: 0, cPres: 36, cAbs: 0, cMal: 0, pos: "PRESENT", email: "baleng@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 77, taille: 1.68, gs: "", tension: "127/87", dinc: "2019-08-26", dnais: "1997-08-10", lnais: "BOKITO", spec: "SG" },
+        { id: "OFF/014", nom: "BAMBO", prenom: "LEONARD", grade: "S/C", dipCiv: "CAP ELEQ", dipMil: "BS1", nTir: 11, nPhy: 10.5, nInt: 10.5, nMor: 18.4, nCom: 11, cMis: 46, cSta: 0, cPer: 0, cPres: 0, cAbs: 0, cMal: 0, pos: "MISSION", email: "bambo@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 73, taille: 1.76, gs: "", tension: "", dinc: "2013-03-22", dnais: "1989-09-15", lnais: "POLI", spec: "EPMS" },
+        { id: "OFF/015", nom: "OKEM", prenom: "CYPRIAN AWA", grade: "SGT", dipCiv: "BAC A4 ALL", dipMil: "CAT2", nTir: 12.5, nPhy: 13, nInt: 12, nMor: 18.9, nCom: 12, cMis: 0, cSta: 46, cPer: 0, cPres: 0, cAbs: 0, cMal: 0, pos: "STAGE", email: "okem@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 74, taille: 1.74, gs: "", tension: "112/83", dinc: "2013-03-22", dnais: "1992-03-25", lnais: "BENABENGE-ESIMBI", spec: "FUSAIR" },
+        { id: "OFF/016", nom: "MEDAGUE", prenom: "CLAUDE", grade: "SGT", dipCiv: "BAC A4 ESP", dipMil: "CAT2", nTir: 11.5, nPhy: 12.5, nInt: 12, nMor: 18.8, nCom: 12.2, cMis: 0, cSta: 0, cPer: 20, cPres: 30, cAbs: 1, cMal: 1, pos: "PRESENT", email: "medague@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 65, taille: 1.7, gs: "", tension: "129/86", dinc: "2022-06-03", dnais: "1999-06-17", lnais: "MAYOS", spec: "SG" },
+        { id: "OFF/017", nom: "MBAZEPANZ", prenom: "ABANDA", grade: "SGT", dipCiv: "BAC A4 ESP", dipMil: "CAT2", nTir: 10.5, nPhy: 12, nInt: 11.5, nMor: 18.5, nCom: 11.8, cMis: 0, cSta: 0, cPer: 0, cPres: 0, cAbs: 0, cMal: 0, pos: "DETACHE", email: "mbazepanz@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 0, taille: 0, gs: "", tension: "", dinc: "2022-06-03", dnais: "2000-06-22", lnais: "MODJENDI 2", spec: "SG" },
+        { id: "OFF/018", nom: "AZOA MEDJO", prenom: "ORNELLA SANDRA", grade: "SGT", dipCiv: "BAC A4", dipMil: "CAT2", nTir: 11, nPhy: 12, nInt: 12.5, nMor: 18.7, nCom: 12.1, cMis: 0, cSta: 0, cPer: 20, cPres: 28, cAbs: 1, cMal: 2, pos: "PRESENT", email: "azoa@ba301.mil", phone: "+237 6XX XXX XXX", photo: "", poids: 66, taille: 1.67, gs: "", tension: "", dinc: "2022-06-03", dnais: "2000-09-14", lnais: "DJOUM", spec: "SG" }
+    ];
+
+    let configs = JSON.parse(localStorage.getItem('rh_config')) || {
+        unit: "AIR BASE 301",
+        admin: "ADMIN",
+        pass: "301",
+        created: new Date().toISOString()
+    };
+
+    let roster = hydrateRoster(JSON.parse(localStorage.getItem('rh_roster')) || personnelData);
+
+    let isAdmin = false;
+    let currentUserId = null;
+    let currentPerson = null;
+    let isEditing = false;
+    let myRadarChart = null;
+
+    let dashboardCharts = {
+        positions: null,
+        grades: null,
+        averages: null,
+        morale: null,
+        activity: null
+    };
+
+    function hydrateRoster(data) {
+        return (data || []).map(p => ({
+            photo: "",
+            nom: "",
+            prenom: "",
+            id: "",
+            email: "",
+            phone: "",
+            dnais: "",
+            lnais: "",
+            dipCiv: "",
+            dipMil: "",
+            sit: "",
+            grade: "",
+            spec: "",
+            dinc: "",
+            uori: "",
+            pos: "PRÉSENT",
+            ansServ: "",
+            gs: "",
+            poids: 0,
+            taille: 0,
+            sgp: "",
+            tension: "",
+            all: "",
+            cPres: 0,
+            cAbs: 0,
+            cPer: 0,
+            cMis: 0,
+            cMal: 0,
+            cSta: 0,
+            nPhy: 0,
+            nMor: 0,
+            nInt: 0,
+            nTir: 0,
+            nCom: 0,
+            ...p,
+            pos: normalizePosition((p && p.pos) || "PRÉSENT")
+        }));
+    }
+
+    function num(v) {
+        const n = parseFloat(v);
+        return isNaN(n) ? 0 : n;
+    }
+
+    function normalizePosition(pos) {
+        const value = String(pos || "").trim().toUpperCase();
+
+        if (value === "PRESENT" || value === "PRÉSENT") return "PRÉSENT";
+        if (value === "MISSION") return "MISSION";
+        if (value === "STAGE") return "STAGE";
+        if (value === "PERMISSION") return "PERMISSION";
+        if (value === "DETACHE" || value === "DÉTACHÉ") return "DÉTACHÉ";
+        if (value === "MALADE" || value === "CONVALESCENCE") return "CONVALESCENCE";
+        if (value === "DESERTION" || value === "DÉSERTION") return "DÉSERTION";
+        return value || "PRÉSENT";
+    }
+
+    function saveLocalRoster() {
+        localStorage.setItem('rh_roster', JSON.stringify(roster));
+    }
+
+    function access() {
+        const id = document.getElementById('log-id').value.trim();
+        const pass = document.getElementById('log-pass').value.trim();
+
+        if (!id || !pass) {
+            showAlert('Veuillez remplir tous les champs.', 'danger');
+            return;
+        }
+
+        if (id === configs.admin && pass === configs.pass) {
+            isAdmin = true;
+            currentUserId = null;
+            document.body.className = "is-admin";
+            document.getElementById('ui-role').innerText = "Administrateur";
+            document.getElementById('nav-admin-only').style.display = "flex";
+            document.getElementById('p-select').style.display = "block";
+            document.getElementById('btn-new').style.display = "inline-block";
+            document.getElementById('btn-delete').style.display = "inline-block";
+            document.getElementById('btn-clone').style.display = "inline-block";
+            document.getElementById('btn-edit').style.display = "inline-block";
+            document.getElementById('search-quick').style.display = "inline-block";
+            fillSel();
+            if (roster.length) loadP(roster[0].id);
+        } else {
+            const user = roster.find(x => x.id === id);
+            if (!user) {
+                showAlert('Identifiant ou code incorrect.', 'danger');
+                return;
+            }
+            isAdmin = false
