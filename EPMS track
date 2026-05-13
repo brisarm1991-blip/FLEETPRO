@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Système d'Évaluation Physique - FUSCO Air</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf-autotable.min.js"></script>
+    <style>
+        :root { --mil-green: #384d30; --mil-gold: #c5a059; --light: #f4f4f4; }
+        body { font-family: Arial, sans-serif; background: var(--light); margin: 0; padding-bottom: 50px; }
+        .header { background: var(--mil-green); color: white; padding: 15px; text-align: center; border-bottom: 4px solid var(--mil-gold); }
+        .container { max-width: 1200px; margin: 20px auto; background: white; padding: 25px; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        h3 { border-left: 5px solid var(--mil-green); padding-left: 10px; color: var(--mil-green); }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        .btn { padding: 10px 15px; border: none; border-radius: 4px; color: white; cursor: pointer; font-weight: bold; margin-right: 5px; }
+        .btn-save { background: #27ae60; }
+        .btn-export { background: #2980b9; }
+        .btn-import { background: #8e44ad; }
+        .btn-pdf { background: #c0392b; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background: var(--mil-green); color: white; }
+        .photo-preview { width: 60px; height: 60px; object-fit: cover; border-radius: 50%; border: 2px solid var(--mil-gold); }
+        .admin-panel { background: #eee; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: flex; gap: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>ÉVALUATION DES PERFORMANCES PHYSIQUES (EPP)</h1>
+    <p>Centre d'Instruction de la Base Aérienne 301 - Garoua</p>
+</div>
+
+<div class="container">
+    <div class="admin-panel">
+        <button class="btn btn-export" onclick="exporterBase()">💾 Sauvegarder la Base (Export JSON)</button>
+        <input type="file" id="importFile" style="display:none" onchange="importerBase(event)">
+        <button class="btn btn-import" onclick="document.getElementById('importFile').click()">📂 Restaurer une Sauvegarde</button>
+    </div>
+
+    <h3>1. Identification du Stagiaire</h3>
+    <form id="eppForm">
+        <div class="form-grid">
+            <div><label>Photo</label><input type="file" id="photo" accept="image/*"></div>
+            <div><label>Nom</label><input type="text" id="nom" required></div>
+            <div><label>Prénom</label><input type="text" id="prenom" required></div>
+            <div><label>Date de Naiss.</label><input type="date" id="dateNaiss" required></div>
+            <div><label>Tranche d'âge</label>
+                <select id="age">
+                    <option value="20-24">20-24 ans</option><option value="25-29">25-29 ans</option>
+                    <option value="30-34">30-34 ans</option><option value="35-39">35-39 ans</option>
+                    <option value="40-44">40-44 ans</option><option value="45-49">45-49 ans</option>
+                    <option value="50-55">50-55 ans</option>
+                </select>
+            </div>
+            <div><label>Stage</label>
+                <select id="stage">
+                    <option value="CAT1">CAT1</option><option value="CAT2">CAT2</option>
+                    <option value="BA1">BA1</option><option value="BA2">BA2</option>
+                    <option value="BS1">BS1</option><option value="BS2">BS2</option>
+                </select>
+            </div>
+            <div><label>Spécialité</label><input type="text" id="specialite"></div>
+            <div><label>Compagnie</label><select id="cie"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+            <div><label>Section</label><select id="sec"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+        </div>
+
+        <h3>2. Épreuves Sportives</h3>
+        <div class="form-grid">
+            <div><label>Pompes (nb)</label><input type="number" id="p_pushup"></div>
+            <div><label>Squats (nb)</label><input type="number" id="p_squats"></div>
+            <div><label>Abdos (nb)</label><input type="number" id="p_abdos"></div>
+            <div><label>100m (sec)</label><input type="number" step="0.01" id="p_100m"></div>
+            <div><label>1500m (sec ex: 300)</label><input type="number" id="p_1500m"></div>
+            <div><label>Charge 50kg (sec)</label><input type="number" step="0.01" id="p_charge"></div>
+        </div>
+        <button type="button" class="btn btn-save" onclick="enregistrerStagiaire()">✅ Enregistrer l'Évaluation</button>
+    </form>
+</div>
+
+<div class="container">
+    <h3>3. Tableau de Bord Général</h3>
+    <button class="btn btn-pdf" onclick="genererPDFGeneral()">🖨️ Imprimer Liste Générale (PDF)</button>
+    <div id="affichageListe"></div>
+</div>
+
+<script>
+    let db = JSON.parse(localStorage.getItem('epp_fusco_db')) || [];
+
+    const baremeMax = { 
+        pushup: 40, squats: 60, abdos: 40, "100m": 17, "1500m": 300, charge: 15 
+    };
+
+    const coeffStage = { 
+        "CAT1": 1.3, "CAT2": 1.2, "BA1": 1.1, "BA2": 1.0, "BS1": 0.9, "BS2": 0.8 
+    };
+
+    function calculerNote(valeur, type, stage) {
+        if(!valeur) return 0;
+        let mod = coeffStage[stage];
+        let note = 0;
+        if(['pushup', 'squats', 'abdos'].includes(type)) {
+            note = (valeur / (baremeMax[type] * mod)) * 20;
+        } else {
+            note = ((baremeMax[type] / mod) / valeur) * 20;
+        }
+        return Math.min(20, Math.max(0, note)).toFixed(2);
+    }
+
+    async function enregistrerStagiaire() {
+        const photoFile = document.getElementById('photo').files[0];
+        let photoBase64 = "";
+        if(photoFile) {
+            photoBase64 = await toBase64(photoFile);
+        }
+
+        const stage = document.getElementById('stage').value;
+        const p = {
+            id: Date.now(),
+            nom: document.getElementById('nom').value.toUpperCase(),
+            prenom: document.getElementById('prenom').value,
+            age: document.getElementById('age').value,
+            stage: stage,
+            cie: document.getElementById('cie').value,
+            sec: document.getElementById('sec').value,
+            specialite: document.getElementById('specialite').value,
+            photo: photoBase64,
+            perfs: {
+                pu: document.getElementById('p_pushup').value,
+                sq: document.getElementById('p_squats').value,
+                ab: document.getElementById('p_abdos').value,
+                c1: document.getElementById('p_100m').value,
+                c15: document.getElementById('p_1500m').value,
+                ch: document.getElementById('p_charge').value
+            }
+        };
+
+        const n1 = calculerNote(p.perfs.pu, 'pushup', stage);
+        const n2 = calculerNote(p.perfs.sq, 'squats', stage);
+        const n3 = calculerNote(p.perfs.ab, 'abdos', stage);
+        const n4 = calculerNote(p.perfs.c1, '100m', stage);
+        const n5 = calculerNote(p.perfs.c15, '1500m', stage);
+        const n6 = calculerNote(p.perfs.ch, 'charge', stage);
+        
+        p.notes = [n1, n2, n3, n4, n5, n6];
+        p.moyenne = ((parseFloat(n1)+parseFloat(n2)+parseFloat(n3)+parseFloat(n4)+parseFloat(n5)+parseFloat(n6))/6).toFixed(2);
+
+        db.push(p);
+        localStorage.setItem('epp_fusco_db', JSON.stringify(db));
+        location.reload();
+    }
+
+    function afficherListe() {
+        let html = `<table><tr><th>Photo</th><th>Nom & Prénom</th><th>Stage</th><th>Cie/Sec</th><th>Moyenne</th><th>Actions</th></tr>`;
+        db.sort((a,b) => a.nom.localeCompare(b.nom)).forEach(s => {
+            html += `<tr>
+                <td><img src="${s.photo || 'https://via.placeholder.com/50'}" class="photo-preview"></td>
+                <td>${s.nom} ${s.prenom}</td>
+                <td>${s.stage}</td>
+                <td>C${s.cie}/S${s.sec}</td>
+                <td><strong>${s.moyenne}/20</strong></td>
+                <td><button class="btn btn-pdf" onclick="imprimerFiche(${s.id})">Fiche</button></td>
+            </tr>`;
+        });
+        html += `</table>`;
+        document.getElementById('affichageListe').innerHTML = html;
+    }
+
+    function exporterBase() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", "sauvegarde_epp_fusco.json");
+        downloadAnchor.click();
+    }
+
+    function importerBase(event) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const importedDb = JSON.parse(e.target.result);
+            if(confirm("Écraser la base actuelle avec cette sauvegarde ?")) {
+                localStorage.setItem('epp_fusco_db', JSON.stringify(importedDb));
+                location.reload();
+            }
+        };
+        reader.readAsText(event.target.files[0]);
+    }
+
+    const toBase64 = file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+
+    window.onload = afficherListe;
+
+    // --- Fonctions PDF simplifiées ---
+    function genererPDFGeneral() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text("LISTE GÉNÉRALE DES RÉSULTATS PHYSIQUES", 105, 15, {align:'center'});
+        const rows = db.map(s => [s.nom, s.prenom, s.stage, s.cie, s.moyenne]);
+        doc.autoTable({ head: [['Nom', 'Prénom', 'Stage', 'Cie', 'Moyenne']], body: rows, startY: 25 });
+        doc.text("Examinateur", 20, doc.lastAutoTable.finalY + 20);
+        doc.text("Directeur de Stage", 140, doc.lastAutoTable.finalY + 20);
+        doc.save("liste_epp.pdf");
+    }
+</script>
+</body>
+</html>
